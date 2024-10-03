@@ -2,7 +2,7 @@ import React from 'react'
 
 const Footer = () => {
     return (
-        <div className='grid grid-cols-3'>
+        <div id="footer" className='grid grid-cols-3'>
             <div className='px-8 flex flex-col justify-center'>
                 <p className='font-bold text-[1.5rem]'>About</p>
                 <p className='text-justify'>Melodies is a website that has been created for over <span className='text-primaryColorPink'>5 year&apos;s</span> now and it is one of the most famous music player website&apos;s in the world. in this website you can listen and download songs for free. also of you want no limitation you can buy our <span className='text-primaryColorBlue'>premium pass&apos;s</span>.</p>

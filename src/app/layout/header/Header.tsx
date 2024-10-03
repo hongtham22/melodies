@@ -13,9 +13,9 @@ const Header = () => {
             </div>
             <div>
                 <ul className='flex'>
-                    <li className='text-nowrap font-semibold mx-8'>About Us</li>
-                    <li className='font-semibold mx-8'>Contact</li>
-                    <li className='font-semibold mx-8'>Premium</li>
+                    <li className='text-nowrap font-semibold mx-8'><a href="#footer">About Us</a></li>
+                    <li className='font-semibold mx-8'><a href="#footer">Contact</a></li>
+                    <li className='font-semibold mx-8'><a href="">Premium</a></li>
                 </ul>
             </div>
             <div>
