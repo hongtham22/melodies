@@ -1,6 +1,6 @@
 'use client';
 import Image from "next/image";
-import songimg from "../../../public/images/songs.png";
+import songimg from "@/assets/img/songs.png";
 import { HeartIcon } from "@radix-ui/react-icons";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 import { PlusIcon } from "@radix-ui/react-icons";

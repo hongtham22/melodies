@@ -1,5 +1,5 @@
 import React from "react";
-import artistimg from "../../../public/images/artist.png";
+import artistimg from "@/assets/img/artist.png";
 import Image from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
 

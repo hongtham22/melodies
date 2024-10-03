@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import {
   RegisterBody,
   RegisterBodyType,
-} from "../../../schemaValidations/auth.schema";
+} from "../../schemaValidations/auth.schema";
 
 import { FcGoogle } from "react-icons/fc";
 import { EnvelopeClosedIcon } from "@radix-ui/react-icons";
@@ -77,7 +77,7 @@ function LogInForm() {
                         placeholder="Enter your email"
                         type="email"
                         {...field}
-                        className="pl-9" 
+                        className="pl-9"
                       />
                     </div>
                   </FormControl>

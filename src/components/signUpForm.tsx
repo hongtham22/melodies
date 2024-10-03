@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import {
   RegisterBody,
   RegisterBodyType,
-} from "../../../schemaValidations/auth.schema";
+} from "../../schemaValidations/auth.schema";
 
 import { FcGoogle } from "react-icons/fc";
 import { EnvelopeClosedIcon } from "@radix-ui/react-icons";
@@ -121,7 +121,7 @@ function SignUpForm() {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                  <div className="relative">
+                    <div className="relative">
                       <LockClosedIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 text-white w-5 h-5" />
                       <Input
                         placeholder="Re-enter your password"
@@ -130,7 +130,7 @@ function SignUpForm() {
                         className="pl-9"
                       />
                     </div>
-                    
+
                   </FormControl>
                   <FormMessage />
                 </FormItem>

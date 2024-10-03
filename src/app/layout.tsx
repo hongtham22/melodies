@@ -30,10 +30,10 @@ export default function RootLayout({
     <html lang="en">
       <body
         suppressHydrationWarning={true}
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primaryColorBg flex text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primaryColorBg flex text-white overflow-x-hidden`}
       >
         <Sidebar />
-        <main className="ml-[20%]">
+        <main className="ml-[20%] flex flex-col items-center">
           <Header />
           {children}
           <Footer />
