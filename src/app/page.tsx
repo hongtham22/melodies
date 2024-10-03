@@ -1,14 +1,18 @@
+import Banner from "@/components/banner";
+import PopularArtists from "@/components/popularArtists";
+import SignUp from "@/components/signUp";
+import SongList from "@/components/SongList";
+import TrendingSongs from "@/components/trendingSongs";
+
 export default function Home() {
   return (
     <div>
-      <h1 className="text-primaryColorPink font-bold text-center">Hello World</h1>
-      <div className="flex justify-center">
-        <button className="bg-primaryColorPink p-2 text-white">Hello World</button>
-      </div>
-      <h1 className="text-primaryColorBlue font-bold text-center">Hello World</h1>
-      <div className="flex justify-center">
-        <button className="bg-primaryColorBlue p-2 text-white">Hello World</button>
-      </div>
+      <Banner></Banner>
+      <SongList />
+      <TrendingSongs></TrendingSongs>
+      <PopularArtists></PopularArtists>
+      <SignUp></SignUp>
     </div>
   );
 }
+
