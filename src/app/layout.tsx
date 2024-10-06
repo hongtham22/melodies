@@ -4,6 +4,8 @@ import "./globals.css";
 import Sidebar from "@/app/layout/sidebar/Sidebar";
 import Footer from "@/app/layout/footer/Footer";
 import Header from "@/app/layout/header/Header";
+import HeaderLogin from "@/app/layout/header/HeaderLogin";
+import MusicPlayer from "@/components/musicPlayer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,12 +36,12 @@ export default function RootLayout({
       >
         <Sidebar />
         <main className="ml-[20%] flex flex-col items-center">
-          <Header />
+          {/* <Header /> */}
+          <HeaderLogin />
           {children}
           <Footer />
-
         </main>
-
+        <MusicPlayer />
       </body>
     </html>
   );

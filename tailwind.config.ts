@@ -19,7 +19,7 @@ const config: Config = {
         primaryColorPinkHover: "#D60E9E",
         lightPink: "#FDE7F7",
         lightPinkHover: "#FCDBF3",
-        darkPink:"#B30C84",
+        darkPink: "#B30C84",
         darkPinkHover: "#8F0A6A",
         darkerPink: "#53063E",
 
@@ -31,6 +31,7 @@ const config: Config = {
         darkBlueHover: "#085F8F",
         darkerBlue: "#053754",
 
+        primaryColorGray: '#DFDFDF',
 
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
