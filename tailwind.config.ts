@@ -89,6 +89,9 @@ const config: Config = {
         textMedium: ["14px", { fontWeight: "200" }],
         textSmall: ["12px", { fontWeight: "100" }],
       },
+      backgroundImage: {
+        'custom-gradient': 'linear-gradient(to right, #1171E2 0%, #53ADD6 88%, #8BCBE7 100%)',
+      },
     },
   },
 };

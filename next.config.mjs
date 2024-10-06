@@ -5,11 +5,11 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'i.scdn.co',
-                port: '',
-                pathname: '/image/**',
+                pathname: '/**',
             },
         ],
     },
+
 };
 
 export default nextConfig;
