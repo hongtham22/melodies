@@ -34,7 +34,7 @@ export default function RootLayout({
       >
         <Sidebar />
         <main className="ml-[20%] flex flex-col items-center">
-          <Header />
+          {/* <Header /> */}
           {children}
           <Footer />
 
