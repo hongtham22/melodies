@@ -4,8 +4,8 @@ import "./globals.css";
 import Sidebar from "@/app/layout/sidebar/Sidebar";
 import Footer from "@/app/layout/footer/Footer";
 import Header from "@/app/layout/header/Header";
-import HeaderLogin from "@/app/layout/header/HeaderLogin";
 import MusicPlayer from "@/components/musicPlayer";
+import { SongProvider } from "@/components/provider/songProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,14 +34,17 @@ export default function RootLayout({
         suppressHydrationWarning={true}
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primaryColorBg flex text-white overflow-x-hidden`}
       >
-        <Sidebar />
-        <main className="ml-[20%] flex flex-col items-center">
-          <Header />
-          {/* <HeaderLogin /> */}
-          {children}
-          <Footer />
-        </main>
-        <MusicPlayer />
+        <SongProvider>
+          <Sidebar />
+          <main className="ml-[20%] flex flex-col items-center">
+            <Header />
+            {/* <HeaderLogin /> */}
+            {children}
+            <Footer />
+          </main>
+          <MusicPlayer />
+        </SongProvider>
+
       </body>
     </html>
   );

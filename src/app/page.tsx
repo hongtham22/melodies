@@ -5,11 +5,13 @@ import SignUp from "@/components/signUp";
 import SongList from "@/components/listSong";
 import TrendingSongs from "@/components/trendingSongs";
 import MoodPlaylist from "@/components/moodPlaylist";
+import CommentSection from "@/components/commentSection";
 
 export default function Home() {
   return (
-    <div>
+    <div className="m-3">
       <ArtistBanner />
+      <CommentSection />
       <SongList />
       <MoodPlaylist />
 

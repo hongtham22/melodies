@@ -11,13 +11,13 @@ export async function GET(request) {
     const vibrantSwatch = palette.Muted //palette.DarkVibrant; 
     // const vibrantSwatch = palette.DarkVibrant //palette.DarkVibrant; 
 
-    
-    if (vibrantSwatch) {
-      const rgbColor = vibrantSwatch.rgb; 
-      // Tăng cường độ màu
-      const adjustedColor = rgbColor.map(color => Math.min(255, Math.round(color))); 
 
-      const dominantColor = `rgb(${adjustedColor[0]}, ${adjustedColor[1]}, ${adjustedColor[2]})`; 
+    if (vibrantSwatch) {
+      const rgbColor = vibrantSwatch.rgb;
+      // Tăng cường độ màu
+      const adjustedColor = rgbColor.map(color => Math.min(255, Math.round(color)));
+
+      const dominantColor = `rgb(${adjustedColor[0]}, ${adjustedColor[1]}, ${adjustedColor[2]})`;
       console.log("Dominant: ", dominantColor);
       return new Response(JSON.stringify({ dominantColor }), {
         status: 200,

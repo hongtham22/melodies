@@ -7,7 +7,7 @@ const ArtistBanner = () => {
 
     return (
         <div
-            className="w-[75vw] h-[60vh] my-8 px-6 py-4 rounded-3xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden"
+            className="w-[75vw] h-[60vh] my-4 px-6 py-4 rounded-3xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden"
         >
             {/* Pseudo-element for background image */}
             <div

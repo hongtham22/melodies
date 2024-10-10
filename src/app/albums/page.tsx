@@ -20,7 +20,7 @@ function Page() {
         album: "Hard to Imagine the Neighbourhood Ever Changing",
         duration: "3:26",
         imageUrl:
-          "https://i.scdn.co/image/ab67616d00001e029fb4a807965fa0cb0972221b", 
+          "https://i.scdn.co/image/ab67616d00001e029fb4a807965fa0cb0972221b",
       },
     ],
     []
@@ -60,9 +60,9 @@ function Page() {
         }}
       >
         {/* Banner album */}
-        <div className="p-5 flex flex-col gap-6 rounded-t-lg bg-gradient-to-b from-transparent to-black/50">
+        <div className="p-5 flex flex-col gap-10 rounded-t-lg bg-gradient-to-b from-transparent to-black/50">
           {/* Header */}
-          <div className="w-full h-12 bg-slate-300"></div>
+          <div className="w-full h-12 bg-transparent"></div>
           {/* Content albums */}
           <div className="flex items-end gap-8">
             <div className="shadow-[0_4px_60px_rgba(0,0,0,0.5)] rounded-md ">
@@ -121,7 +121,7 @@ function Page() {
                   </td>
                   <td>
                     <Image
-                      src={songs[0].imageUrl} 
+                      src={songs[0].imageUrl}
                       alt="song"
                       width={60}
                       height={60}

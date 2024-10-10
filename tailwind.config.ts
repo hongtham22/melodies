@@ -93,6 +93,11 @@ const config: Config = {
         'custom-gradient': 'linear-gradient(to right, #1171E2 0%, #53ADD6 88%, #8BCBE7 100%)',
       },
     },
+    variants: {
+      extend: {
+        lineClamp: ['hover']
+      },
+    }
   },
 };
 
