@@ -23,6 +23,8 @@ const config: Config = {
         darkPinkHover: "#8F0A6A",
         darkerPink: "#53063E",
 
+        colorPopover: 'rgba(58, 58, 58, 1)',
+
         primaryColorBlue: "#0E9EEF",
         primaryColorBlueHover: "#0D8ED7",
         lightBlue: "#E7F5FD",

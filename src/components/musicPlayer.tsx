@@ -8,9 +8,13 @@ import {
     FaCirclePause,
     FaForward,
     FaBackward,
-    FaRepeat
+    FaRepeat,
 } from "react-icons/fa6";
-import { BsFilePlayFill } from "react-icons/bs";
+import {
+    BsFilePlayFill,
+    BsSkipEndFill,
+    BsFillSkipStartFill,
+} from "react-icons/bs";
 import {
     PiMicrophoneStageFill,
     PiSpeakerHighFill,
@@ -19,7 +23,6 @@ import {
 } from "react-icons/pi";
 import {
     MdLyrics,
-    MdCastConnected
 } from "react-icons/md";
 import {
     RiExpandDiagonalLine
@@ -35,7 +38,7 @@ import {
 } from "@/components/ui/tooltip"
 
 const MusicPlayer: React.FC = () => {
-    const { currentSong } = useAppContext()
+    const { currentSong, setValueSkip, setIsSkip } = useAppContext()
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [endTime, setEndTime] = useState<number>(0);
@@ -48,39 +51,49 @@ const MusicPlayer: React.FC = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
-        {
-            audioRef.current = new Audio(currentSong?.audio);
+        if (currentSong?.audio) {
+            // audioRef.current = new Audio(currentSong.audio);
+            audioRef.current = new Audio('https://audiomelodies.nyc3.digitaloceanspaces.com/motdieu.m4a');
             const audioElement = audioRef.current;
 
-            audioElement.addEventListener('loadedmetadata', () => {
+            const handleMetadataLoaded = () => {
                 setEndTime(audioElement.duration);
-            });
+                audioElement.play()
+                    .then(() => {
+                        setIsPlaying(true);
+                    })
+                    .catch((error) => {
+                        console.error('Autoplay failed:', error);
+                    });
+            };
 
-            audioElement.addEventListener('timeupdate', () => {
+            const handleTimeUpdate = () => {
                 setStartTime(audioElement.currentTime);
-            });
+            };
 
-            audioElement.addEventListener('ended', () => {
+            const handleAudioEnded = () => {
                 setIsPlaying(false);
-            });
+                setIsSkip(true);
+                setValueSkip('forward')
+            };
+
+            audioElement.addEventListener('loadedmetadata', handleMetadataLoaded);
+            audioElement.addEventListener('timeupdate', handleTimeUpdate);
+            audioElement.addEventListener('ended', handleAudioEnded);
 
             audioElement.volume = sound / 100;
-            audioElement.play()
-                .then(() => {
-                    setIsPlaying(true);
-                })
-                .catch((error) => {
-                    console.error('Autoplay failed:', error);
-                });
+
+            return () => {
+                if (audioRef.current) {
+                    audioRef.current.pause(); // Pause the audio
+                    audioRef.current.removeEventListener('loadedmetadata', handleMetadataLoaded);
+                    audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
+                    audioRef.current.removeEventListener('ended', handleAudioEnded);
+                }
+            };
         }
-        return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.removeEventListener('loadedmetadata', () => { });
-                audioRef.current.removeEventListener('timeupdate', () => { });
-            }
-        };
     }, [currentSong]);
+
 
 
     useEffect(() => {
@@ -177,7 +190,7 @@ const MusicPlayer: React.FC = () => {
     return (
         <TooltipProvider>
             <div className='fixed bottom-0 h-[12vh] w-full border-2 bg-[#121212] flex justify-between items-center px-5' >
-                <div className='flex items-center'>
+                <div className='flex items-center w-[20vw]'>
                     <Image
                         src={currentSong.poster}
                         alt="Song Poster"
@@ -194,38 +207,46 @@ const MusicPlayer: React.FC = () => {
                     </div>
                 </div>
                 <div className='flex flex-col items-center'>
-                    <div className='flex items-center mb-1'>
+                    <div className='flex items-center mb-1 text-primaryColorGray cursor-pointer'>
                         <Tooltip>
                             <TooltipTrigger>
-                                <TbSwitch3 className='mx-3 w-[24px] h-[24px] cursor-pointer text-primaryColorGray hover:text-primaryColorPink' />
+                                <TbSwitch3 className='mx-3 w-[24px] h-[24px] hover:text-primaryColorPink' />
                             </TooltipTrigger>
                             <TooltipContent>
                                 <p>Bật phát lộn xộn</p>
                             </TooltipContent>
                         </Tooltip>
+                        <BsFillSkipStartFill
+                            className='mx-3 w-[25px] h-[25px] hover:text-primaryColorPink'
+                            onClick={() => { setIsSkip(true); setValueSkip('back') }}
+                        />
                         <FaBackward
-                            className='mx-3 w-[20px] h-[20px] cursor-pointer text-primaryColorGray hover:text-primaryColorPink'
+                            className='mx-3 w-[20px] h-[20px]  hover:text-primaryColorPink'
                             onClick={handleSkipBackward}
                         />
                         {isPlaying ? (
                             <FaCirclePause
-                                className='mx-3 w-[32px] h-[32px] cursor-pointer'
+                                className='mx-3 w-[32px] h-[32px]'
                                 onClick={handlePlayPause}
                             />
                         ) : (
                             <FaCirclePlay
-                                className='mx-3 w-[32px] h-[32px] cursor-pointer'
+                                className='mx-3 w-[32px] h-[32px]'
                                 onClick={handlePlayPause}
                             />
                         )}
                         <FaForward
-                            className='mx-3 w-[20px] h-[20px] cursor-pointer text-primaryColorGray hover:text-primaryColorPink'
+                            className='mx-3 w-[20px] h-[20px] hover:text-primaryColorPink'
                             onClick={handleSkipForward}
+                        />
+                        <BsSkipEndFill
+                            className='mx-3 w-[25px] h-[25px] hover:text-primaryColorPink'
+                            onClick={() => { setIsSkip(true); setValueSkip('forward') }}
                         />
                         <Tooltip>
                             <TooltipTrigger className='relative'>
                                 <FaRepeat
-                                    className={`mx-3 w-[20px] h-[20px] cursor-pointer text-primaryColorGray hover:text-primaryColorPink ${isRepeat ? 'text-primaryColorPink' : 'text-white'}`}
+                                    className={`mx-3 w-[20px] h-[20px] hover:text-primaryColorPink ${isRepeat ? 'text-primaryColorPink' : 'text-white'}`}
                                     onClick={handleRepeat}
                                 />
                                 {
@@ -263,7 +284,6 @@ const MusicPlayer: React.FC = () => {
                     <BsFilePlayFill className='w-[18px] h-[18px] ml-2 cursor-pointer' />
                     <PiMicrophoneStageFill className='w-[18px] h-[18px] ml-2 cursor-pointer' />
                     <MdLyrics className='w-[18px] h-[18px] ml-2 cursor-pointer' />
-                    <MdCastConnected className='w-[18px] h-[18px] ml-2 cursor-pointer' />
                     <div className='flex items-center ml-2 cursor-pointer'>
                         {getVolumeIcon()}
 

@@ -49,14 +49,14 @@ const CommentSection = () => {
                     </button>
                     {
                         isClickSort && (
-                            <div className='absolute mt-2 left-[40%] bg-[#1F1F1F] w-[80px] rounded-lg'>
+                            <div className='absolute mt-2 left-[40%] bg-colorPopover w-[80px] z-10 rounded-lg'>
                                 <ul>
                                     {sorts.map((sort, index) => {
                                         return (
                                             <li
                                                 key={index}
                                                 onClick={() => handleValueSort(sort)}
-                                                className='cursor-pointer text-end p-2 hover:text-primaryColorPink'
+                                                className='cursor-pointer text-[0.9rem] text-end p-2 hover:text-primaryColorPink'
                                             >
                                                 {sort}
                                             </li>
@@ -69,7 +69,7 @@ const CommentSection = () => {
                 </div>
             </div>
             <hr className='' />
-            <ScrollArea className='h-[600px]  pr-3'>
+            <ScrollArea className='h-[600px]  pr-4'>
                 <CommentProvider>
                     <CommentPart />
                 </CommentProvider>

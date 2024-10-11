@@ -21,7 +21,7 @@ const CommentPart = () => {
 
             {
                 replyStatus && (
-                    <div className='flex justify-between pl-14 items-center my-5'>
+                    <div className='flex justify-between pl-14 items-center my-5 mb-7'>
                         <div className='w-[100%] mr-2 flex'>
                             <div className='w-[50px] mr-2 flex'>
                                 <Image

@@ -9,7 +9,7 @@ import CommentSection from "@/components/commentSection";
 
 export default function Home() {
   return (
-    <div className="m-3">
+    <div className="">
       <ArtistBanner />
       <CommentSection />
       <SongList />

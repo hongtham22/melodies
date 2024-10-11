@@ -12,6 +12,10 @@ interface SongData {
 
 // Create the context
 interface SongContextType {
+    valueSkip: string;
+    setValueSkip: (value: string) => void
+    isSkip: boolean | null;
+    setIsSkip: (skip: boolean) => void;
     currentSong: SongData | null;
     setCurrentSong: (song: SongData) => void;
 }
@@ -30,12 +34,17 @@ export const useAppContext = () => {
 // Create the SongProvider component
 export const SongProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [currentSong, setCurrentSong] = useState<SongData | null>(null);
+    const [valueSkip, setValueSkip] = useState<string>('')
+    const [isSkip, setIsSkip] = useState<boolean | null>(null)
 
     const value = {
+        valueSkip,
+        setValueSkip,
+        isSkip,
+        setIsSkip,
         currentSong,
-        setCurrentSong,
+        setCurrentSong
     };
-
     return (
         <SongContext.Provider value={value}>
             {children}

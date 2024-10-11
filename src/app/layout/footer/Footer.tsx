@@ -3,7 +3,7 @@ import React from 'react'
 const Footer = () => {
     return (
         <div id="footer" className='grid grid-cols-3'>
-            <div className='px-8 flex flex-col justify-center'>
+            <div id='about' className='px-8 flex flex-col justify-center'>
                 <p className='font-bold text-[1.5rem]'>About</p>
                 <p className='text-justify'>Melodies is a website that has been created for over <span className='text-primaryColorPink'>5 year&apos;s</span> now and it is one of the most famous music player website&apos;s in the world. in this website you can listen and download songs for free. also of you want no limitation you can buy our <span className='text-primaryColorBlue'>premium pass&apos;s</span>.</p>
             </div>
@@ -28,7 +28,7 @@ const Footer = () => {
                         <li className='text-[0.9rem] mb-3'>Trending</li>
                     </ul>
                 </div>
-                <div className='mx-4 flex flex-col items-center'>
+                <div id='contact' className='mx-4 flex flex-col items-center'>
                     <p className='font-semibold text-[1.2rem]'>Contact</p>
                     <hr className='w-[8rem] border-t-4 border-white my-5' />
                     <ul className='flex flex-col items-center cursor-pointer'>

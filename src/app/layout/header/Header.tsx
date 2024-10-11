@@ -37,8 +37,8 @@ const Header: React.FC = () => {
             </div>
             <div>
                 <ul className='flex'>
-                    <li className='text-nowrap font-semibold mx-8'><a href="#footer">About Us</a></li>
-                    <li className='font-semibold mx-8'><a href="#footer">Contact</a></li>
+                    <li className='text-nowrap font-semibold mx-8'><a href="#about">About Us</a></li>
+                    <li className='font-semibold mx-8'><a href="#contact">Contact</a></li>
                     <li className='font-semibold mx-8'><a href="">Premium</a></li>
                 </ul>
             </div>
