@@ -35,13 +35,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primaryColorBg flex text-white overflow-x-hidden`}
       >
         <Sidebar />
-        <main className="ml-[20%] flex flex-col items-center">
+        <main className="ml-[20%] flex flex-col items-center ">
           <Header />
           {/* <HeaderLogin /> */}
           {children}
           <Footer />
         </main>
-        <MusicPlayer />
+        {/* <MusicPlayer /> */}
       </body>
     </html>
   );

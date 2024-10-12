@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import Image from "next/image";
 import songimg from "@/assets/img/songs.png";
 import { HeartIcon } from "@radix-ui/react-icons";
@@ -19,25 +19,25 @@ function TrendingSongs() {
   ];
 
   return (
-    <div className="bg-primaryColorBg w-[1062px] mx-6 my-6 p-3">
+    <div className="bg-primaryColorBg w-full mt-2">
       <h1 className="text-white text-h1">
         Trending <span className="text-primaryColorPink"> Songs</span>
       </h1>
       <div className="flex flex-col justify-center items-center">
         <table className="max-w-full text-white border-separate border-spacing-y-3 ">
-          <thead className="max-h-[32px]">
+          <thead className="w-full max-h-[32px]">
             <tr>
-              <th className="w-[30px] pl-4"></th>
-              <th className="w-[60px] pl-4"></th>
-              <th className="w-[250px] pl-4"></th>
-              <th className="w-[130px] text-textBig pl-4">Release Date</th>
-              <th className="w-[400px] text-textBig pl-4">Album</th>
-              <th className="w-[80px] text-textBig ">Time</th>
+              <th className="w-[3%] pl-4"></th>
+              <th className="w-[4%] pl-4"></th>
+              <th className="w-[30%] pl-4"></th>
+              <th className="w-[15%] text-textMedium pl-4">Release Date</th>
+              <th className="w-[33%] text-textMedium pl-4">Album</th>
+              <th className="w-[15%] text-textMedium ">Time</th>
             </tr>
           </thead>
           <tbody className="">
             {Array.from({ length: 7 }, (_, index) => (
-              <tr key={index} className="bg-secondColorBg">
+              <tr key={index} className="bg-secondColorBg  cursor-pointer hover:bg-gray-700">
                 <td className="pl-4 pr-8 text-h2 rounded-tl-lg rounded-bl-lg">
                   #{index + 1}
                 </td>
@@ -51,8 +51,8 @@ function TrendingSongs() {
                   />
                 </td>
                 <td className="pl-4">
-                  <h3 className="text-h3 mb-1">{songs[0].title}</h3>
-                  <p className="text-textSmall">{songs[0].artist}</p>
+                  <h3 className="text-h3 mb-1 hover:underline">{songs[0].title}</h3>
+                  <p className="text-textSmall hover:underline">{songs[0].artist}</p>
                 </td>
                 <td className="text-textMedium pl-4 text-center">
                   {songs[0].releaseDate}
@@ -60,8 +60,8 @@ function TrendingSongs() {
                 <td className="text-textMedium pl-4 text-center">
                   {songs[0].album}
                 </td>
-                <td className="text-center pl-4 rounded-tr-lg rounded-br-lg">
-                  <div className="flex gap-2">
+                <td className="text-center pl-4 rounded-tr-lg rounded-br-lg align-middle">
+                  <div className="flex gap-2 items-center justify-center">
                     <div
                       onMouseEnter={() => setHoveredIndex(index)}
                       onMouseLeave={() => setHoveredIndex(null)}
