@@ -2,7 +2,7 @@ import imgBanner from '@/assets/img/banner.png'
 function Banner() {
   return (
     <div
-      className="w-[75vw] h-[80vh] text-primaryColorPink my-8 px-6 py-4 rounded-3xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden"
+      className="w-[75vw] h-[80vh] text-primaryColorPink my-4 px-6 py-4 rounded-3xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden"
     >
       {/* Pseudo-element for background image */}
       <div

@@ -5,7 +5,6 @@ import {
     PlusIcon
 } from '@radix-ui/react-icons'
 import { useAppContext } from '@/components/provider/songProvider';
-import Poster from '@/assets/img/song_img.jpg';
 import PropTypes from 'prop-types';
 
 // Define an interface for the props
@@ -50,7 +49,11 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {
                     {
                         listSong.map((song, index) => (
                             // <div key={index} className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg border border-gray-700 cursor-pointer'>
-                            <div key={index} className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg  cursor-pointer'>
+                            <div
+                                key={index}
+                                className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg  cursor-pointer'
+                                onClick={() => { setCurrentSong(song); setIndex(index) }}
+                            >
                                 <Image
                                     src={song.poster}
                                     alt="Song Poster"
