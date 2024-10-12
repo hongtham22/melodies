@@ -69,7 +69,10 @@ const CommentSection = () => {
                 </div>
             </div>
             <hr className='' />
-            <ScrollArea className='h-[600px]  pr-4'>
+            <ScrollArea className='h-[600px] overflow-auto pr-4'>
+                <CommentProvider>
+                    <CommentPart />
+                </CommentProvider>
                 <CommentProvider>
                     <CommentPart />
                 </CommentProvider>

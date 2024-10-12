@@ -28,7 +28,7 @@ const ArtistBanner = () => {
                 <div className="flex items-center mb-3">
                     <svg className="w-[16px] text-[#4CB3FF]" data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M10.814.5a1.658 1.658 0 0 1 2.372 0l2.512 2.572 3.595-.043a1.658 1.658 0 0 1 1.678 1.678l-.043 3.595 2.572 2.512c.667.65.667 1.722 0 2.372l-2.572 2.512.043 3.595a1.658 1.658 0 0 1-1.678 1.678l-3.595-.043-2.512 2.572a1.658 1.658 0 0 1-2.372 0l-2.512-2.572-3.595.043a1.658 1.658 0 0 1-1.678-1.678l.043-3.595L.5 13.186a1.658 1.658 0 0 1 0-2.372l2.572-2.512-.043-3.595a1.658 1.658 0 0 1 1.678-1.678l3.595.043L10.814.5zm6.584 9.12a1 1 0 0 0-1.414-1.413l-6.011 6.01-1.894-1.893a1 1 0 0 0-1.414 1.414l3.308 3.308 7.425-7.425z"></path></svg>
-                    <p className="text-[0.9rem] ml-2">Nghệ sĩ được xác minh</p>
+                    <p className="text-[0.9rem] ml-2">Verified Artist</p>
                 </div>
                 <p className="font-bold text-7xl mb-4">Hoàng Dũng</p>
                 <div
@@ -40,7 +40,7 @@ const ArtistBanner = () => {
                     ) : (
                         <FaRegHeart className="text-[#F75050] text-[1.7rem] transition-transform duration-300 hover:scale-[1.1]" />
                     )}
-                    <p className="ml-2 text-[0.95rem]">100.000 người theo dõi</p>
+                    <p className="ml-2 text-[0.95rem]">100.000 followers</p>
                 </div>
             </div>
         </div>

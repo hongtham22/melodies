@@ -52,8 +52,8 @@ const MusicPlayer: React.FC = () => {
 
     useEffect(() => {
         if (currentSong?.audio) {
-            // audioRef.current = new Audio(currentSong.audio);
-            audioRef.current = new Audio('https://audiomelodies.nyc3.digitaloceanspaces.com/motdieu.m4a');
+            audioRef.current = new Audio(currentSong.audio);
+            // audioRef.current = new Audio('https://audiomelodies.nyc3.digitaloceanspaces.com/motdieu.m4a');
             const audioElement = audioRef.current;
 
             const handleMetadataLoaded = () => {
