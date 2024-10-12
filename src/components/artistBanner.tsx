@@ -1,13 +1,17 @@
 'use client'
 import React, { useState } from "react";
+import { useAppContext } from '@/components/provider/songProvider';
+
 
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 const ArtistBanner = () => {
+    const { showContentSong } = useAppContext();
+
     const [tym, setTym] = useState<boolean>(false)
 
     return (
         <div
-            className="w-[75vw] h-[60vh] my-4 px-6 py-4 rounded-3xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden"
+            className={`${showContentSong ? 'w-[55vw]' : 'w-[75vw] h-[80vh]'} my-4 px-6 py-4 rounded-3xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden`}
         >
             {/* Pseudo-element for background image */}
             <div

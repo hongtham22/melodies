@@ -7,6 +7,7 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 
 function TrendingSongs() {
+
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const songs = [
     {

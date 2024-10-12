@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/tooltip"
 
 const MusicPlayer: React.FC = () => {
-    const { currentSong, setValueSkip, setIsSkip } = useAppContext()
+    const { currentSong, setValueSkip, setIsSkip, showContentSong, setShowContentSong } = useAppContext()
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [endTime, setEndTime] = useState<number>(0);
@@ -53,7 +53,6 @@ const MusicPlayer: React.FC = () => {
     useEffect(() => {
         if (currentSong?.audio) {
             audioRef.current = new Audio(currentSong.audio);
-            // audioRef.current = new Audio('https://audiomelodies.nyc3.digitaloceanspaces.com/motdieu.m4a');
             const audioElement = audioRef.current;
 
             const handleMetadataLoaded = () => {
@@ -281,7 +280,10 @@ const MusicPlayer: React.FC = () => {
                     </div>
                 </div>
                 <div className='flex'>
-                    <BsFilePlayFill className='w-[18px] h-[18px] ml-2 cursor-pointer' />
+                    <BsFilePlayFill
+                        className='w-[18px] h-[18px] ml-2 cursor-pointer'
+                        onClick={() => setShowContentSong(!showContentSong)}
+                    />
                     <PiMicrophoneStageFill className='w-[18px] h-[18px] ml-2 cursor-pointer' />
                     <MdLyrics className='w-[18px] h-[18px] ml-2 cursor-pointer' />
                     <div className='flex items-center ml-2 cursor-pointer'>

@@ -1,13 +1,22 @@
+'use client'
 import React from "react";
 import artistimg from "@/assets/img/artist.png";
 import Image from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
+import { useAppContext } from '@/components/provider/songProvider';
 
 function PopularArtists() {
+  const { showContentSong } = useAppContext();
   const artist = { name: "Lana Del Ray", img: artistimg };
 
   // Sử dụng Array.from để tạo mảng gồm 6 bản sao của cùng một nghệ sĩ
-  const artistList = Array.from({ length: 6 }, () => artist);
+  let artistList = []
+  if (showContentSong) {
+    artistList = Array.from({ length: 5 }, () => artist);
+  } else {
+    artistList = Array.from({ length: 6 }, () => artist);
+  }
+
 
   return (
     <div className="bg-primaryColorBg w-full mt-2 text-white">
@@ -20,24 +29,36 @@ function PopularArtists() {
             key={index}
             className="flex flex-col gap-6 justify-center items-center"
           >
-            <Image
-              src={artist.img}
-              alt={artist.name}
-              width={150}
-              height={150}
-              quality={100}
-              className="rounded-full"
-            />
+            {
+              showContentSong ? (
+                <Image
+                  src={artist.img}
+                  alt={artist.name}
+                  width={120}
+                  height={120}
+                  quality={100}
+                  className="rounded-full"
+                />
+              ) : (
+                <Image
+                  src={artist.img}
+                  alt={artist.name}
+                  width={150}
+                  height={150}
+                  quality={100}
+                  className="rounded-full"
+                />
+              )
+            }
+
             <h3 className="text-textMedium">{artist.name}</h3>
           </div>
         ))}
 
         {/* View All button */}
-        <div className="flex flex-col gap-2 justify-center items-center">
-          <button className="h-[50px] w-[50px] bg-secondColorBg rounded-full flex items-center justify-center">
-            <PlusIcon className="w-6 h-6" />
-          </button>
-          <h4 className="text-h4">View All</h4>
+        <div className='flex flex-col items-center ml-3 cursor-pointer'>
+          <PlusIcon className={`${showContentSong ? 'w-[40px] h-[40px]' : 'w-[50px] h-[50px]'} bg-[#1F1F1F] rounded-full p-3 mb-2`} />
+          <p className={`${showContentSong ? 'font-semibold text-[0.9rem]' : 'text-h4'} whitespace-nowrap`}>View All</p>
         </div>
       </div>
     </div>

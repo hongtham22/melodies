@@ -14,7 +14,7 @@ interface SongListProps {
 }
 
 const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {
-    const { setCurrentSong, isSkip, setIsSkip, valueSkip } = useAppContext();
+    const { setCurrentSong, isSkip, setIsSkip, valueSkip, showContentSong } = useAppContext();
     const [index, setIndex] = useState<number | null>(null);
 
     useEffect(() => {
@@ -47,29 +47,28 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {
             <div className='flex items-center'>
                 <div id="list" className='flex'>
                     {
-                        listSong.map((song, index) => (
-                            // <div key={index} className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg border border-gray-700 cursor-pointer'>
+                        (showContentSong ? listSong.slice(0, 4) : listSong).map((song, index) => (
                             <div
                                 key={index}
-                                className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg  cursor-pointer'
-                                onClick={() => { setCurrentSong(song); setIndex(index) }}
+                                className={`bg-[#1F1F1F] p-2 px-3 mr-3 ${showContentSong ? 'w-[11vw]' : 'w-[13vw]'} rounded-lg cursor-pointer`}
+                                onClick={() => { setCurrentSong(song); setIndex(index); }}
                             >
                                 <Image
                                     src={song.poster}
                                     alt="Song Poster"
-                                    width={500}
-                                    height={500}
+                                    width={400}
+                                    height={400}
                                     className='mb-2 rounded-2xl'
                                 />
-                                <p className='text-[1.1rem] font-semibold mb-1'>{song.name}</p>
+                                <p className={`${showContentSong ? '' : 'text-[1.1rem]'} font-semibold mb-1 line-clamp-2`}>{song.name}</p>
                                 <p className='text-[0.8rem] font-thin mb-1'>{song.artist}</p>
                             </div>
                         ))
                     }
                 </div>
                 <div className='flex flex-col items-center ml-3 cursor-pointer'>
-                    <PlusIcon className='w-[50px] h-[50px] bg-[#1F1F1F] rounded-full p-3' />
-                    <p className='whitespace-nowrap text-h4'>View All</p>
+                    <PlusIcon className={`${showContentSong ? 'w-[40px] h-[40px]' : 'w-[50px] h-[50px]'} bg-[#1F1F1F] rounded-full p-3 mb-2`} />
+                    <p className={`${showContentSong ? 'font-semibold text-[0.9rem]' : 'text-h4'} whitespace-nowrap`}>View All</p>
                 </div>
             </div>
         </div>

@@ -12,6 +12,8 @@ interface SongData {
 
 // Create the context
 interface SongContextType {
+    showContentSong: boolean | null,
+    setShowContentSong: (show: boolean) => void;
     valueSkip: string;
     setValueSkip: (value: string) => void
     isSkip: boolean | null;
@@ -24,6 +26,7 @@ const SongContext = createContext<SongContextType | undefined>(undefined);
 
 // Create a custom hook to use the SongContext
 export const useAppContext = () => {
+
     const context = useContext(SongContext);
     if (!context) {
         throw new Error("useAppContext must be used within a SongProvider");
@@ -36,8 +39,11 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [currentSong, setCurrentSong] = useState<SongData | null>(null);
     const [valueSkip, setValueSkip] = useState<string>('')
     const [isSkip, setIsSkip] = useState<boolean | null>(null)
+    const [showContentSong, setShowContentSong] = useState<boolean | null>(false)
 
     const value = {
+        showContentSong,
+        setShowContentSong,
         valueSkip,
         setValueSkip,
         isSkip,

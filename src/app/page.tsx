@@ -3,7 +3,7 @@ import PopularArtists from "@/components/popularArtists";
 import SongList from "@/components/listSong";
 import TrendingSongs from "@/components/trendingSongs";
 import MoodPlaylist from "@/components/moodPlaylist";
-import SignUp from "@/components/signUp";
+import CommentSection from "@/components/commentSection";
 
 export default function Home() {
   return (
@@ -14,17 +14,23 @@ export default function Home() {
       </div>
       <div className="mt-4">
         <SongList maintitle="New Releases" subtitle="Songs" />
-
+      </div>
+      <div className="">
+        <CommentSection />
       </div>
       <div className="">
         <TrendingSongs />
       </div>
-      <PopularArtists />
+      <div className="">
+        <PopularArtists />
+      </div>
       <div className="mt-4">
         <SongList maintitle="Top" subtitle="Albums" />
-
       </div>
-      <MoodPlaylist />
+      <div className="mt-4">
+        <MoodPlaylist />
+      </div>
+
       {/* <SignUp/> */}
     </div>
   );
