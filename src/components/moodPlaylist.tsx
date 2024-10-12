@@ -16,12 +16,13 @@ const MoodPlaylist = () => {
     ]
     return (
         <div className=''>
-            <h1 className='font-bold text-[1.5rem] mb-2'>Mood <span className='text-primaryColorPink'>Playlists</span></h1>
+            <h1 className='text-h1 my-6'>Mood <span className='text-primaryColorPink'>Playlists</span></h1>
             <div className='flex items-center'>
                 <div id="list" className='flex'>
                     {
                         listSong.map((song, index: number) => (
-                            <div key={index} className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg border border-gray-700 cursor-pointer'>
+                            <div key={index} className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg  cursor-pointer'>
+                            {/* <div key={index} className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg border border-gray-700 cursor-pointer'> */}
                                 <Image
                                     src={Poster}
                                     alt="Song Poster"
@@ -36,7 +37,7 @@ const MoodPlaylist = () => {
                 </div>
                 <div className='flex flex-col items-center ml-3 cursor-pointer'>
                     <PlusIcon className='w-[50px] h-[50px] bg-[#1F1F1F] rounded-full p-3' />
-                    <p className='whitespace-nowrap font-semibold'>View All</p>
+                    <p className='whitespace-nowrap text-h4'>View All</p>
                 </div>
             </div>
         </div>

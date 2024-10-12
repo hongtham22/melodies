@@ -1,13 +1,20 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image';
-
 import {
     PlusIcon
 } from '@radix-ui/react-icons'
 import { useAppContext } from '@/components/provider/songProvider';
+import Poster from '@/assets/img/song_img.jpg';
+import PropTypes from 'prop-types';
 
-const SongList = () => {
+// Define an interface for the props
+interface SongListProps {
+    maintitle: string;
+    subtitle: string;
+}
+
+const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {
     const { setCurrentSong, isSkip, setIsSkip, valueSkip } = useAppContext();
     const [index, setIndex] = useState<number | null>(null);
 
@@ -25,9 +32,6 @@ const SongList = () => {
         setIsSkip(false);
     }, [isSkip]);
 
-
-
-
     const listSong = [
         { audio: '/audio/NangTho.mp3', poster: 'https://i.scdn.co/image/ab67616d00001e02c8e1db773a282546b2a57fd9', name: 'Nàng thơ', artist: 'Hoàng Dũng' },
         { audio: '/audio/EmDungKhoc.mp3', poster: "https://i.scdn.co/image/ab67616d00001e02827bd87fc2dec81441a4a059", name: 'Em đừng khóc', artist: 'Chillies' },
@@ -38,16 +42,15 @@ const SongList = () => {
 
     return (
         <div className=''>
-            <h1 className='font-bold text-[1.5rem] mb-2'>Weekly Top <span className='text-primaryColorPink'>Songs</span></h1>
+            <h1 className='text-h1 mb-5'>
+                {maintitle} <span className='text-primaryColorPink'>{subtitle}</span>
+            </h1>
             <div className='flex items-center'>
                 <div id="list" className='flex'>
                     {
-                        listSong.map((song, index: number) => (
-                            <div
-                                key={index}
-                                className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg border border-gray-700 cursor-pointer'
-                                onClick={() => { setCurrentSong(song); setIndex(index) }}
-                            >
+                        listSong.map((song, index) => (
+                            // <div key={index} className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg border border-gray-700 cursor-pointer'>
+                            <div key={index} className='bg-[#1F1F1F] p-2 px-3 mr-3 w-[13vw] rounded-lg  cursor-pointer'>
                                 <Image
                                     src={song.poster}
                                     alt="Song Poster"
@@ -63,11 +66,17 @@ const SongList = () => {
                 </div>
                 <div className='flex flex-col items-center ml-3 cursor-pointer'>
                     <PlusIcon className='w-[50px] h-[50px] bg-[#1F1F1F] rounded-full p-3' />
-                    <p className='whitespace-nowrap font-semibold'>View All</p>
+                    <p className='whitespace-nowrap text-h4'>View All</p>
                 </div>
             </div>
         </div>
     )
 }
 
-export default SongList
+// Define PropTypes as a fallback for runtime validation
+SongList.propTypes = {
+    maintitle: PropTypes.string.isRequired,
+    subtitle: PropTypes.string.isRequired
+}
+
+export default SongList;

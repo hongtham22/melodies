@@ -5,6 +5,8 @@ import { HeartIcon, HeartFilledIcon } from "@radix-ui/react-icons";
 import { FaPlay } from "react-icons/fa";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { IoIosMore } from "react-icons/io";
+import SongList from "@/components/listSong";
+
 
 function Page() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -52,17 +54,17 @@ function Page() {
   }, [songs]); // useEffect will now trigger only when songs change
 
   return (
-    <div className="w-full mb-5">
+    <div className="w-full  bg-secondColorBg">
       <div
-        className="m-3 rounded-lg bg-gradient-to-b to-black/25"
+        className="m-3 rounded-lg border-2 border-primaryColorBg bg-gradient-to-b to bg-primaryColorBg"
         style={{
-          background: `linear-gradient(to bottom, ${dominantColor} 20%, rgba(0, 0, 0, 0.5) 80%)`,
+          background: `linear-gradient(to bottom, ${dominantColor} 20%, rgba(0, 0, 0, 1) 80%)`,
         }}
       >
         {/* Banner album */}
-        <div className="p-5 flex flex-col gap-10 rounded-t-lg bg-gradient-to-b from-transparent to-black/50">
+        <div className=" w-full h-[50vh] p-5 flex flex-col justify-end gap-6 rounded-t-lg bg-gradient-to-b from-transparent to-black/50">
           {/* Header */}
-          <div className="w-full h-12 bg-transparent"></div>
+          {/* <div className="w-full h-12 bg-slate-300"></div> */}
           {/* Content albums */}
           <div className="flex items-end gap-8">
             <div className="shadow-[0_4px_60px_rgba(0,0,0,0.5)] rounded-md ">
@@ -164,6 +166,10 @@ function Page() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mx-5 mt-10 mb-20">
+          <SongList maintitle="Artist " subtitle="Albums" />
+
         </div>
       </div>
     </div>

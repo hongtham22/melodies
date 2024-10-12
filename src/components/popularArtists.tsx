@@ -10,11 +10,11 @@ function PopularArtists() {
   const artistList = Array.from({ length: 6 }, () => artist);
 
   return (
-    <div className="bg-primaryColorBg w-[1062px] mx-6 my-6 p-3 text-white">
-      <h1 className="text-h1 mb-4">
+    <div className="bg-primaryColorBg w-full mt-2 text-white">
+      <h1 className="text-h1 mb-5">
         Popular <span className="text-primaryColorPink"> Artists</span>
       </h1>
-      <div className="flex justify-around gap-6 items-center">
+      <div className="flex justify-around gap-6 items-center pr-5">
         {artistList.map((artist, index) => (
           <div
             key={index}
@@ -23,10 +23,10 @@ function PopularArtists() {
             <Image
               src={artist.img}
               alt={artist.name}
-              width={130}
-              height={130}
+              width={150}
+              height={150}
               quality={100}
-              className="rounded-[200px]"
+              className="rounded-full"
             />
             <h3 className="text-textMedium">{artist.name}</h3>
           </div>
@@ -34,8 +34,8 @@ function PopularArtists() {
 
         {/* View All button */}
         <div className="flex flex-col gap-2 justify-center items-center">
-          <button className="h-[62px] w-[62px] bg-secondColorBg rounded-[31px] flex items-center justify-center">
-            <PlusIcon className="w-5 h-5" />
+          <button className="h-[50px] w-[50px] bg-secondColorBg rounded-full flex items-center justify-center">
+            <PlusIcon className="w-6 h-6" />
           </button>
           <h4 className="text-h4">View All</h4>
         </div>

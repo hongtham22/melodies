@@ -44,7 +44,6 @@ export default function RootLayout({
           </main>
           <MusicPlayer />
         </SongProvider>
-
       </body>
     </html>
   );
