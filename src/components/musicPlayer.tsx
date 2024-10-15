@@ -233,12 +233,12 @@ const MusicPlayer: React.FC = () => {
                         />
                         {isPlaying ? (
                             <FaCirclePause
-                                className='mx-3 w-[32px] h-[32px]'
+                                className='mx-3 w-[32px] h-[32px]  hover:text-primaryColorPink'
                                 onClick={handlePlayPause}
                             />
                         ) : (
                             <FaCirclePlay
-                                className='mx-3 w-[32px] h-[32px]'
+                                className='mx-3 w-[32px] h-[32px]  hover:text-primaryColorPink'
                                 onClick={handlePlayPause}
                             />
                         )}

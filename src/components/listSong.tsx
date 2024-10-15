@@ -50,7 +50,7 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {
                         (showSidebarRight ? listSong.slice(0, 4) : listSong).map((song, index) => (
                             <div
                                 key={index}
-                                className={`bg-[#1F1F1F] p-2 px-3 mr-3 ${showSidebarRight ? 'w-[11vw]' : 'w-[13vw]'} rounded-lg cursor-pointer`}
+                                className={`bg-[#1F1F1F] p-2 px-3 mr-3 ${showSidebarRight ? 'w-[12vw]' : 'w-[13vw]'} rounded-lg cursor-pointer`}
                                 onClick={() => { setCurrentSong(song); setIndex(index); }}
                             >
                                 <Image
@@ -58,7 +58,7 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {
                                     alt="Song Poster"
                                     width={400}
                                     height={400}
-                                    className='mb-2 rounded-2xl'
+                                    className='mb-2 rounded-md'
                                 />
                                 <p className={`${showSidebarRight ? '' : 'text-[1.1rem]'} font-semibold mb-1 line-clamp-2`}>{song.name}</p>
                                 <p className='text-[0.8rem] font-thin mb-1'>{song.artist}</p>

@@ -62,7 +62,7 @@ function Page() {
         }}
       >
         {/* Banner album */}
-        <div className=" w-full h-[50vh] p-5 flex flex-col justify-end gap-6 rounded-t-lg bg-gradient-to-b from-transparent to-black/50">
+        <div className=" w-full h-[50vh] p-5 flex flex-col justify-end gap-6 rounded-t-lg bg-gradient-to-b from-transparent to-black/30">
           {/* Header */}
           {/* <div className="w-full h-12 bg-slate-300"></div> */}
           {/* Content albums */}

@@ -42,7 +42,7 @@ export default function RootLayout({
           <SongProvider>
             <Sidebar />
             <ScrollContent>
-              <div className="ml-[20vw]">
+              <div className="ml-[16.66vw]">
                 <main className="flex flex-col items-center">
                   <Header />
                   {children}

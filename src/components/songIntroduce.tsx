@@ -26,7 +26,7 @@ const SongIntroduce: React.FC = () => {
             '>
                 <div className='block w-[19%] fixed bg-primaryColorBg py-3 shadow-lg shadow-black'>
                     <div className='w-full flex justify-between'>
-                        <p className='font-semibold mt-1 ml-3 text-nowrap line-clamp-1'>Nàng thơ</p>
+                        <p className='font-semibold mt-1 ml-3 text-[1.1rem] text-primaryColorPink text-nowrap line-clamp-1'>Nàng thơ</p>
                         <div className='flex items-center gap-2'>
                             <IoIosMore className='text-2xl' />
                             <IoIosClose className='text-3xl' />
@@ -80,7 +80,7 @@ const SongIntroduce: React.FC = () => {
                                 <p className='font-semibold'>Hoàng Dũng</p>
                                 <p className='text-[0.95rem] text-primaryColorGray text-wrap'>123.456 người theo dõi</p>
                             </div>
-                            <button className='border-2 border-slate-50 px-3 py-1 rounded-full text-[0.9rem] text-nowrap'>
+                            <button className='border-2 border-slate-50 font-semibold px-3 py-1 rounded-full text-[0.9rem] text-nowrap'>
                                 Hủy theo dõi
                             </button>
                         </div>

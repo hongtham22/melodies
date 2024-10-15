@@ -11,7 +11,7 @@ const ArtistBanner = () => {
 
     return (
         <div
-            className={`${showSidebarRight ? 'w-[55vw] h-[60vh]' : 'w-[75vw] h-[60vh]'} my-4 px-6 py-4 rounded-3xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden`}
+            className={`${showSidebarRight ? 'w-[60vw] h-[60vh]' : 'w-[75vw] h-[60vh]'} my-4 px-6 py-4 rounded-3xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden`}
         >
             {/* Pseudo-element for background image */}
             <div

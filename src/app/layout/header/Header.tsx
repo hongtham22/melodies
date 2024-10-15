@@ -47,7 +47,7 @@ const Header = ({ }) => {
         <div
             ref={headerRef}
             id="header"
-            className={`${showSidebarRight ? 'w-[58vw]' : 'w-[78vw]'} flex pt-8 px-12 justify-between items-center bg-transparent fixed z-20`}
+            className={`${showSidebarRight ? 'w-[62vw]' : 'w-[78vw]'} flex pt-8 px-12 justify-between items-center bg-transparent fixed z-20`}
         >
             <div id="search-header" className='flex bg-transparent border-2 items-center px-2 rounded-full w-[30%]'>
                 <MagnifyingGlassIcon className="w-[24px] h-[24px]" />
