@@ -2,13 +2,15 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAppContext } from '@/components/provider/songProvider';
 import Image from 'next/image';
-import { CiCirclePlus } from "react-icons/ci";
+
+import { GoPlusCircle } from "react-icons/go";
 import {
     FaCirclePlay,
     FaCirclePause,
     FaForward,
     FaBackward,
     FaRepeat,
+    FaListCheck
 } from "react-icons/fa6";
 import {
     BsFilePlayFill,
@@ -16,7 +18,6 @@ import {
     BsFillSkipStartFill,
 } from "react-icons/bs";
 import {
-    PiMicrophoneStageFill,
     PiSpeakerHighFill,
     PiSpeakerXFill,
     PiSpeakerLowFill
@@ -38,7 +39,16 @@ import {
 } from "@/components/ui/tooltip"
 
 const MusicPlayer: React.FC = () => {
-    const { currentSong, setValueSkip, setIsSkip, showContentSong, setShowContentSong } = useAppContext()
+    const {
+        currentSong,
+        setValueSkip,
+        setIsSkip,
+        showContentSong,
+        setShowContentSong,
+        setShowSidebarRight,
+        waitingList,
+        setWaitingList
+    } = useAppContext()
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [endTime, setEndTime] = useState<number>(0);
@@ -92,8 +102,6 @@ const MusicPlayer: React.FC = () => {
             };
         }
     }, [currentSong]);
-
-
 
     useEffect(() => {
         const progress = (startTime / endTime) * 100;
@@ -188,7 +196,7 @@ const MusicPlayer: React.FC = () => {
 
     return (
         <TooltipProvider>
-            <div className='fixed bottom-0 h-[12vh] w-full border-2 bg-[#121212] flex justify-between items-center px-5' >
+            <div className='fixed bottom-0 h-[12vh] w-full border-2 bg-[#121212] flex justify-between items-center px-5 z-40' >
                 <div className='flex items-center w-[20vw]'>
                     <Image
                         src={currentSong.poster}
@@ -202,7 +210,7 @@ const MusicPlayer: React.FC = () => {
                         <p className='text-[0.8rem] text-primaryColorGray font-thin'>{currentSong.artist}</p>
                     </div>
                     <div className='ml-3 cursor-pointer text-primaryColorGray transition-transform duration-200 hover:scale-105 hover:text-white'>
-                        <CiCirclePlus className='w-[20px] h-[20px]' />
+                        <GoPlusCircle className='w-[20px] h-[20px]' />
                     </div>
                 </div>
                 <div className='flex flex-col items-center'>
@@ -281,11 +289,14 @@ const MusicPlayer: React.FC = () => {
                 </div>
                 <div className='flex'>
                     <BsFilePlayFill
-                        className='w-[18px] h-[18px] ml-2 cursor-pointer'
-                        onClick={() => setShowContentSong(!showContentSong)}
+                        className={`w-[18px] h-[18px] ml-2 cursor-pointer ${showContentSong ? 'text-primaryColorPink' : 'text-white'}`}
+                        onClick={() => { setShowContentSong(!showContentSong); setShowSidebarRight(showContentSong ? false : true); setWaitingList(false) }}
                     />
-                    <PiMicrophoneStageFill className='w-[18px] h-[18px] ml-2 cursor-pointer' />
                     <MdLyrics className='w-[18px] h-[18px] ml-2 cursor-pointer' />
+                    <FaListCheck
+                        className={`w-[18px] h-[18px] ml-2 cursor-pointer ${waitingList ? 'text-primaryColorPink' : 'text-white'}`}
+                        onClick={() => { setShowSidebarRight(waitingList ? false : true); setWaitingList(!waitingList); setShowContentSong(false) }}
+                    />
                     <div className='flex items-center ml-2 cursor-pointer'>
                         {getVolumeIcon()}
 

@@ -56,7 +56,7 @@ function Page() {
   return (
     <div className="w-full  bg-secondColorBg">
       <div
-        className="m-3 rounded-lg border-2 border-primaryColorBg bg-gradient-to-b to bg-primaryColorBg"
+        className="m-3 rounded-lg border-2 border-primaryColorBg bg-gradient-to-b to bg-primaryColorBg overflow-auto"
         style={{
           background: `linear-gradient(to bottom, ${dominantColor} 20%, rgba(0, 0, 0, 1) 80%)`,
         }}

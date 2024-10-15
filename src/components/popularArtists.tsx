@@ -6,12 +6,12 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from '@/components/provider/songProvider';
 
 function PopularArtists() {
-  const { showContentSong } = useAppContext();
+  const { showSidebarRight } = useAppContext();
   const artist = { name: "Lana Del Ray", img: artistimg };
 
   // Sử dụng Array.from để tạo mảng gồm 6 bản sao của cùng một nghệ sĩ
   let artistList = []
-  if (showContentSong) {
+  if (showSidebarRight) {
     artistList = Array.from({ length: 5 }, () => artist);
   } else {
     artistList = Array.from({ length: 6 }, () => artist);
@@ -30,7 +30,7 @@ function PopularArtists() {
             className="flex flex-col gap-6 justify-center items-center"
           >
             {
-              showContentSong ? (
+              showSidebarRight ? (
                 <Image
                   src={artist.img}
                   alt={artist.name}
@@ -57,8 +57,8 @@ function PopularArtists() {
 
         {/* View All button */}
         <div className='flex flex-col items-center ml-3 cursor-pointer'>
-          <PlusIcon className={`${showContentSong ? 'w-[40px] h-[40px]' : 'w-[50px] h-[50px]'} bg-[#1F1F1F] rounded-full p-3 mb-2`} />
-          <p className={`${showContentSong ? 'font-semibold text-[0.9rem]' : 'text-h4'} whitespace-nowrap`}>View All</p>
+          <PlusIcon className={`${showSidebarRight ? 'w-[40px] h-[40px]' : 'w-[50px] h-[50px]'} bg-[#1F1F1F] rounded-full p-3 mb-2`} />
+          <p className={`${showSidebarRight ? 'font-semibold text-[0.9rem]' : 'text-h4'} whitespace-nowrap`}>View All</p>
         </div>
       </div>
     </div>

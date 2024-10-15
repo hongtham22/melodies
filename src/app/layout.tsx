@@ -7,6 +7,9 @@ import Header from "@/app/layout/header/Header";
 import MusicPlayer from "@/components/musicPlayer";
 import { SongProvider } from "@/components/provider/songProvider";
 import SongIntroduce from "@/components/songIntroduce";
+import { ScrollProvider } from "@/components/provider/scrollProvider";
+import ScrollContent from "@/components/scrollContent";
+import WaitingList from "@/components/waitingList";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,19 +36,27 @@ export default function RootLayout({
     <html lang="en">
       <body
         suppressHydrationWarning={true}
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primaryColorBg flex text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primaryColorBg flex overflow-hidden text-white`}
       >
-        <SongProvider>
-          <Sidebar />
-          <main className="ml-[20%] flex flex-col items-center">
-            <Header />
-            {children}
-            <Footer />
-          </main>
-          <SongIntroduce />
-          <MusicPlayer />
-        </SongProvider>
+        <ScrollProvider>
+          <SongProvider>
+            <Sidebar />
+            <ScrollContent>
+              <div className="ml-[20vw]">
+                <main className="flex flex-col items-center">
+                  <Header />
+                  {children}
+                  <Footer />
+                </main>
+              </div>
+            </ScrollContent>
+            <SongIntroduce />
+            <WaitingList />
+            <MusicPlayer />
+          </SongProvider>
+        </ScrollProvider>
+
       </body>
-    </html>
+    </html >
   );
 }

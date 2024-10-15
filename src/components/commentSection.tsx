@@ -27,7 +27,7 @@ const CommentSection = () => {
     }
 
     return (
-        <div className='w-[65%] '>
+        <div className='w-[40vw]'>
             <div className='flex justify-between mb-2 items-end'>
                 <div className='flex items-center text-primaryColorGray'>
                     <FaCommentAlt />

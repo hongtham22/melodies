@@ -1,8 +1,12 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindScrollbar from 'tailwind-scrollbar'
 
 const config: Config = {
-  plugins: [tailwindcssAnimate],
+  plugins: [
+    tailwindcssAnimate,
+    tailwindScrollbar,
+  ],
   darkMode: ["class"],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -12,7 +16,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primaryColorBg: "#181818",
+        primaryColorBg: "#121212",
         secondColorBg: "#1E1E1E",
 
         primaryColorPink: "#EE10B0",

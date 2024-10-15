@@ -2,35 +2,30 @@
 import { useAppContext } from '@/components/provider/songProvider';
 import Image from 'next/image';
 import React from 'react'
-import '@/components/scss/songIntroduce.scss'
+import '@/components/scss/waitingList.scss'
 
 import {
-    IoIosMore,
     IoIosClose,
     IoIosLink
 } from "react-icons/io";
 import { GoPlusCircle } from "react-icons/go";
 
-const SongIntroduce: React.FC = () => {
-    const { showContentSong, currentSong } = useAppContext();
+const WaitingList: React.FC = () => {
+    const { waitingList, currentSong } = useAppContext();
 
-    if (!showContentSong) return null;
+    if (!waitingList) return null;
 
     return (
         <div
-            className='min-w-[20vw] block bg-secondColorBg text-white right-0 pl-1 animate-slide-in-right'
+            className='min-w-[20vw] block bg-secondColorBg text-white right-0 pl-1 animate-slide-up'
         >
             <div className='
             flex flex-col w-[98%] bg-primaryColorBg rounded-md mt-3 group
-                    
             '>
                 <div className='block w-[19%] fixed bg-primaryColorBg py-3 shadow-lg shadow-black'>
                     <div className='w-full flex justify-between'>
-                        <p className='font-semibold mt-1 ml-3 text-nowrap line-clamp-1'>Nàng thơ</p>
-                        <div className='flex items-center gap-2'>
-                            <IoIosMore className='text-2xl' />
-                            <IoIosClose className='text-3xl' />
-                        </div>
+                        <p className='font-semibold mt-1 ml-3 text-nowrap'>Waiting list</p>
+                        <IoIosClose className='text-3xl' />
                     </div>
                 </div>
                 <div className='w-full self-center flex flex-col overflow-auto mt-16 h-screen
@@ -92,4 +87,4 @@ const SongIntroduce: React.FC = () => {
     )
 }
 
-export default SongIntroduce
+export default WaitingList;

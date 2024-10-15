@@ -4,6 +4,8 @@ import SongList from "@/components/listSong";
 import TrendingSongs from "@/components/trendingSongs";
 import MoodPlaylist from "@/components/moodPlaylist";
 import CommentSection from "@/components/commentSection";
+import AvatarArtist from "@/components/avatarArtist";
+import ArtistBanner from "@/components/artistBanner";
 
 export default function Home() {
   return (
@@ -15,8 +17,13 @@ export default function Home() {
       <div className="mt-4">
         <SongList maintitle="New Releases" subtitle="Songs" />
       </div>
-      <div className="">
-        <CommentSection />
+      <div className="flex">
+        <div className="mr-8">
+          <AvatarArtist />
+        </div>
+        <div>
+          <CommentSection />
+        </div>
       </div>
       <div className="">
         <TrendingSongs />
