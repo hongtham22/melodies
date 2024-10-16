@@ -43,9 +43,9 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [currentSong, setCurrentSong] = useState<SongData | null>(null);
     const [valueSkip, setValueSkip] = useState<string>('')
     const [isSkip, setIsSkip] = useState<boolean | null>(null)
-    const [showSidebarRight, setShowSidebarRight] = useState<boolean | null>(true)
+    const [showSidebarRight, setShowSidebarRight] = useState<boolean | null>(false)
     const [showContentSong, setShowContentSong] = useState<boolean | null>(false)
-    const [waitingList, setWaitingList] = useState<boolean | null>(true)
+    const [waitingList, setWaitingList] = useState<boolean | null>(false)
 
     const value = {
         showSidebarRight,
