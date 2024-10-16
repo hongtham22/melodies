@@ -14,7 +14,7 @@ function TrendingSongs() {
       title: "Pain the town red",
       artist: "The neighborhood",
       releaseDate: "Nov 4, 2023",
-      album: "Hard to Imagine the Neighbourhood Ever Changing",
+      album: "Hard to Imagine the Neighbourhood Ever Changing ",
       duration: "3:26",
     },
   ];

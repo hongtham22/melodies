@@ -7,6 +7,8 @@ import Header from "@/app/layout/header/Header";
 import MusicPlayer from "@/components/musicPlayer";
 import { SongProvider } from "@/components/provider/songProvider";
 import SongIntroduce from "@/components/songIntroduce";
+import { Toast } from "@radix-ui/react-toast";
+import { ToastProvider } from "@/components/ui/toast";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -36,10 +38,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primaryColorBg flex text-white`}
       >
         <SongProvider>
-          <Sidebar />
-          <main className="ml-[20%] flex flex-col items-center">
+          {/* <Sidebar /> */}
+          <main className="flex flex-col items-center">
+          {/* <main className="ml-[20%] flex flex-col items-center"> */}
             <Header />
             {children}
+            <ToastProvider/>
             <Footer />
           </main>
           <SongIntroduce />
