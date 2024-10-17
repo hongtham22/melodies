@@ -14,7 +14,7 @@ const Footer = () => {
     }, [currentSong]);
 
     return (
-        <div id="footer" className={`grid grid-cols-3 ${mb && 'mb-24'}`}>
+        <div id="footer" className={`grid grid-cols-3 py-7 ${mb && 'mb-16'}`}>
             <div id='about' className={`${showSidebarRight && 'w-[90%]'} px-8 flex flex-col justify-center`}>
                 <p className={`font-bold ${showSidebarRight ? 'text-[1.3rem]' : 'text-[1.5rem]'} `}>About</p>
                 <p className={`text-justify ${showSidebarRight && ' text-[0.9rem]'}`}>Melodies is a website that has been created for over <span className='text-primaryColorPink'>5 year&apos;s</span> now and it is one of the most famous music player website&apos;s in the world. in this website you can listen and download songs for free. also of you want no limitation you can buy our <span className='text-primaryColorBlue'>premium pass&apos;s</span>.</p>

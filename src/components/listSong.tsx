@@ -9,8 +9,8 @@ import PropTypes from 'prop-types';
 
 // Define an interface for the props
 interface SongListProps {
-    maintitle: string;
-    subtitle: string;
+    maintitle?: string;
+    subtitle?: string;
 }
 
 const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {

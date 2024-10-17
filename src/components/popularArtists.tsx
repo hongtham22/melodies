@@ -5,7 +5,12 @@ import Image from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from '@/components/provider/songProvider';
 
-function PopularArtists() {
+interface PeopleListProps {
+  maintitle?: string;
+  subtitle?: string;
+}
+
+const PopularArtists: React.FC<PeopleListProps> = ({ maintitle, subtitle }) => {
   const { showSidebarRight } = useAppContext();
   const artist = { name: "Lana Del Ray", img: artistimg };
 
@@ -21,7 +26,7 @@ function PopularArtists() {
   return (
     <div className="bg-primaryColorBg w-full mt-2 text-white">
       <h1 className="text-h1 mb-5">
-        Popular <span className="text-primaryColorPink"> Artists</span>
+        {maintitle} <span className="text-primaryColorPink"> {subtitle}</span>
       </h1>
       <div className="flex justify-around gap-6 items-center pr-5">
         {artistList.map((artist, index) => (

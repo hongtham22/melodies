@@ -28,7 +28,7 @@ export default function Home() {
         <TrendingSongs />
       </div>
       <div className="">
-        <PopularArtists />
+        <PopularArtists maintitle="Popular" subtitle="Artists" />
       </div>
       <div className="mt-4">
         <SongList maintitle="Top" subtitle="Albums" />

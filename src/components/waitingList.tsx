@@ -10,7 +10,7 @@ import {
 
 
 const WaitingList: React.FC = () => {
-    const { waitingList, currentSong } = useAppContext();
+    const { waitingList, setWaitingList, setShowSidebarRight, currentSong } = useAppContext();
 
     const listSong = [
         { poster: 'https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da', name: 'Nàng thơ', artist: 'Hoàng Dũng' },
@@ -42,7 +42,10 @@ const WaitingList: React.FC = () => {
                 <div className='block w-[19%] fixed bg-primaryColorBg py-3 shadow-lg shadow-black'>
                     <div className='w-full flex justify-between'>
                         <p className='font-semibold text-[1.1rem] mt-1 ml-3 text-primaryColorPink text-nowrap'>Waiting list</p>
-                        <IoIosClose className='text-3xl' />
+                        <IoIosClose
+                            className='text-3xl cursor-pointer'
+                            onClick={() => { setShowSidebarRight(waitingList ? false : true); setWaitingList(!waitingList); }}
+                        />
                     </div>
                 </div>
                 <div className='w-full self-center flex flex-col overflow-auto mt-16 h-screen

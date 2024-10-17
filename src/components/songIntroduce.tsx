@@ -12,7 +12,7 @@ import {
 import { GoPlusCircle } from "react-icons/go";
 
 const SongIntroduce: React.FC = () => {
-    const { showContentSong, currentSong } = useAppContext();
+    const { showContentSong, setShowContentSong, currentSong, setShowSidebarRight } = useAppContext();
 
     if (!showContentSong) return null;
 
@@ -29,7 +29,10 @@ const SongIntroduce: React.FC = () => {
                         <p className='font-semibold mt-1 ml-3 text-[1.1rem] text-primaryColorPink text-nowrap line-clamp-1'>Nàng thơ</p>
                         <div className='flex items-center gap-2'>
                             <IoIosMore className='text-2xl' />
-                            <IoIosClose className='text-3xl' />
+                            <IoIosClose
+                                className='text-3xl cursor-pointer'
+                                onClick={() => { setShowContentSong(!showContentSong); setShowSidebarRight(showContentSong ? false : true); }}
+                            />
                         </div>
                     </div>
                 </div>
