@@ -6,13 +6,20 @@ import { useScrollArea } from "@/components/provider/scrollProvider";
 import { Link } from 'react-scroll';
 
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
-// import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
 
 const Header = ({ }) => {
     const { scrollAreaRef } = useScrollArea();
     const { showSidebarRight } = useAppContext();
     const headerRef = useRef<HTMLDivElement | null>(null);
+    const router = useRouter();
+    const handleSignUpClick = () => {
+      router.push('/authenticate/signup'); 
+    };
+    const handleLoginClick = () => {
+      router.push('/authenticate/login'); 
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -77,8 +84,8 @@ const Header = ({ }) => {
                 </ul>
             </div>
             <div id='button-section' className="flex">
-                <button className={`${showSidebarRight ? 'text-[0.9rem] mx-1 w-24' : 'mx-2 w-32'} border-2 border-white text-white font-semibold py-2  rounded-full`}>Login</button>
-                <button className={`${showSidebarRight ? 'text-[0.9rem] mx-1 w-24' : 'mx-2 w-32'} bg-white font-semibold py-2  rounded-full text-black`}>Sign Up</button>
+                <button className={`${showSidebarRight ? 'text-[0.9rem] mx-1 w-24' : 'mx-2 w-32'} border-2 border-white text-white font-semibold py-2  rounded-full`} onClick={handleLoginClick}>Login</button>
+                <button className={`${showSidebarRight ? 'text-[0.9rem] mx-1 w-24' : 'mx-2 w-32'} bg-white font-semibold py-2  rounded-full text-black`}onClick={handleSignUpClick}>Sign Up</button>
             </div>
         </div>
     );

@@ -7,6 +7,9 @@ import Header from "@/app/layout/header/Header";
 import MusicPlayer from "@/components/musicPlayer";
 import { SongProvider } from "@/components/provider/songProvider";
 import SongIntroduce from "@/components/songIntroduce";
+
+import { Toast } from "@radix-ui/react-toast";
+import { ToastProvider } from "@/components/ui/toast";
 import { ScrollProvider } from "@/components/provider/scrollProvider";
 import ScrollContent from "@/components/scrollContent";
 import WaitingList from "@/components/waitingList";
@@ -46,6 +49,7 @@ export default function RootLayout({
                 <main className="flex flex-col items-center">
                   <Header />
                   {children}
+                  <ToastProvider/>
                   <Footer />
                 </main>
               </div>
@@ -55,7 +59,6 @@ export default function RootLayout({
             <MusicPlayer />
           </SongProvider>
         </ScrollProvider>
-
       </body>
     </html >
   );

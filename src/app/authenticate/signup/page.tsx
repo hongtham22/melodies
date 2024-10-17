@@ -15,14 +15,18 @@ import { Input } from "@/components/ui/input";
 import {
   RegisterBody,
   RegisterBodyType,
-} from "../../schemaValidations/auth.schema";
+} from "../../../../schemaValidations/auth.schema";
 
 import { FcGoogle } from "react-icons/fc";
 import { EnvelopeClosedIcon } from "@radix-ui/react-icons";
 import { PersonIcon } from "@radix-ui/react-icons";
 import { LockClosedIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
-function SignUpForm() {
+function Page() {
+  const router = useRouter();
+
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
     defaultValues: {
@@ -35,11 +39,19 @@ function SignUpForm() {
 
   function onSubmit(values: RegisterBodyType) {
     console.log(values);
+    router.push('/authenticate/otp?action=signup');
+
   }
   return (
-    <div>
+    <div className="flex gap-5 justify-center items-center flex-col">
+      <p className="text-h2 text-primaryColorPink border-b-2 border-primaryColorPink">
+        Sign Up
+      </p>
+      <p className="text-textMedium">
+        Let’s get you all st up so you can access your personal account
+      </p>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="flex gap-2">
             {/* Username */}
             <FormField
@@ -130,12 +142,22 @@ function SignUpForm() {
                         className="pl-9"
                       />
                     </div>
-
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="terms"
+              className="mr-2 bg-transparent h-4 w-4 border-2 border-black"
+            />
+            <label htmlFor="terms" className="text-textMedium">
+              I agree to all the Terms and Privacy Policies
+            </label>
           </div>
 
           <Button
@@ -144,6 +166,21 @@ function SignUpForm() {
           >
             Sign Up
           </Button>
+
+          <div className="flex items-center justify-center">
+            <p className="text-textMedium">
+              Already have an account?
+              <span>
+                <Link
+                  href="/authenticate/login"
+                  className="text-primaryColorPink underline"
+                >
+                  {" "}
+                  Login
+                </Link>
+              </span>
+            </p>
+          </div>
           <div className="flex items-center my-4">
             <div className="flex-grow border-t"></div>
             <span className="mx-3">Or</span>
@@ -163,4 +200,4 @@ function SignUpForm() {
   );
 }
 
-export default SignUpForm;
+export default Page;
