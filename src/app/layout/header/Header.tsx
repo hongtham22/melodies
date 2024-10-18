@@ -15,10 +15,10 @@ const Header = ({ }) => {
     const headerRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter();
     const handleSignUpClick = () => {
-      router.push('/authenticate/signup'); 
+      router.push('/signup'); 
     };
     const handleLoginClick = () => {
-      router.push('/authenticate/login'); 
+      router.push('/login'); 
     };
 
     useEffect(() => {

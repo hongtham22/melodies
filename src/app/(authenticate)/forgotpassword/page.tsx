@@ -20,12 +20,12 @@ import {
 } from "../../../../schemaValidations/auth.schema";
 import { FcGoogle } from "react-icons/fc";
 import { EnvelopeClosedIcon } from "@radix-ui/react-icons";
-import { useRouter} from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 function Page() {
   const router = useRouter();
   const handleEmailSubmit = () => {
-    router.push('/authenticate/otp?action=forgotpassword'); 
+    router.push("/otp?action=forgotpassword");
   };
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
@@ -40,7 +40,7 @@ function Page() {
 
   return (
     <div className="flex flex-col justify-center gap-4 p-4">
-      <Link href="/authenticate/login" className="flex items-center">
+      <Link href="/login" className="flex items-center">
         <ChevronLeftIcon className="w-5 h-5" />
         <p>Back to login</p>
       </Link>

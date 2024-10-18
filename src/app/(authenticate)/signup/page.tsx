@@ -22,9 +22,16 @@ import { EnvelopeClosedIcon } from "@radix-ui/react-icons";
 import { PersonIcon } from "@radix-ui/react-icons";
 import { LockClosedIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 function Page() {
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChecked(event.target.checked);
+  };
+
   const router = useRouter();
 
   const form = useForm<RegisterBodyType>({
@@ -38,9 +45,12 @@ function Page() {
   });
 
   function onSubmit(values: RegisterBodyType) {
+    if (!isChecked) {
+      alert("Please accept the terms and privacy policies to sign up.");
+      return;
+    }
     console.log(values);
-    router.push('/authenticate/otp?action=signup');
-
+    router.push("/otp?action=signup");
   }
   return (
     <div className="flex gap-5 justify-center items-center flex-col">
@@ -153,6 +163,8 @@ function Page() {
             <input
               type="checkbox"
               id="terms"
+              checked={isChecked}
+              onChange={handleCheckboxChange}
               className="mr-2 bg-transparent h-4 w-4 border-2 border-black"
             />
             <label htmlFor="terms" className="text-textMedium">
@@ -163,6 +175,7 @@ function Page() {
           <Button
             type="submit"
             className="bg-primaryColorPink w-full p-4  hover:bg-darkPinkHover"
+            // disabled={!isChecked}
           >
             Sign Up
           </Button>
@@ -171,10 +184,7 @@ function Page() {
             <p className="text-textMedium">
               Already have an account?
               <span>
-                <Link
-                  href="/authenticate/login"
-                  className="text-primaryColorPink underline"
-                >
+                <Link href="/login" className="text-primaryColorPink underline">
                   {" "}
                   Login
                 </Link>

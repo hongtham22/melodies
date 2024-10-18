@@ -16,14 +16,6 @@ export default function Home() {
       <div className="mt-4">
         <SongList maintitle="New Releases" subtitle="Songs" />
       </div>
-      <div className="flex">
-        <div className="mr-8">
-          <AvatarArtist />
-        </div>
-        <div>
-          <CommentSection />
-        </div>
-      </div>
       <div className="">
         <TrendingSongs />
       </div>
@@ -36,9 +28,6 @@ export default function Home() {
       <div className="mt-4">
         <MoodPlaylist />
       </div>
-
-      {/* <SignUp/> */}
     </div>
   );
 }
-

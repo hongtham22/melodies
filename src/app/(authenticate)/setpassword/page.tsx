@@ -21,11 +21,10 @@ import {
 import { LockClosedIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 
-
 function Page() {
   const router = useRouter();
   const handleSetPasswordClick = () => {
-    router.push('/authenticate/login'); 
+    router.push("/login");
   };
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
@@ -36,12 +35,10 @@ function Page() {
 
   function onSubmit(values: RegisterBodyType) {
     console.log(values);
-    router.push("/authenticate/login"); 
-
   }
   return (
     <div className="flex flex-col justify-center gap-5 p-4">
-      <Link href="/authenticate/login" className="flex items-center">
+      <Link href="/login" className="flex items-center">
         <ChevronLeftIcon className="w-5 h-5" />
         <p>Back to login</p>
       </Link>

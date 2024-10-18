@@ -7,12 +7,10 @@ import { TfiMoreAlt } from "react-icons/tfi";
 import { IoIosMore } from "react-icons/io";
 import SongList from "@/components/listSong";
 
-
 function Page() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [dominantColor, setDominantColor] = useState<string>();
 
-  // Memoize the songs array to avoid re-initialization on every render
   const songs = useMemo(
     () => [
       {
@@ -26,11 +24,11 @@ function Page() {
       },
     ],
     []
-  ); // Add dependencies if the songs array can dynamically change
+  );
 
   useEffect(() => {
     const getDominantColor = async () => {
-      const imageUrl = songs[0].imageUrl; // Lấy URL từ bài hát đầu tiên
+      const imageUrl = songs[0].imageUrl;
       try {
         const response = await fetch(
           `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`
@@ -39,7 +37,7 @@ function Page() {
         const data = await response.json();
         if (response.ok) {
           console.log("Dominant color:", data.dominantColor);
-          setDominantColor(data.dominantColor); // Cập nhật màu vào state
+          setDominantColor(data.dominantColor);
         } else {
           console.error("Error fetching dominant color:", data.error);
         }
@@ -49,9 +47,9 @@ function Page() {
     };
 
     if (songs.length > 0) {
-      getDominantColor(); // Gọi hàm nếu mảng songs có phần tử
+      getDominantColor();
     }
-  }, [songs]); // useEffect will now trigger only when songs change
+  }, [songs]);
 
   return (
     <div className="w-full  bg-secondColorBg">
@@ -64,7 +62,6 @@ function Page() {
         {/* Banner album */}
         <div className=" w-full h-[50vh] p-5 flex flex-col justify-end gap-6 rounded-t-lg bg-gradient-to-b from-transparent to-black/30">
           {/* Header */}
-          {/* <div className="w-full h-12 bg-slate-300"></div> */}
           {/* Content albums */}
           <div className="flex items-end gap-8">
             <div className="shadow-[0_4px_60px_rgba(0,0,0,0.5)] rounded-md ">
@@ -169,7 +166,6 @@ function Page() {
         </div>
         <div className="mx-5 mt-10 mb-20">
           <SongList maintitle="Artist " subtitle="Albums" />
-
         </div>
       </div>
     </div>

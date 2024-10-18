@@ -14,7 +14,6 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import {
@@ -41,22 +40,20 @@ function Page() {
     },
   });
 
-  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes = 120 seconds
-
+  const [timeLeft, setTimeLeft] = useState(120);
   const firstInputRef = useRef<HTMLInputElement>(null);
-  // const firstInputRef = useRef(null); // Tạo ref cho ô đầu tiên
 
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
     }, 1000);
 
-    return () => clearInterval(timer); // Cleanup timer when component unmounts
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
     if (firstInputRef.current) {
-      firstInputRef.current.focus(); // Focus ô đầu tiên
+      firstInputRef.current.focus();
     }
   }, []);
 
@@ -75,17 +72,22 @@ function Page() {
         </pre>
       ),
     });
-    // router.push("/authenticate/login");
+
     if (action === "signup") {
-      router.push("/authenticate/login"); 
+      router.push("/login");
     } else if (action === "forgotpassword") {
-      router.push("/authenticate/setpassword"); 
+      router.push("/setpassword");
     }
+  }
+
+  function handleResend() {
+    form.reset({ pin: "" });
+    router.push(`/otp?action=${action}`);
   }
 
   return (
     <div className="flex flex-col justify-center gap-4 p-4">
-      <Link href="/authenticate/login" className="flex items-center">
+      <Link href="/login" className="flex items-center">
         <ChevronLeftIcon className="w-5 h-5" />
         <p>Back to login</p>
       </Link>
@@ -108,8 +110,8 @@ function Page() {
                     <InputOTPGroup className="h-6">
                       <InputOTPSlot
                         index={0}
-                        ref={firstInputRef} // Gán ref cho ô đầu tiên
-                        tabIndex={0} // Đảm bảo ô đầu tiên nhận focus
+                        ref={firstInputRef}
+                        tabIndex={0}
                       />
                       <InputOTPSlot index={1} />
                       <InputOTPSlot index={2} />
@@ -138,12 +140,12 @@ function Page() {
       <p className="text-textMedium">
         Haven&apos;t got the email yet?
         <span>
-          <Link
-            href="/authenticate/forgotpassword"
+          <button
+            onClick={handleResend}
             className="text-primaryColorPink underline"
           >
-            Resend email
-          </Link>
+            Resend
+          </button>
         </span>
       </p>
     </div>
