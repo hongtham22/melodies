@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import envConfig from "@/config"
 import { useAppContext } from '@/app/AppProvider';
 
@@ -30,7 +30,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 function Page() {
-  const { setRole, setAccessToken } = useAppContext()
+  const { role, setRole, accessToken, setAccessToken } = useAppContext()
   const router = useRouter();
   const { toast } = useToast()
   const form = useForm<LoginBodyType>({
@@ -40,6 +40,16 @@ function Page() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    if (accessToken && role) {
+      if (role === 'User') {
+        router.push("/");
+      } else if (role === 'Admin') {
+        router.push('/admin');
+      }
+    }
+  }, [accessToken, role]);
 
   async function onSubmit(values: LoginBodyType) {
     console.log(values);
@@ -67,8 +77,12 @@ function Page() {
       console.log(result);
       setAccessToken(result.payload.accessToken)
       setRole(result.payload.role)
+      // if (role === 'User') {
+      //   router.push("/");
+      // } else {
+      //   router.push('/admin')
+      // }
 
-      router.push("/");
     } catch (error) {
       console.log(error);
       toast({
@@ -168,10 +182,10 @@ function Page() {
 
           <Button
             type="submit"
-            className="bg-transparent  border-white border-2 w-full p-4 flex items-center justify-center gap-2 "
+            className="bg-transparent  border-white border-2 w-full p-4 flex items-center justify-center gap-2 group"
           >
             <FcGoogle className="w-6 h-6" />
-            Login With Google
+            <p className="text-white group-hover:text-black">Login With Google</p>
           </Button>
         </form>
       </Form>
