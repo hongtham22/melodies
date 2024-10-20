@@ -1,12 +1,13 @@
 "use client";
+import { useState, useEffect, useRef } from "react";
+import envConfig from "@/config"
+
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { useState, useEffect, useRef } from "react";
-
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,21 +23,17 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
-
-const FormSchema = z.object({
-  pin: z.string().min(5, {
-    message: "Your one-time password must be 5 characters.",
-  }),
-});
+import { RegisterBody, RegisterBodyType } from "../../../../schemaValidations/auth.schema";
 
 function Page() {
   const router = useRouter();
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const action = searchParams.get("action");
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<RegisterBodyType>({
+    resolver: zodResolver(RegisterBody),
     defaultValues: {
-      pin: "",
+      otp: "",
     },
   });
 
@@ -63,25 +60,70 @@ function Page() {
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   }
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-full rounded-md p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  async function onSubmit(values: RegisterBodyType) {
+    console.log(values);
 
-    if (action === "signup") {
-      router.push("/login");
-    } else if (action === "forgotpassword") {
-      router.push("/setpassword");
+    const storedUsername = localStorage.getItem("username");
+    const storedEmail = localStorage.getItem("email");
+    const storedPassword = localStorage.getItem("password");
+
+    const combinedValues = {
+      ...values,
+      username: storedUsername,
+      email: storedEmail,
+      password: storedPassword
+    };
+
+    console.log("Combined values:", combinedValues);
+
+    try {
+      const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/users/register`,
+        {
+          body: JSON.stringify(combinedValues),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          method: 'POST'
+        }).then(async (res) => {
+          // console.log(res);
+
+          const payload = await res.json()
+          const data = {
+            status: res.status,
+            payload
+          }
+          if (!res.ok) {
+            throw data
+          }
+          return data
+        })
+      console.log(result);
+      localStorage.removeItem('password');
+      localStorage.removeItem('username');
+      localStorage.removeItem('email')
+      if (action === "signup") {
+        router.push("/login");
+      } else if (action === "forgotpassword") {
+        router.push("/setpassword");
+      }
+      toast({
+        variant: "success",
+        title: "Congratulation!!",
+        description: "Register Successfully",
+      })
+    } catch (error) {
+      console.log(error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: (error as { payload: { errMess: string } }).payload.errMess,
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      })
     }
   }
 
   function handleResend() {
-    form.reset({ pin: "" });
+    form.reset({ otp: "" });
     router.push(`/otp?action=${action}`);
   }
 
@@ -102,7 +144,7 @@ function Page() {
         >
           <FormField
             control={form.control}
-            name="pin"
+            name="otp"
             render={({ field }) => (
               <FormItem className="flex flex-col items-center gap-3">
                 <FormControl>
@@ -142,7 +184,7 @@ function Page() {
         <span>
           <button
             onClick={handleResend}
-            className="text-primaryColorPink underline"
+            className="text-primaryColorPink underline ml-1"
           >
             Resend
           </button>

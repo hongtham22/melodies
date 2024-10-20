@@ -1,5 +1,7 @@
 "use client";
 import React from "react";
+import envConfig from "@/config"
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -13,9 +15,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  RegisterBody,
-  RegisterBodyType,
+  GetOtpBody,
+  GetOtpBodyType
 } from "../../../../schemaValidations/auth.schema";
+
+import { useToast } from "@/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 import { FcGoogle } from "react-icons/fc";
 import { EnvelopeClosedIcon } from "@radix-ui/react-icons";
@@ -27,15 +32,15 @@ import { useState } from "react";
 
 function Page() {
   const [isChecked, setIsChecked] = useState(false);
+  const { toast } = useToast()
+  const router = useRouter();
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked);
   };
 
-  const router = useRouter();
-
-  const form = useForm<RegisterBodyType>({
-    resolver: zodResolver(RegisterBody),
+  const form = useForm<GetOtpBodyType>({
+    resolver: zodResolver(GetOtpBody),
     defaultValues: {
       email: "",
       username: "",
@@ -44,14 +49,51 @@ function Page() {
     },
   });
 
-  function onSubmit(values: RegisterBodyType) {
+  async function onSubmit(values: GetOtpBodyType) {
     if (!isChecked) {
       alert("Please accept the terms and privacy policies to sign up.");
       return;
     }
     console.log(values);
-    router.push("/otp?action=signup");
+    try {
+      const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/users/otp`,
+        {
+          body: JSON.stringify(values),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          method: 'POST'
+        }).then(async (res) => {
+          // console.log(res);
+
+          const payload = await res.json()
+          const data = {
+            status: res.status,
+            payload
+          }
+          if (!res.ok) {
+            throw data
+          }
+          return data
+        })
+      console.log(result);
+      if (result.status === 200) {
+        localStorage.setItem('email', values.email)
+        localStorage.setItem('username', values.username)
+        localStorage.setItem('password', values.password)
+      }
+      router.push("/otp?action=signup");
+    } catch (error) {
+      console.log(error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: (error as { payload: { errMess: string } }).payload.errMess,
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      })
+    }
   }
+
   return (
     <div className="flex gap-5 justify-center items-center flex-col">
       <p className="text-h2 text-primaryColorPink border-b-2 border-primaryColorPink">
@@ -175,7 +217,7 @@ function Page() {
           <Button
             type="submit"
             className="bg-primaryColorPink w-full p-4  hover:bg-darkPinkHover"
-            // disabled={!isChecked}
+          // disabled={!isChecked}
           >
             Sign Up
           </Button>
