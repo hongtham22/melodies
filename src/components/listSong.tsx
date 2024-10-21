@@ -8,14 +8,50 @@ import { useAppContext } from '@/components/provider/songProvider';
 import PropTypes from 'prop-types';
 
 // Define an interface for the props
+interface Album {
+    albumId: string,
+    title: string
+    albumImages: Array<ImageAlbum>
+}
+interface Artists {
+    id: string,
+    name: string,
+    avatar: string
+}
+interface ImageAlbum {
+    albumId: string,
+    image: string,
+    size: number
+}
+interface SongPlay {
+    id: string;
+    albumId: string;
+    title: string;
+    duration: number;
+    lyric: string;
+    filePathAudio: string;
+    privacy: boolean;
+    uploadUserId: string | null;
+    createdAt: string;
+    updatedAt: string;
+    likeCount: string;
+    viewCount: string;
+    totalCount: string;
+    album: Album;
+    artists: Array<Artists>;
+}
+
 interface SongListProps {
     maintitle?: string;
     subtitle?: string;
+    data?: Array<SongPlay>
 }
 
-const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {
+const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
     const { setCurrentSong, isSkip, setIsSkip, valueSkip, showSidebarRight } = useAppContext();
     const [index, setIndex] = useState<number | null>(null);
+
+    const listSong: Array<{ audio: string; poster: string; name: string; artist: string }> = []
 
     useEffect(() => {
         if (index !== null && index >= 0 && index < listSong.length && isSkip) {
@@ -31,13 +67,6 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {
         setIsSkip(false);
     }, [isSkip]);
 
-    const listSong = [
-        { audio: '/audio/NangTho.mp3', poster: 'https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da', name: 'Nàng thơ', artist: 'Hoàng Dũng' },
-        { audio: '/audio/EmDungKhoc.mp3', poster: "https://i.scdn.co/image/ab67616d00001e02827bd87fc2dec81441a4a059", name: 'Em đừng khóc', artist: 'Chillies' },
-        { audio: '/audio/DoanKetMoi.mp3', poster: "https://i.scdn.co/image/ab67616d00001e02d0e2168c8f5e545b621ad549", name: 'Đoạn kết mới', artist: 'Hoàng Dũng' },
-        { audio: '/audio/MotNganNoiDau.mp3', poster: "https://i.scdn.co/image/ab67616d00001e02acdef1320a648494b4303e9d", name: 'Một ngàn nỗi đau', artist: 'Văn Mai Hương' },
-        { audio: '/audio/Audio.mp3', poster: 'https://i.scdn.co/image/ab67616d00001e02a1bc26cdd8eecd89da3adc39', name: 'Đừng làm trái tim anh đau', artist: 'Sơn Tùng M-TP' },
-    ]
 
     return (
         <div className=''>
@@ -47,23 +76,37 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle }) => {
             <div className='flex items-center'>
                 <div id="list" className='flex'>
                     {
-                        (showSidebarRight ? listSong.slice(0, 4) : listSong).map((song, index) => (
-                            <div
-                                key={index}
-                                className={`bg-[#1F1F1F] p-2 px-3 mr-3 ${showSidebarRight ? 'w-[12vw]' : 'w-[13vw]'} rounded-lg cursor-pointer`}
-                                onClick={() => { setCurrentSong(song); setIndex(index); }}
-                            >
-                                <Image
-                                    src={song.poster}
-                                    alt="Song Poster"
-                                    width={400}
-                                    height={400}
-                                    className='mb-2 rounded-md'
-                                />
-                                <p className={`${showSidebarRight ? '' : 'text-[1.1rem]'} font-semibold mb-1 line-clamp-2`}>{song.name}</p>
-                                <p className='text-[0.8rem] font-thin mb-1'>{song.artist}</p>
-                            </div>
-                        ))
+                        (showSidebarRight ? data?.slice(0, 4) : data?.slice(0, 5))?.map((song, index) => {
+                            const nameArtist = song.artists && song.artists.length > 0 ? song.artists[0].name : 'Unknown Artist'
+                            const poster = song.album && song.album.albumImages && song.album.albumImages.length > 0
+                                ? song.album.albumImages[0].image
+                                : 'https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da';
+                            const songData = {
+                                audio: song.filePathAudio,
+                                poster: poster,
+                                name: song.title,
+                                artist: nameArtist
+                            };
+                            listSong.push(songData)
+                            return (
+                                <div
+                                    key={index}
+                                    className={`bg-[#1F1F1F] p-2 px-3 mr-3 ${showSidebarRight ? 'w-[12vw]' : 'w-[13vw]'} rounded-lg cursor-pointer`}
+                                    onClick={() => { setCurrentSong(songData); setIndex(index); }}
+                                >
+                                    <Image
+                                        src={poster}
+                                        alt="Song Poster"
+                                        width={400}
+                                        height={400}
+                                        className='mb-2 rounded-md'
+                                    />
+                                    <p className={`${showSidebarRight ? '' : 'text-[1.1rem]'} font-semibold mb-1 line-clamp-2`}>{song.title}</p>
+                                    <p className='text-[0.8rem] font-thin mb-1'>{nameArtist}</p>
+                                </div>
+                            )
+
+                        })
                     }
                 </div>
                 <div className='flex flex-col items-center ml-3 cursor-pointer'>

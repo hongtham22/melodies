@@ -1,27 +1,26 @@
 'use client'
 import React from "react";
-import artistimg from "@/assets/img/artist.png";
 import Image from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from '@/components/provider/songProvider';
 
+interface Artist {
+  id: string;
+  name: string;
+  avatar: string;
+  bio: string | null;
+  createdAt: string;
+  updatedAt: string;
+  followerCount: string;
+}
 interface PeopleListProps {
   maintitle?: string;
   subtitle?: string;
+  data?: Array<Artist>
 }
 
-const PopularArtists: React.FC<PeopleListProps> = ({ maintitle, subtitle }) => {
+const PopularArtists: React.FC<PeopleListProps> = ({ maintitle, subtitle, data }) => {
   const { showSidebarRight } = useAppContext();
-  const artist = { name: "Lana Del Ray", img: artistimg };
-
-  // Sử dụng Array.from để tạo mảng gồm 6 bản sao của cùng một nghệ sĩ
-  let artistList = []
-  if (showSidebarRight) {
-    artistList = Array.from({ length: 5 }, () => artist);
-  } else {
-    artistList = Array.from({ length: 6 }, () => artist);
-  }
-
 
   return (
     <div className="bg-primaryColorBg w-full mt-2 text-white">
@@ -29,7 +28,7 @@ const PopularArtists: React.FC<PeopleListProps> = ({ maintitle, subtitle }) => {
         {maintitle} <span className="text-primaryColorPink"> {subtitle}</span>
       </h1>
       <div className="flex justify-around gap-6 items-center pr-5">
-        {artistList.map((artist, index) => (
+        {data?.slice(0, 6).map((artist, index) => (
           <div
             key={index}
             className="flex flex-col gap-6 justify-center items-center"
@@ -37,7 +36,8 @@ const PopularArtists: React.FC<PeopleListProps> = ({ maintitle, subtitle }) => {
             {
               showSidebarRight ? (
                 <Image
-                  src={artist.img}
+                  // src={artist.avatar || `https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da`}
+                  src={`https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da`}
                   alt={artist.name}
                   width={120}
                   height={120}
@@ -46,7 +46,8 @@ const PopularArtists: React.FC<PeopleListProps> = ({ maintitle, subtitle }) => {
                 />
               ) : (
                 <Image
-                  src={artist.img}
+                  // src={artist.avatar || `https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da`}
+                  src={`https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da`}
                   alt={artist.name}
                   width={150}
                   height={150}

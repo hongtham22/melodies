@@ -197,7 +197,7 @@ const MusicPlayer: React.FC = () => {
     return (
         <TooltipProvider>
             <div className='fixed bottom-0 h-[12vh] w-full border-2 bg-[#121212] flex justify-between items-center px-5 z-40' >
-                <div className='flex items-center w-[20vw]'>
+                <div className='flex items-center w-[23vw]'>
                     <Image
                         src={currentSong.poster}
                         alt="Song Poster"
