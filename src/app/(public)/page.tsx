@@ -7,8 +7,10 @@ import PopularArtists from "@/components/popularArtists";
 import SongList from "@/components/listSong";
 import TrendingSongs from "@/components/trendingSongs";
 import MoodPlaylist from "@/components/moodPlaylist";
+import { useAppContext } from "@/app/AppProvider";
 
 export default function Home() {
+  const { setLoading } = useAppContext();
   const [weekSong, setWeekSong] = useState()
   const [newReleaseSong, setNewReleaseSong] = useState()
   const [trendSong, setTrendSong] = useState()
@@ -16,6 +18,7 @@ export default function Home() {
   useEffect(() => {
     const fetchSong = async () => {
       try {
+        setLoading(true)
         const urls = [
           `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/songs/weeklytopsongs`,
           `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/songs/newRaleaseSong`,
@@ -48,6 +51,7 @@ export default function Home() {
       } catch (error) {
         console.error('Error fetching actor details:', error);
       } finally {
+        setLoading(false)
       }
     };
 

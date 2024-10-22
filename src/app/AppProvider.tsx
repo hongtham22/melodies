@@ -1,8 +1,10 @@
 'use client'
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-
+import Cookies from 'js-cookie';
 interface AppContextType {
+    loading: boolean,
+    setLoading: (loading: boolean) => void
     role: string | null,
     setRole: (role: string) => void;
     accessToken: string | null,
@@ -20,38 +22,45 @@ export const useAppContext = () => {
     return context;
 };
 
-export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [role, setRole] = useState<string>("");
-    const [accessToken, setAccessToken] = useState<string>("");
+export const AppProvider: React.FC<{
+    children: ReactNode
+    initialAccessToken?: string
+    initialRole?: string
+}> = ({
+    children,
+    initialAccessToken = '',
+    initialRole = ''
+}) => {
+        const [loading, setLoading] = useState<boolean>(false)
+        const [role, setRole] = useState<string>(() => {
+            return typeof window !== "undefined" ? Cookies.get('role') || "" : initialRole;
+        });
 
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const savedRole = localStorage.getItem('role') || "";
-            const savedAccessToken = localStorage.getItem('accessToken') || "";
-            setRole(savedRole);
-            setAccessToken(savedAccessToken);
-        }
-    }, []);
+        const [accessToken, setAccessToken] = useState<string>(() => {
+            return typeof window !== "undefined" ? Cookies.get('accessToken') || "" : initialAccessToken;
+        });
 
-    useEffect(() => {
-        if (accessToken && role) {
-            localStorage.setItem("role", role);
-            localStorage.setItem("accessToken", accessToken);
-        } else {
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("role");
-        }
-    }, [accessToken, role]);
+        useEffect(() => {
+            if (accessToken && role) {
+                Cookies.set('role', role, { expires: 7 }); // Expire in 7 days
+                Cookies.set('accessToken', accessToken, { expires: 7 }); // Expire in 7 days
+            } else {
+                Cookies.remove('accessToken');
+                Cookies.remove('role');
+            }
+        }, [accessToken, role]);
 
-    const value = {
-        role,
-        setRole,
-        accessToken,
-        setAccessToken
+        const value = {
+            loading,
+            setLoading,
+            role,
+            setRole,
+            accessToken,
+            setAccessToken
+        };
+        return (
+            <AppContext.Provider value={value}>
+                {children}
+            </AppContext.Provider>
+        );
     };
-    return (
-        <AppContext.Provider value={value}>
-            {children}
-        </AppContext.Provider>
-    );
-};

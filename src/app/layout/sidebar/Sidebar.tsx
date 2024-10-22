@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { useState } from 'react';
+import envConfig from "@/config"
 
 import {
     HomeIcon,
@@ -16,12 +17,65 @@ import {
 } from '@radix-ui/react-icons'
 import Link from 'next/link';
 
+import { useRouter } from 'next/navigation';
+import { useToast } from "@/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
+import { useAppContext } from '@/app/AppProvider';
+
 const Sidebar = () => {
+    const { accessToken } = useAppContext()
     const [activeMenu, setActiveMenu] = useState('');
+    const { toast } = useToast()
+    const router = useRouter();
 
     const handleMenuClick = (menuItem: string) => {
         setActiveMenu(menuItem);
     };
+
+    const handleLogout = async () => {
+        try {
+            const token = `Bearer ${accessToken}`;
+            console.log(token);
+
+            const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/auth/logout`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'token': token,
+                    },
+                    method: 'POST'
+                }).then(async (res) => {
+                    // console.log(res);
+
+                    const payload = await res.json()
+                    const data = {
+                        status: res.status,
+                        payload
+                    }
+                    if (!res.ok) {
+                        throw data
+                    }
+                    return data
+                })
+            console.log(result);
+            document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            router.push('/');
+            toast({
+                variant: "success",
+                title: "Congratulation!!",
+                description: "Logout Successfully",
+            })
+        } catch (error) {
+            console.log(error);
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                // description:,
+                action: <ToastAction altText="Try again">Try again</ToastAction>,
+            })
+        }
+    }
 
     const getMenuClass = (menuItem: string) => {
         return activeMenu === menuItem ? 'bg-primaryColorPink rounded-xl px-2 font-semibold' : 'text-[0.9rem]';
@@ -114,10 +168,14 @@ const Sidebar = () => {
 
                     {/* <p>Setting</p> */}
                 </div>
-                <div className={`flex my-2 cursor-pointer py-2 items-center`}
+                <div
+                    className={`flex my-2 cursor-pointer py-2 items-center`}
+                    onClick={() => handleLogout()}
                 >
                     <ExitIcon className='w-[24px] h-[24px] mr-3 text-primaryColorPink' />
-                    <Link href="/logout" className='text-primaryColorPink' >Logout</Link>
+                    <p
+                        className='text-primaryColorPink'
+                    >Logout</p>
 
                     {/* <p className='text-primaryColorPink'>Logout</p> */}
                 </div>

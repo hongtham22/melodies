@@ -46,6 +46,7 @@ export default function AuthLayout({
         <Footer />
       </ScrollContent>
       <ScrollButton />
+
     </div>
   );
 }

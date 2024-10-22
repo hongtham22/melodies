@@ -9,10 +9,6 @@ import {
     AvatarIcon,
     ExitIcon,
     GearIcon,
-    HeartIcon,
-    CounterClockwiseClockIcon,
-    ClockIcon,
-    ListBulletIcon
 } from '@radix-ui/react-icons'
 import Link from 'next/link';
 
@@ -85,7 +81,7 @@ const SidebarAdmin = () => {
                     {/* <p>Artists</p> */}
                 </div>
             </div>
-           
+
 
             <div id="general-section" className='mb-5'>
                 <p className='text-primaryColorPink/60 text-[0.8rem]'>General</p>
