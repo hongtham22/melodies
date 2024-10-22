@@ -1,8 +1,8 @@
-'use client'
+"use client";
 import React from "react";
 import Image from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
-import { useAppContext } from '@/components/provider/songProvider';
+import { useAppContext } from "@/components/provider/songProvider";
 
 interface Artist {
   id: string;
@@ -13,62 +13,73 @@ interface Artist {
   updatedAt: string;
   followerCount: string;
 }
+
 interface PeopleListProps {
   maintitle?: string;
   subtitle?: string;
-  data?: Array<Artist>
+  data?: Array<Artist>;
 }
 
-const PopularArtists: React.FC<PeopleListProps> = ({ maintitle, subtitle, data }) => {
+const PopularArtists: React.FC<PeopleListProps> = ({
+  maintitle = "Popular",
+  subtitle = "Artists",
+  data = [],
+}) => {
   const { showSidebarRight } = useAppContext();
+
+  const avatarSize = showSidebarRight ? 120 : 150;
 
   return (
     <div className="bg-primaryColorBg w-full mt-2 text-white">
       <h1 className="text-h1 mb-5">
-        {maintitle} <span className="text-primaryColorPink"> {subtitle}</span>
+        {maintitle} <span className="text-primaryColorPink">{subtitle}</span>
       </h1>
-      <div className="flex justify-around gap-6 items-center pr-5">
+
+      <div className="flex justify-between items-center">
+        {/* Map over artist data */}
         {data?.slice(0, 6).map((artist, index) => (
           <div
-            key={index}
+            key={artist.id || index}
             className="flex flex-col gap-6 justify-center items-center"
           >
-            {
-              showSidebarRight ? (
-                <Image
-                  // src={artist.avatar || `https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da`}
-                  src={`https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da`}
-                  alt={artist.name}
-                  width={120}
-                  height={120}
-                  quality={100}
-                  className="rounded-full"
-                />
-              ) : (
-                <Image
-                  // src={artist.avatar || `https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da`}
-                  src={`https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da`}
-                  alt={artist.name}
-                  width={150}
-                  height={150}
-                  quality={100}
-                  className="rounded-full"
-                />
-              )
-            }
+            <div className={`w-[${avatarSize}px] h-[${avatarSize}px]`}>
+              <Image
+                src={artist.avatar}
+                alt={`Avatar of ${artist.name}`}
+                width={avatarSize}
+                height={avatarSize}
+                quality={100}
+                className="rounded-full w-full h-full"
+              />
+            </div>
 
-            <h3 className="text-textMedium">{artist.name}</h3>
+            <h3 className="text-textMedium line-clamp-1">{artist.name}</h3>
           </div>
         ))}
 
         {/* View All button */}
-        <div className='flex flex-col items-center ml-3 cursor-pointer'>
-          <PlusIcon className={`${showSidebarRight ? 'w-[40px] h-[40px]' : 'w-[50px] h-[50px]'} bg-[#1F1F1F] rounded-full p-3 mb-2`} />
-          <p className={`${showSidebarRight ? 'font-semibold text-[0.9rem]' : 'text-h4'} whitespace-nowrap`}>View All</p>
+        <div className="flex flex-col items-center cursor-pointer">
+          <PlusIcon
+            className={`${
+              showSidebarRight ? "w-[40px] h-[40px]" : "w-[50px] h-[50px]"
+            } bg-[#1F1F1F] rounded-full p-3 mb-2`}
+          />
+          <p
+            className={`${
+              showSidebarRight ? "font-semibold text-[0.9rem]" : "text-h4"
+            } whitespace-nowrap`}
+          >
+            View All
+          </p>
         </div>
       </div>
+
+      {/* Fallback for empty data */}
+      {data?.length === 0 && (
+        <p className="text-center text-textMedium mt-4">No artists found</p>
+      )}
     </div>
   );
-}
+};
 
 export default PopularArtists;

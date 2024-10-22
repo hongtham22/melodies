@@ -42,43 +42,37 @@ const SidebarAdmin = () => {
                 >
                     <HomeIcon className='w-[24px] h-[24px] mr-3' />
                     <Link href="/admin">Dashboard</Link>
-                    {/* <p>Home</p> */}
                 </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('track')} py-2 items-center`}
                     onClick={() => handleMenuClick('track')}
                 >
                     <GlobeIcon className='w-[24px] h-[24px] mr-3' />
                     <Link href="/">Tracks</Link>
-                    {/* <p>Discover</p> */}
                 </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('album')} py-2 items-center`}
                     onClick={() => handleMenuClick('album')}
                 >
                     <DiscIcon className='w-[24px] h-[24px] mr-3' />
-                    <Link href="/albums">Albums</Link>
+                    <Link href="/">Albums</Link>
 
-                    {/* <p>Albums</p> */}
                 </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('artist')} py-2 items-center`}
                     onClick={() => handleMenuClick('artist')}
                 >
                     <AvatarIcon className='w-[24px] h-[24px] mr-3' />
                     <Link href="/">Artists</Link>
-                    {/* <p>Artists</p> */}
                 </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('playlist')} py-2 items-center`}
                     onClick={() => handleMenuClick('user')}
                 >
                     <AvatarIcon className='w-[24px] h-[24px] mr-3' />
                     <Link href="/">Playlists</Link>
-                    {/* <p>Artists</p> */}
                 </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('user')} py-2 items-center`}
                     onClick={() => handleMenuClick('user')}
                 >
                     <AvatarIcon className='w-[24px] h-[24px] mr-3' />
                     <Link href="/">Users</Link>
-                    {/* <p>Artists</p> */}
                 </div>
             </div>
 
@@ -91,14 +85,12 @@ const SidebarAdmin = () => {
                     <GearIcon className='w-[24px] h-[24px] mr-3' />
                     <Link href="/setting">Setting</Link>
 
-                    {/* <p>Setting</p> */}
                 </div>
                 <div className={`flex my-2 cursor-pointer py-2 items-center`}
                 >
                     <ExitIcon className='w-[24px] h-[24px] mr-3 text-primaryColorPink' />
                     <Link href="/logout" className='text-primaryColorPink' >Logout</Link>
 
-                    {/* <p className='text-primaryColorPink'>Logout</p> */}
                 </div>
             </div>
         </div >
