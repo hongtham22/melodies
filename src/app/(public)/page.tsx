@@ -54,7 +54,7 @@ export default function Home() {
     fetchSong();
   }, []);
   return (
-    <div className="flex flex-col gap-5 mb-20">
+    <div className="flex flex-col px-8 gap-5 mb-20">
       <Banner />
       <div className="">
         <SongList maintitle="Weekly Top" subtitle="Songs" data={weekSong} />
