@@ -67,7 +67,7 @@ const Header = () => {
         <div
             ref={headerRef}
             id="header"
-            className={`${showSidebarRight ? 'w-[62%]' : 'w-[83%]'} flex pt-8 px-28 justify-between items-center bg-transparent fixed z-20`}
+            className={`${showSidebarRight ? 'w-[62%]' : 'w-[82%]'} flex pt-8 px-28 justify-between items-center bg-transparent fixed z-20`}
         >
             <div className={`${showSidebarRight ? 'w-[25vw]' : 'w-[30vw]'} flex items-center`}>
                 <div>
