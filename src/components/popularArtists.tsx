@@ -42,7 +42,7 @@ const PopularArtists: React.FC<PeopleListProps> = ({
             key={artist.id || index}
             className="flex flex-col gap-6 justify-center items-center"
           >
-            <div className={`w-[${avatarSize}px] h-[${avatarSize}px]`}>
+            <div style={{ width: avatarSize, height: avatarSize }}>
               <Image
                 src={artist.avatar}
                 alt={`Avatar of ${artist.name}`}
