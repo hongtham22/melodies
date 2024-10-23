@@ -112,7 +112,7 @@ const WaitingList: React.FC = () => {
             flex flex-col w-[98%] bg-primaryColorBg rounded-md mt-3
             "
       >
-        <div className="block w-[19%] fixed bg-primaryColorBg py-3 shadow-lg shadow-black">
+        <div className="block w-[18%] fixed bg-primaryColorBg py-3 shadow-lg shadow-black">
           <div className="w-full flex justify-between">
             <p className="font-semibold text-[1.1rem] mt-1 ml-3 text-primaryColorPink text-nowrap">
               Waiting list

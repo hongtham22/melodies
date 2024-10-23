@@ -25,7 +25,7 @@ const SongIntroduce: React.FC = () => {
                     
             "
       >
-        <div className="block w-[19%] fixed bg-primaryColorBg py-3 shadow-lg shadow-black">
+        <div className="block w-[18%] fixed bg-primaryColorBg py-3 shadow-lg shadow-black">
           <div className="w-full flex justify-between">
             <p className="font-semibold mt-1 ml-3 text-[1.1rem] text-primaryColorPink text-nowrap line-clamp-1">
               Nàng thơ
@@ -76,9 +76,8 @@ const SongIntroduce: React.FC = () => {
             </div>
           </div>
           <div
-            className={`relative self-center rounded-md ${
-              currentSong ? "mb-60" : "mb-40"
-            } `}
+            className={`relative self-center rounded-md ${currentSong ? "mb-60" : "mb-40"
+              } `}
           >
             <Image
               src="https://i.scdn.co/image/ab67616100005174d1f2d75c4da62e87d1ede357"

@@ -92,8 +92,8 @@ const TrendingSongs: React.FC<SongListProps> = ({ data }) => {
               const nameAlbum = song.album ? song.album.title : "";
               const poster =
                 song.album &&
-                song.album.albumImages &&
-                song.album.albumImages.length > 0
+                  song.album.albumImages &&
+                  song.album.albumImages.length > 0
                   ? song.album.albumImages[0].image
                   : "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
               return (
