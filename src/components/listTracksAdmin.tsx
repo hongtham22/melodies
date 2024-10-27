@@ -31,7 +31,7 @@ function ListTracksAdmin() {
   ];
   return (
     <div className="w-full flex flex-col justify-center items-center">
-      <ScrollArea className="w-[1150px] whitespace-nowrap rounded-md border-primaryColorBg">
+      <ScrollArea className="w-[1150px] whitespace-nowrap rounded-md border-primaryColorBg mb-2">
         <table className="w-[120%] text-white border-separate border-spacing-y-3 mb-5 ">
           <thead className="w-full text-textMedium text-primaryColorBlue">
             <tr>
@@ -79,7 +79,7 @@ function ListTracksAdmin() {
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
-              <th className="w-[10%] pl-2">
+              <th className="w-[15%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Like Times</p>
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
