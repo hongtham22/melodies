@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import envConfig from "@/config"
+import { fetchApiData } from "@/app/api/appService";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -54,45 +54,29 @@ function Page() {
       alert("Please accept the terms and privacy policies to sign up.");
       return;
     }
+  
     console.log(values);
-    try {
-      const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/users/otp`,
-        {
-          body: JSON.stringify(values),
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          method: 'POST'
-        }).then(async (res) => {
-          // console.log(res);
 
-          const payload = await res.json()
-          const data = {
-            status: res.status,
-            payload
-          }
-          if (!res.ok) {
-            throw data
-          }
-          return data
-        })
-      console.log(result);
-      if (result.status === 200) {
-        localStorage.setItem('email', values.email)
-        localStorage.setItem('username', values.username)
-        localStorage.setItem('password', values.password)
-      }
+    const result = await fetchApiData(
+      "/api/user/otp",
+      "POST",
+      JSON.stringify(values)
+    );
+
+    if (result.success) {
+      localStorage.setItem('email', values.email);
+      localStorage.setItem('username', values.username);
+      localStorage.setItem('password', values.password);
       router.push("/otp?action=signup");
-    } catch (error) {
-      console.log(error);
+    } else {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: (error as { payload: { errMess: string } }).payload.errMess,
+        description: result.error || "Unexpected error occurred.",
         action: <ToastAction altText="Try again">Try again</ToastAction>,
-      })
+      });
     }
-  }
+  }  
 
   return (
     <div className="flex gap-5 justify-center items-center flex-col">
@@ -100,7 +84,7 @@ function Page() {
         Sign Up
       </p>
       <p className="text-textMedium">
-        Let’s get you all st up so you can access your personal account
+        Let&apos;s get you all st up so you can access your personal account
       </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

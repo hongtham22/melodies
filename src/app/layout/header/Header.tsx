@@ -73,7 +73,7 @@ const Header = () => {
                 <div>
                     <FaArrowLeft className='mr-8' />
                 </div>
-                <div id="search-header" className='w-full flex bg-transparent border-2 items-center px-2 rounded-full'>
+                <div id="search-header" className='w-full flex bg-transparent border-2 border-slate-200 items-center px-2 rounded-full'>
                     <MagnifyingGlassIcon className="w-[24px] h-[24px]" />
                     <input
                         type="text"

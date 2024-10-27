@@ -20,6 +20,7 @@
     "canvas": "^2.11.2",
     "class-variance-authority": "0.7.0",
     "clsx": "2.1.1",
+    "genius-lyrics-api": "^3.2.1",
     "input-otp": "^1.2.4",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.446.0",
@@ -37,6 +38,7 @@
     "tailwind-merge": "2.5.2",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss-animate": "1.0.7",
+    "tinycolor2": "^1.6.0",
     "zod": "3.23.8"
   },
   "devDependencies": {

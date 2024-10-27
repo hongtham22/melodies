@@ -1,0 +1,12 @@
+.background-with-blur::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: right;
+    filter: blur(5px);
+    z-index: 0;
+    /* Biến CSS để thiết lập hình nền */
+    background-image: var(--background-image);
+}
+  

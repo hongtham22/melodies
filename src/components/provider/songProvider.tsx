@@ -24,6 +24,8 @@ interface SongContextType {
     setIsSkip: (skip: boolean) => void;
     currentSong: SongData | null;
     setCurrentSong: (song: SongData) => void;
+    showLyricPage: boolean | null;
+    setShowLyricPage: (show: boolean) => void
 }
 
 const SongContext = createContext<SongContextType | undefined>(undefined);
@@ -46,6 +48,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [showSidebarRight, setShowSidebarRight] = useState<boolean | null>(false)
     const [showContentSong, setShowContentSong] = useState<boolean | null>(false)
     const [waitingList, setWaitingList] = useState<boolean | null>(false)
+    const [showLyricPage, setShowLyricPage] = useState<boolean | null>(false)
 
     const value = {
         showSidebarRight,
@@ -59,7 +62,9 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isSkip,
         setIsSkip,
         currentSong,
-        setCurrentSong
+        setCurrentSong,
+        showLyricPage,
+        setShowLyricPage
     };
     return (
         <SongContext.Provider value={value}>

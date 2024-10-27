@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from "@/components/provider/songProvider";
+import { useRouter } from 'next/navigation';
 import PropTypes from "prop-types";
 
 // Define an interface for the props
@@ -46,6 +47,7 @@ interface SongListProps {
 }
 
 const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
+  const router = useRouter();
   const { setCurrentSong, isSkip, setIsSkip, valueSkip, showSidebarRight } =
     useAppContext();
   const [index, setIndex] = useState<number | null>(null);
@@ -94,10 +96,9 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
                 ? song.artists[0].name
                 : "Unknown Artist";
             const poster =
-              song.album &&
-              song.album.albumImages &&
               song.album.albumImages.length > 0
-                ? song.album.albumImages[0].image
+                ? song.album.albumImages.find(img => img.size === 300)?.image ||
+                song.album.albumImages[0].image
                 : "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
             const songData = {
               audio: song.filePathAudio,
@@ -109,9 +110,8 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
             return (
               <div
                 key={index}
-                className={`bg-[#1F1F1F] p-2 px-3 mr-3 ${
-                  showSidebarRight ? "w-[12vw]" : "w-[13vw]"
-                } rounded-lg cursor-pointer flex flex-col`}
+                className={`bg-[#1F1F1F] p-2 px-3 mr-3 ${showSidebarRight ? "w-[12vw]" : "w-[13vw]"
+                  } rounded-lg cursor-pointer flex flex-col`}
                 onClick={() => {
                   setCurrentSong(songData);
                   setIndex(index);
@@ -126,13 +126,15 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
                 />
                 <div className="flex flex-col justify-between">
                   <p
-                    className={`${
-                      showSidebarRight ? "" : "text-h4"
-                    } font-semibold mb-1 line-clamp-2`}
+                    className={`${showSidebarRight ? "" : "text-h4"
+                      } font-semibold mb-1 line-clamp-2 cursor-pointer hover:underline`}
                   >
                     {song.title}
                   </p>
-                  <p className="text-[0.8rem] font-thin mb-1 line-clamp-1">
+                  <p
+                    className="text-[0.8rem] font-thin mb-1 line-clamp-1 cursor-pointer hover:underline"
+                    onClick={() => router.push(`/artist/${song.artists[0].id}`)}
+                  >
                     {nameArtist}
                   </p>
                 </div>
@@ -142,20 +144,18 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
         )}
         <div className="flex flex-col items-center cursor-pointer justify-center">
           <PlusIcon
-            className={`${
-              showSidebarRight ? "w-[40px] h-[40px]" : "w-[50px] h-[50px]"
-            } bg-[#1F1F1F] rounded-full p-3 mb-2`}
+            className={`${showSidebarRight ? "w-[40px] h-[40px]" : "w-[50px] h-[50px]"
+              } bg-[#1F1F1F] rounded-full p-3 mb-2`}
           />
           <p
-            className={`${
-              showSidebarRight ? "font-semibold text-[0.9rem]" : "text-h4"
-            } whitespace-nowrap`}
+            className={`${showSidebarRight ? "font-semibold text-[0.9rem]" : "text-h4"
+              } whitespace-nowrap`}
           >
             View All
           </p>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -30,7 +30,7 @@ interface SongPlay {
   privacy: boolean;
   uploadUserId: string | null;
   createdAt: string;
-  updatedAt: string;
+  releaseDate: string;
   likeCount: string;
   viewCount: string;
   totalCount: string;
@@ -39,10 +39,12 @@ interface SongPlay {
 }
 
 interface SongListProps {
+  maintitle?: string;
+  subtitle?: string;
   data?: Array<SongPlay>;
 }
 
-const TrendingSongs: React.FC<SongListProps> = ({ data }) => {
+const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const formatDate = (isoDate: string) => {
@@ -67,9 +69,9 @@ const TrendingSongs: React.FC<SongListProps> = ({ data }) => {
   };
 
   return (
-    <div className="bg-primaryColorBg w-full mt-2">
+    <div className="w-full mt-2">
       <h1 className="text-white text-h1">
-        Trending <span className="text-primaryColorPink"> Songs</span>
+        {maintitle} <span className="text-primaryColorPink">{subtitle}</span>
       </h1>
       <div className="flex flex-col justify-center items-center">
         <table className="max-w-full text-white border-separate border-spacing-y-3 ">
@@ -101,7 +103,7 @@ const TrendingSongs: React.FC<SongListProps> = ({ data }) => {
                   key={index}
                   className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
                 >
-                  <td className="pl-4 pr-8 text-h2 rounded-tl-lg rounded-bl-lg">
+                  <td className="pl-4 pr-8 text-h4 rounded-tl-lg rounded-bl-lg">
                     #{index + 1}
                   </td>
                   <td className="">
@@ -122,7 +124,7 @@ const TrendingSongs: React.FC<SongListProps> = ({ data }) => {
                     </p>
                   </td>
                   <td className="text-textMedium pl-4 text-center">
-                    {formatDate(song.updatedAt)}
+                    {formatDate(song.releaseDate)}
                   </td>
                   {/* <td className="text-textMedium pl-4 line-clamp-2 text-center align-middle">
                     {nameAlbum}

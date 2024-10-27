@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAppContext } from '@/components/provider/songProvider';
 import Image from 'next/image';
+import './scss/musicPlayer.scss'
 
 import { GoPlusCircle } from "react-icons/go";
 import {
@@ -47,7 +48,9 @@ const MusicPlayer: React.FC = () => {
         setShowContentSong,
         setShowSidebarRight,
         waitingList,
-        setWaitingList
+        setWaitingList,
+        showLyricPage,
+        setShowLyricPage
     } = useAppContext()
 
     const [isPlaying, setIsPlaying] = useState(false);
@@ -196,8 +199,8 @@ const MusicPlayer: React.FC = () => {
 
     return (
         <TooltipProvider>
-            <div className='fixed bottom-0 h-[12vh] w-full border-2 bg-[#121212] flex justify-between items-center px-5 z-40' >
-                <div className='flex items-center w-[23vw]'>
+            <div className='fixed bottom-0 h-[12%] w-full border-2 bg-[#121212] flex justify-between items-center px-5 z-40' >
+                <div className='flex items-center w-[23%]'>
                     <Image
                         src={currentSong.poster}
                         alt="Song Poster"
@@ -205,9 +208,15 @@ const MusicPlayer: React.FC = () => {
                         height={60}
                         className='mb-2 rounded-md'
                     />
-                    <div className='ml-3'>
-                        <p className='font-[400]'>{currentSong.name}</p>
-                        <p className='text-[0.8rem] text-primaryColorGray font-thin'>{currentSong.artist}</p>
+                    <div className='ml-3 max-w-[70%]'>
+                        <div className='relative max-w-full overflow-hidden cursor-pointer hover:underline'>
+                            <p
+                                className={`font-[500] ${currentSong.name.length > 30 ? 'marquee' : ''}`}
+                            >
+                                {currentSong.name}
+                            </p>
+                        </div>
+                        <p className='text-[0.8rem] text-primaryColorGray font-thin cursor-pointer hover:underline hover:text-white'>{currentSong.artist}</p>
                     </div>
                     <div className='ml-3 cursor-pointer text-primaryColorGray transition-transform duration-200 hover:scale-105 hover:text-white'>
                         <GoPlusCircle className='w-[20px] h-[20px]' />
@@ -292,7 +301,10 @@ const MusicPlayer: React.FC = () => {
                         className={`w-[18px] h-[18px] ml-2 cursor-pointer ${showContentSong ? 'text-primaryColorPink' : 'text-white'}`}
                         onClick={() => { setShowContentSong(!showContentSong); setShowSidebarRight(showContentSong ? false : true); setWaitingList(false) }}
                     />
-                    <MdLyrics className='w-[18px] h-[18px] ml-2 cursor-pointer' />
+                    <MdLyrics
+                        className={`w-[18px] h-[18px] ml-2 cursor-pointer ${showLyricPage ? 'text-primaryColorPink' : 'text-white'}`}
+                        onClick={() => setShowLyricPage(!showLyricPage)}
+                    />
                     <FaListCheck
                         className={`w-[18px] h-[18px] ml-2 cursor-pointer ${waitingList ? 'text-primaryColorPink' : 'text-white'}`}
                         onClick={() => { setShowSidebarRight(waitingList ? false : true); setWaitingList(!waitingList); setShowContentSong(false) }}

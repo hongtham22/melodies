@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from "react";
-import envConfig from "@/config"
+import { fetchApiData } from "@/app/api/appService";
 
 import Banner from "@/components/banner";
 import PopularArtists from "@/components/popularArtists";
@@ -17,48 +17,29 @@ export default function Home() {
   const [popularArtist, setPopularArtist] = useState()
   useEffect(() => {
     const fetchSong = async () => {
+      setLoading(true);
       try {
-        setLoading(true)
-        const urls = [
-          `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/songs/weeklytopsongs`,
-          `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/songs/newRaleaseSong`,
-          `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/songs/trending`,
-          `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/songs/popularArtist`
-        ];
-
-        const options = {
-          method: "GET",
-          headers: {
-            'Content-Type': 'application/json'
-          },
-        };
-        const fetchMovies = async (url: string) => {
-          return await fetch(url, options).then((response) => response.json());
-        };
-        try {
-          const response = await Promise.all(urls.map(fetchMovies));
-          const data1 = response[0];
-          const data2 = response[1];
-          const data3 = response[2];
-          const data4 = response[3];
-          setWeekSong(data1.weeklyTopSongs)
-          setNewReleaseSong(data2.newReleaseSongs)
-          setTrendSong(data3.topSongs)
-          setPopularArtist(data4.popArtist)
-        } catch (error) {
-          console.log(error);
-        }
+        const responses = await Promise.all([
+          fetchApiData("/api/songs/weeklytopsongs", "GET", null, null, 0),
+          fetchApiData("/api/songs/newRaleaseSong", "GET", null, null, 23),
+          fetchApiData("/api/songs/trending", "GET", null, null, 5),
+          fetchApiData("/api/artist/popular", "GET", null, null, 0)
+        ]);
+        if (responses[0].success) setWeekSong(responses[0].data.weeklyTopSongs);
+        if (responses[1].success) setNewReleaseSong(responses[1].data.newReleaseSongs);
+        if (responses[2].success) setTrendSong(responses[2].data.trendingSongs);
+        if (responses[3].success) setPopularArtist(responses[3].data.popArtists);
       } catch (error) {
-        console.error('Error fetching actor details:', error);
+        console.error("Error fetching songs:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     };
-
     fetchSong();
   }, []);
+
   return (
-    <div className="flex flex-col px-8 gap-5 mb-20">
+    <div className="flex flex-col px-8 gap-5 mb-20 relative">
       <Banner />
       <div className="">
         <SongList maintitle="Weekly Top" subtitle="Songs" data={weekSong} />
@@ -67,7 +48,7 @@ export default function Home() {
         <SongList maintitle="New Releases" subtitle="Songs" data={newReleaseSong} />
       </div>
       <div className="">
-        <TrendingSongs data={trendSong} />
+        <TrendingSongs maintitle="Trending" subtitle="Songs" data={trendSong} />
       </div>
       <div className="">
         <PopularArtists maintitle="Popular" subtitle="Artists" data={popularArtist} />

@@ -8,6 +8,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import Header from "@/app/layout/header/Header";
 import Footer from "@/app/layout/footer/Footer";
 import ScrollButton from "@/app/layout/scrollButton/ScrollButton";
+import LyricPage from "@/components/lyricPage";
 
 const PublicLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -17,9 +18,10 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({
       <Sidebar />
       <ScrollContent>
         <div className="ml-[16.66vw]">
-          <main className="flex flex-col items-center">
+          <main className="flex flex-col items-center relative">
             <Header />
             {children}
+            <LyricPage />
             <ToastProvider />
             <Footer />
           </main>

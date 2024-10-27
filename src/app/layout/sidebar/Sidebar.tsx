@@ -25,7 +25,7 @@ import { useAppContext as useSongContext } from '@/components/provider/songProvi
 
 
 const Sidebar = () => {
-    const { accessToken } = useAppContext()
+    const { accessToken, setAccessToken, setRole } = useAppContext()
     const { currentSong } = useSongContext();
     const [pb, setPb] = useState(false)
 
@@ -48,7 +48,7 @@ const Sidebar = () => {
             const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/auth/logout`,
                 {
                     headers: {
-                        'token': `Bearer ${accessToken}`,
+                        'Authorization': `Bearer ${accessToken}`,
                     },
                     method: 'POST'
                 }).then(async (res) => {
@@ -67,7 +67,10 @@ const Sidebar = () => {
             console.log(result);
             document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             document.cookie = 'role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            setAccessToken('')
+            setRole('')
             router.push('/');
+            window.location.reload();
             toast({
                 variant: "success",
                 title: "Congratulation!!",

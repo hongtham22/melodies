@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import envConfig from "@/config"
+import { fetchApiData } from "@/app/api/appService";
 
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
@@ -61,46 +61,25 @@ function Page() {
   }
 
   async function onSubmit(values: RegisterBodyType) {
-    console.log(values);
-
-    const storedUsername = localStorage.getItem("username");
-    const storedEmail = localStorage.getItem("email");
-    const storedPassword = localStorage.getItem("password");
-
     const combinedValues = {
       ...values,
-      username: storedUsername,
-      email: storedEmail,
-      password: storedPassword
+      username: localStorage.getItem("username"),
+      email: localStorage.getItem("email"),
+      password: localStorage.getItem("password"),
     };
+  
+    const result = await fetchApiData(
+      "/api/user/register",
+      "POST",
+      JSON.stringify(combinedValues)
+    );
 
-    console.log("Combined values:", combinedValues);
+    if (result.success) {
+      console.log("Registration result:", result.data);
+      localStorage.removeItem("username");
+      localStorage.removeItem("email");
+      localStorage.removeItem("password");
 
-    try {
-      const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/users/register`,
-        {
-          body: JSON.stringify(combinedValues),
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          method: 'POST'
-        }).then(async (res) => {
-          // console.log(res);
-
-          const payload = await res.json()
-          const data = {
-            status: res.status,
-            payload
-          }
-          if (!res.ok) {
-            throw data
-          }
-          return data
-        })
-      console.log(result);
-      localStorage.removeItem('password');
-      localStorage.removeItem('username');
-      localStorage.removeItem('email')
       if (action === "signup") {
         router.push("/login");
       } else if (action === "forgotpassword") {
@@ -108,19 +87,19 @@ function Page() {
       }
       toast({
         variant: "success",
-        title: "Congratulation!!",
-        description: "Register Successfully",
-      })
-    } catch (error) {
-      console.log(error);
+        title: "Congratulations!",
+        description: "Registration successful!",
+      });
+    } else {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: (error as { payload: { errMess: string } }).payload.errMess,
+        description: result.error,
         action: <ToastAction altText="Try again">Try again</ToastAction>,
       })
     }
-  }
+  }  
+  
 
   function handleResend() {
     form.reset({ otp: "" });

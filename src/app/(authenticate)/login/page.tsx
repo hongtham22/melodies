@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import envConfig from "@/config"
+import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from '@/app/AppProvider';
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -51,46 +51,23 @@ function Page() {
   }, [accessToken, role]);
 
   async function onSubmit(values: LoginBodyType) {
-    console.log(values);
+    const result = await fetchApiData(
+      "/api/auth/login",
+      "POST",
+      JSON.stringify(values)
+    );
 
-    try {
-      const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/auth/login`,
-        {
-          body: JSON.stringify(values),
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          method: 'POST'
-        }).then(async (res) => {
-          // console.log(res);
-          const payload = await res.json()
-          const data = {
-            status: res.status,
-            payload
-          }
-          if (!res.ok) {
-            throw data
-          }
-          return data
-        })
-      console.log(result);
-      setAccessToken(result.payload.accessToken)
-      setRole(result.payload.role)
-      // if (role === 'User') {
-      //   router.push("/");
-      // } else {
-      //   router.push('/admin')
-      // }
-
-    } catch (error) {
-      console.log(error);
+    if (result.success) {
+      setAccessToken(result.data.accessToken);
+      setRole(result.data.role);
+    } else {
+      console.error("Login error:", result.error);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: (error as { payload: { errMess: string } }).payload.errMess,
+        description: result.error,
         action: <ToastAction altText="Try again">Try again</ToastAction>,
-      })
-
+      });
     }
   }
 

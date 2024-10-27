@@ -1,32 +1,55 @@
 'use client'
 import React, { useState } from "react";
+import tinycolor from "tinycolor2";
 import { useAppContext } from '@/components/provider/songProvider';
-
-
+import './scss/artistBanner.scss'
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-const ArtistBanner = () => {
-    const { showSidebarRight } = useAppContext();
 
+interface Artist {
+    id: string;
+    name: string;
+    avatar: string;
+    followersCount: number
+}
+
+interface BannerProps {
+    data?: Artist
+    color?: string
+}
+const ArtistBanner: React.FC<BannerProps> = ({ data, color }) => {
+    const { showSidebarRight } = useAppContext();
     const [tym, setTym] = useState<boolean>(false)
+
+    const darkerColor = tinycolor(color).darken(30).toString();
 
     return (
         <div
-            className={`${showSidebarRight ? 'w-[60vw] h-[60vh]' : 'w-[75vw] h-[60vh]'} my-4 px-6 py-4 rounded-3xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden`}
+            className={`w-[100%] h-[60vh] px-6 py-4 rounded-t-2xl bg-cover bg-center flex gap-[114px] flex-col relative overflow-hidden`}
         >
             {/* Pseudo-element for background image */}
             <div
                 className="background-image-with-blur absolute inset-0 z-10 bg-contain transform bg-no-repeat rounded-lg"
                 style={{
-                    backgroundImage: "url('https://i.scdn.co/image/ab6761610000e5eb7abbccceb90cd440283fa62a')",
+                    backgroundImage: `url(${data?.avatar})`,
                     backgroundSize: '220px',
                     backgroundPosition: `5% calc(100% - 30px)`,
                 }}
             />
 
             <div
-                className="absolute inset-0 z-5 bg-contain transform bg-right bg-no-repeat before:content-[''] before:absolute before:inset-0 before:bg-[url('https://i.scdn.co/image/ab6761610000e5eb7abbccceb90cd440283fa62a')] before:bg-cover before:transform before:bg-right before:bg-no-repeat before:blur-[5px] before:z-0"
+                className={`absolute inset-0 z-5 bg-contain transform bg-right bg-no-repeat background-with-blur`}
+                style={{
+                    '--background-image': `url(${data?.avatar})`,
+                    // backgroundPosition: `center calc(100% - 200px)`
+                } as React.CSSProperties}
             />
-            <div className="absolute inset-0 z-15 bg-black opacity-50" />
+            <div
+                className="absolute inset-0 z-15"
+                style={{
+                    background: `linear-gradient(to right, #000000 40%, ${darkerColor} 98%)`,
+                    opacity: 0.8, // Điều chỉnh độ mờ của lớp phủ nếu cần
+                }}
+            />
 
             <div className={`z-10 absolute  line-clamp-1 ${showSidebarRight ? 'top-[61%] left-[33%] ' : 'top-[58%] left-[26%]'}`}>
                 <div className="flex items-center mb-3">
@@ -34,17 +57,17 @@ const ArtistBanner = () => {
                         <path fill="currentColor" d="M10.814.5a1.658 1.658 0 0 1 2.372 0l2.512 2.572 3.595-.043a1.658 1.658 0 0 1 1.678 1.678l-.043 3.595 2.572 2.512c.667.65.667 1.722 0 2.372l-2.572 2.512.043 3.595a1.658 1.658 0 0 1-1.678 1.678l-3.595-.043-2.512 2.572a1.658 1.658 0 0 1-2.372 0l-2.512-2.572-3.595.043a1.658 1.658 0 0 1-1.678-1.678l.043-3.595L.5 13.186a1.658 1.658 0 0 1 0-2.372l2.572-2.512-.043-3.595a1.658 1.658 0 0 1 1.678-1.678l3.595.043L10.814.5zm6.584 9.12a1 1 0 0 0-1.414-1.413l-6.011 6.01-1.894-1.893a1 1 0 0 0-1.414 1.414l3.308 3.308 7.425-7.425z"></path></svg>
                     <p className="text-[0.9rem] ml-2">Verified Artist</p>
                 </div>
-                <p className={`font-bold ${showSidebarRight ? 'text-6xl' : 'text-7xl'}  mb-4`}>Hoàng Dũng</p>
+                <p className={`font-bold ${showSidebarRight ? 'text-6xl' : 'text-7xl'}  mb-4`}>{data?.name}</p>
                 <div
-                    className="flex items-center cursor-pointer text-[1.2rem]"
+                    className="flex items-end cursor-pointer text-[1.2rem]"
                     onClick={() => setTym(!tym)} // Toggle between "liked" and "unliked" state
                 >
                     {tym ? (
-                        <FaHeart className="text-[#F75050] text-[1.7rem] transition-transform duration-300 hover:scale-[1.1]" />
+                        <FaHeart className="text-[#F75050] ml-[0.75%] mt-[0.75%] text-[1.7rem] transition-transform duration-300 hover:scale-[1.1]" />
                     ) : (
-                        <FaRegHeart className="text-[#F75050] text-[1.7rem] transition-transform duration-300 hover:scale-[1.1]" />
+                        <FaRegHeart className="text-[#F75050] ml-[0.75%] mt-[0.75%] text-[1.7rem] transition-transform duration-300 hover:scale-[1.1]" />
                     )}
-                    <p className="ml-2 text-[0.95rem]">100.000 followers</p>
+                    <p className="ml-2 text-[0.95rem]">{data?.followersCount.toLocaleString()} followers</p>
                 </div>
             </div>
         </div>
