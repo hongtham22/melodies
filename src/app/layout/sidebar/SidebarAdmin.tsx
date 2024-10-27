@@ -47,7 +47,7 @@ const SidebarAdmin = () => {
                     onClick={() => handleMenuClick('track')}
                 >
                     <GlobeIcon className='w-[24px] h-[24px] mr-3' />
-                    <Link href="/">Tracks</Link>
+                    <Link href="/admin/tracks">Tracks</Link>
                 </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('album')} py-2 items-center`}
                     onClick={() => handleMenuClick('album')}
@@ -72,7 +72,7 @@ const SidebarAdmin = () => {
                     onClick={() => handleMenuClick('user')}
                 >
                     <AvatarIcon className='w-[24px] h-[24px] mr-3' />
-                    <Link href="/">Users</Link>
+                    <Link href="/admin/users">Users</Link>
                 </div>
             </div>
 

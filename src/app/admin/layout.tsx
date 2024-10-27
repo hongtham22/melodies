@@ -5,18 +5,18 @@ import ScrollContent from "@/components/scrollContent";
 import SongIntroduce from "@/components/songIntroduce";
 import WaitingList from "@/components/waitingList";
 import { ToastProvider } from "@/components/ui/toast";
-import Header from "@/app/layout/header/Header";
 import Footer from "@/app/layout/footer/Footer";
 import ScrollButton from "@/app/layout/scrollButton/ScrollButton";
 import SidebarAdmin from "@/app/layout/sidebar/SidebarAdmin";
 import { useAppContext } from "@/app/AppProvider";
+import HeaderAdmin from "@/app/layout/header/HeaderAdmin";
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { role } = useAppContext();
   return (
-    <div className="flex">
+    <div className="">
       {
         role && role === 'Admin' ? (
           <div>
@@ -24,7 +24,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
             <ScrollContent>
               <div className="ml-[16.66vw]">
                 <main className="flex flex-col items-center">
-                  <Header />
+                  <HeaderAdmin />
                   {children}
                   <ToastProvider />
                   <Footer />
@@ -40,7 +40,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
           <p>404 </p>
         )
       }
-
     </div>
   );
 };
