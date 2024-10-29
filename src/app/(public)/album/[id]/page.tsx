@@ -1,12 +1,15 @@
 "use client";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
+import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
 import { HeartIcon, HeartFilledIcon } from "@radix-ui/react-icons";
 import { FaPlay } from "react-icons/fa";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { IoIosMore } from "react-icons/io";
 import AlbumList from "@/components/albumList";
+import LoadingPage from "@/components/loadingPage";
+import NotFound from "@/app/not-found";
 
 interface Artists {
   id: string;
@@ -56,13 +59,16 @@ interface DataAlbum {
 }
 
 const Page = ({ params }: { params: { id: string } }) => {
+  const { loading, setLoading } = useAppContext();
   const [dataAlbum, setDataAlbum] = useState<DataAlbum>()
   const [albumImage, setAlbumImage] = useState<string>("https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da")
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [dominantColor, setDominantColor] = useState<string>();
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const result = await fetchApiData(`/api/album/more/${params.id}`, "GET");
       if (result.success) {
         setDataAlbum(result.data.albumWithSong)
@@ -89,7 +95,9 @@ const Page = ({ params }: { params: { id: string } }) => {
         }
       } else {
         console.error("Login error:", result.error);
+        setNotFound(true)
       }
+      setLoading(false);
     };
 
     fetchData();
@@ -118,8 +126,8 @@ const Page = ({ params }: { params: { id: string } }) => {
     return timeParts.join(' ');
   }
 
-
-
+  if (loading) return <LoadingPage />
+  if (notFound) return <NotFound />;
   return (
     <div className="w-full  bg-secondColorBg">
       <div
@@ -144,7 +152,7 @@ const Page = ({ params }: { params: { id: string } }) => {
               />
             </div>
             <div className="flex gap-4 flex-col">
-              <h3 className="">{dataAlbum?.albumType}</h3>
+              <h3 className="uppercase">{dataAlbum?.albumType}</h3>
               <h1 className="text-t1 text-[58px] ">{dataAlbum?.title}</h1>
               <div className="flex items-center space-x-2 text-h4 font-semibold">
                 <p>{dataAlbum?.artistMain.name}</p>
@@ -173,8 +181,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <th className="w-[3%] pl-4"></th>
                 <th className="w-[4%] pl-4"></th>
                 <th className="w-[30%] pl-4"></th>
-                <th className="w-[15%] text-textMedium pl-4">Release Date</th>
-                <th className="w-[30%] text-textMedium pl-4">Album</th>
                 <th className="w-[18%] text-textMedium ">Time</th>
               </tr>
             </thead>
@@ -204,12 +210,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                       {song.artists[0].name}
                     </p>
                   </td>
-                  <td className="text-textMedium pl-4 text-center">
-                    {song.releaseDate}
-                  </td>
-                  <td className="text-textMedium pl-4 text-center">
-                    {song.album}
-                  </td>
                   <td className="text-center pl-4 rounded-tr-lg rounded-br-lg align-middle">
                     <div className="flex gap-3 items-center justify-center">
                       <div
@@ -234,7 +234,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           </table>
         </div>
         <div className="mx-5 mt-10 mb-20">
-          <AlbumList maintitle="Artist " subtitle="Albums" data={dataAlbum?.albumAnother} />
+          <AlbumList maintitle="Other albums by " subtitle={dataAlbum?.artistMain.name} data={dataAlbum?.albumAnother} />
         </div>
       </div>
     </div>

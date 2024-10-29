@@ -211,7 +211,7 @@ const MusicPlayer: React.FC = () => {
                     <div className='ml-3 max-w-[70%]'>
                         <div className='relative max-w-full overflow-hidden cursor-pointer hover:underline'>
                             <p
-                                className={`font-[500] ${currentSong.name.length > 30 ? 'marquee' : ''}`}
+                                className={`font-[500] ${currentSong.name.length > 25 ? 'marquee' : ''}`}
                             >
                                 {currentSong.name}
                             </p>

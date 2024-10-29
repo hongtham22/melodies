@@ -10,6 +10,7 @@ import ScrollButton from "@/app/layout/scrollButton/ScrollButton";
 import SidebarAdmin from "@/app/layout/sidebar/SidebarAdmin";
 import { useAppContext } from "@/app/AppProvider";
 import HeaderAdmin from "@/app/layout/header/HeaderAdmin";
+import NotFound from "@/app/not-found";
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -37,7 +38,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
             <ScrollButton />
           </div>
         ) : (
-          <p>404 </p>
+          <NotFound />
         )
       }
     </div>

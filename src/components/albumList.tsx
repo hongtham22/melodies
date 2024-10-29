@@ -25,6 +25,7 @@ interface AlbumListProps {
 }
 
 const AlbumList: React.FC<AlbumListProps> = ({ maintitle, subtitle, data }) => {
+    const sortedData = data?.slice().sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
     const router = useRouter();
     const { showSidebarRight } =
         useAppContext();
@@ -39,7 +40,7 @@ const AlbumList: React.FC<AlbumListProps> = ({ maintitle, subtitle, data }) => {
                 id="list"
                 className="w-full flex flex-wrap gap-3 items-stretch"
             >
-                {(showSidebarRight ? data?.slice(0, 4) : data?.slice(0, 5))?.map(
+                {(showSidebarRight ? sortedData?.slice(0, 4) : sortedData?.slice(0, 5))?.map(
                     (album, index) => {
                         const poster =
                             album.albumImages.length > 0

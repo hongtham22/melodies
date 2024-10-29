@@ -1,18 +1,26 @@
 'use client'
 import { useEffect, useState } from "react";
+import { useAppContext } from "@/app/AppProvider";
+
 import { fetchApiData } from "@/app/api/appService";
 import ArtistBanner from "@/components/artistBanner";
 import TrendingSongs from "@/components/trendingSongs";
 import AlbumList from "@/components/albumList";
+import LoadingPage from "@/components/loadingPage";
+import NotFound from "@/app/not-found";
+
 
 const Page = ({ params }: { params: { id: string } }) => {
+    const { loading, setLoading } = useAppContext();
     const [dataArtist, setDataArtist] = useState()
     const [dataSongArtist, setDataSongArtist] = useState()
     const [dominantColor, setDominantColor] = useState<string>();
     const [dataAlbumArtist, setDataAlbumArtist] = useState()
+    const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true)
             const result = await fetchApiData(`/api/artist/more/${params.id}`, "GET");
             if (result.success) {
                 setDataArtist(result.data.artist)
@@ -36,12 +44,16 @@ const Page = ({ params }: { params: { id: string } }) => {
                 }
             } else {
                 console.error("Login error:", result.error);
+                setNotFound(true)
             }
+            setLoading(false);
         };
 
         fetchData();
     }, [params.id]);
 
+    if (loading) return <LoadingPage />
+    if (notFound) return <NotFound />;
     return (
         <div className="w-full  bg-secondColorBg flex flex-col">
             <div

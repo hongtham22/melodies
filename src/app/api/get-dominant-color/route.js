@@ -8,7 +8,7 @@ export async function GET(request) {
     const palette = await Vibrant.from(imageUrl).getPalette();
     // console.log("Palette: ", palette); 
 
-    const vibrantSwatch = palette.Muted //palette.DarkVibrant; 
+    const vibrantSwatch = palette.Muted; 
     // const vibrantSwatch = palette.DarkVibrant //palette.DarkVibrant; 
 
 

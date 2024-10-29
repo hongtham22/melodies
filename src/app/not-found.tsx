@@ -2,7 +2,7 @@ import React from "react";
 import notfoundimg from "@/assets/img/bgnotfound.png";
 import { ResetIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-function notFound() {
+function NotFound() {
   return (
     <div
       className="bg-cover bg-center flex flex-col items-center justify-center h-screen w-screen text-white gap-2"
@@ -25,4 +25,4 @@ function notFound() {
   );
 }
 
-export default notFound;
+export default NotFound;
