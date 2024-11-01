@@ -60,7 +60,7 @@ const SidebarAdmin = () => {
                     onClick={() => handleMenuClick('artist')}
                 >
                     <AvatarIcon className='w-[24px] h-[24px] mr-3' />
-                    <Link href="/">Artists</Link>
+                    <Link href="/admin/artists">Artists</Link>
                 </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('playlist')} py-2 items-center`}
                     onClick={() => handleMenuClick('user')}

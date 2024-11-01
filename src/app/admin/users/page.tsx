@@ -4,8 +4,8 @@ import { MdOutlineWorkspacePremium } from "react-icons/md";
 import { TbUserCheck } from "react-icons/tb";
 function Page() {
   return (
-    <div className="w-full my-20 m-6 p-8 ">
-      <div className="flex justify-around items-center px-4">
+    <div className="w-full my-20 m-6 p-8 flex flex-col items-center justify-center ">
+      <div className="w-full flex justify-around items-center px-4">
         <div className="w-1/5 flex justify-center items-center gap-4 px-4 py-1 bg-secondColorBg shadow-sm shadow-primaryColorBlue rounded-md">
           <div className="w-18 h-18 bg-primaryColorBg rounded-full flex items-center justify-center">
             <BiUser className="w-10 h-10 text-primaryColorPink" />

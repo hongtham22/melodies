@@ -17,7 +17,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
   const { role } = useAppContext();
   return (
     <div className="">
-      {
+      {/* {
         role && role === 'Admin' ? (
           <div>
             <SidebarAdmin />
@@ -39,7 +39,24 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
         ) : (
           <p>404 </p>
         )
-      }
+      } */}
+       <div>
+            <SidebarAdmin />
+            <ScrollContent>
+              <div className="ml-[16.66vw]">
+                <main className="flex flex-col items-center">
+                  <HeaderAdmin />
+                  {children}
+                  <ToastProvider />
+                  <Footer />
+                </main>
+              </div>
+            </ScrollContent>
+            <SongIntroduce />
+            <WaitingList />
+            <MusicPlayer />
+            <ScrollButton />
+          </div>
     </div>
   );
 };

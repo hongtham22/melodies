@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import songimg from "@/assets/img/songs.png";
-import { CaretSortIcon, Pencil1Icon, Cross1Icon } from "@radix-ui/react-icons";
+import { CaretSortIcon} from "@radix-ui/react-icons";
 import {
   Pagination,
   PaginationContent,
@@ -12,7 +12,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox";
+import { useState } from "react";
 
 function ListTracksAdmin() {
   const tracks = [
@@ -23,19 +24,45 @@ function ListTracksAdmin() {
       writer: "Văn Mai Hương",
       duration: "03:45",
       upload_date: "22/10/2024",
+      release_date: "22/10/2024",
       play_times: "10000",
       cmt_times: "10000",
       like_times: "100000",
       report_times: "100000",
     },
   ];
+
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [isHeaderChecked, setIsHeaderChecked] = useState(false);
+
+  const handleHeaderCheckboxChange = () => {
+    if (isHeaderChecked) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(Array.from({ length: 10 }, (_, index) => index));
+    }
+    setIsHeaderChecked(!isHeaderChecked);
+  };
+
+  const handleItemCheckboxChange = (index: number) => {
+    setSelectedItems((prev) =>
+      prev.includes(index)
+        ? prev.filter((item) => item !== index)
+        : [...prev, index]
+    );
+  };
   return (
     <div className="w-full flex flex-col justify-center items-center">
       <ScrollArea className="w-[1150px] whitespace-nowrap rounded-md border-primaryColorBg mb-2">
         <table className="w-[120%] text-white border-separate border-spacing-y-3 mb-5 ">
           <thead className="w-full text-textMedium text-primaryColorBlue">
             <tr>
-              <th className="w-[3%] pl-3"></th>
+              <th className="w-[3%] pl-3">
+                <Checkbox
+                  checked={isHeaderChecked}
+                  onCheckedChange={handleHeaderCheckboxChange}
+                />
+              </th>
               <th className="w-[3%] pl-3">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>No</p>
@@ -69,6 +96,12 @@ function ListTracksAdmin() {
               </th>
               <th className="w-[15%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
+                  <p> Release Date</p>
+                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
+                </div>
+              </th>
+              <th className="w-[15%] pl-2">
+                <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Play Times</p>
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
@@ -91,7 +124,6 @@ function ListTracksAdmin() {
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
-              <th className="w-[10%] pl-2">Action</th>
             </tr>
           </thead>
           <tbody className="">
@@ -101,7 +133,10 @@ function ListTracksAdmin() {
                 className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
               >
                 <td className="pl-2 text-h4 rounded-tl-lg rounded-bl-lg text-center">
-                  <Checkbox />
+                  <Checkbox
+                    checked={selectedItems.includes(index)}
+                    onCheckedChange={() => handleItemCheckboxChange(index)}
+                  />
                 </td>
                 <td className="pl-1 text-h4 text-center">{index + 1}</td>
                 <td className="">
@@ -136,6 +171,9 @@ function ListTracksAdmin() {
                 <td className="text-textMedium pl-2 text-center">
                   <div className="line-clamp-1"> {tracks[0].upload_date}</div>
                 </td>
+                <td className="text-textMedium pl-2 text-center">
+                  <div className="line-clamp-1"> {tracks[0].release_date}</div>
+                </td>
                 <td className="text-textMedium text-center pl-2">
                   <div className="line-clamp-1">{tracks[0].play_times}</div>
                 </td>
@@ -147,16 +185,6 @@ function ListTracksAdmin() {
                 </td>
                 <td className="text-textMedium pl-2 text-center">
                   <div className="line-clamp-1">{tracks[0].report_times}</div>
-                </td>
-                <td className="text-textMedium text-center pl-2  rounded-tr-lg rounded-br-lg">
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-primaryColorPink/40 flex items-center justify-center">
-                      <Cross1Icon className=" w-4 h-4 hover:text-primaryColorBlue" />
-                    </div>
-                    <div className="w-6 h-6 rounded-full bg-primaryColorPink/40 flex items-center justify-center">
-                      <Pencil1Icon className=" w-4 h-4 hover:text-primaryColorBlue" />
-                    </div>
-                  </div>
                 </td>
               </tr>
             ))}
