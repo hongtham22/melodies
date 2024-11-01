@@ -10,7 +10,6 @@ function Page() {
     title: string;
     main_artist: string;
     sub_artist: string[];
-    poster: string;
     audio: string;
   }) => {
     console.log("New track added:", trackData);

@@ -25,6 +25,7 @@ function ListTracksAdmin() {
       duration: "03:45",
       upload_date: "22/10/2024",
       release_date: "22/10/2024",
+      download_times: "10000",
       play_times: "10000",
       cmt_times: "10000",
       like_times: "100000",
@@ -54,7 +55,7 @@ function ListTracksAdmin() {
   return (
     <div className="w-full flex flex-col justify-center items-center">
       <ScrollArea className="w-[1150px] whitespace-nowrap rounded-md border-primaryColorBg mb-2">
-        <table className="w-[120%] text-white border-separate border-spacing-y-3 mb-5 ">
+        <table className=" table-fixed w-[140%] text-white border-separate border-spacing-y-3 mb-5 ">
           <thead className="w-full text-textMedium text-primaryColorBlue">
             <tr>
               <th className="w-[3%] pl-3">
@@ -63,13 +64,13 @@ function ListTracksAdmin() {
                   onCheckedChange={handleHeaderCheckboxChange}
                 />
               </th>
-              <th className="w-[3%] pl-3">
+              <th className="w-[7%] pl-3">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>No</p>
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
-              <th className="w-[25%] pl-2">
+              <th className="w-[30%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Track</p>
                   <CaretSortIcon className="text-white  w-4 h-4" />
@@ -81,8 +82,7 @@ function ListTracksAdmin() {
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
-              <th className="w-[15%] pl-2">Writer</th>
-              <th className="w-[10%] pl-2">
+              <th className="w-[12%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Duration</p>
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
@@ -97,6 +97,12 @@ function ListTracksAdmin() {
               <th className="w-[15%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p> Release Date</p>
+                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
+                </div>
+              </th>
+              <th className="w-[17%] pl-2">
+                <div className="flex gap-1 justify-center items-center cursor-pointer">
+                  <p>Download Times</p>
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
@@ -118,7 +124,7 @@ function ListTracksAdmin() {
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
-              <th className="w-[15%] pl-2">
+              <th className="w-[15%] pl-2 ">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Report Times</p>
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
@@ -162,10 +168,6 @@ function ListTracksAdmin() {
                   <div className="line-clamp-1">{tracks[0].albums}</div>
                 </td>
                 <td className="text-textMedium pl-2 text-center">
-                  <div className="line-clamp-1"> {tracks[0].writer}</div>
-                </td>
-
-                <td className="text-textMedium pl-2 text-center">
                   <div className="line-clamp-1"> {tracks[0].duration}</div>
                 </td>
                 <td className="text-textMedium pl-2 text-center">
@@ -173,6 +175,9 @@ function ListTracksAdmin() {
                 </td>
                 <td className="text-textMedium pl-2 text-center">
                   <div className="line-clamp-1"> {tracks[0].release_date}</div>
+                </td>
+                <td className="text-textMedium text-center pl-2">
+                  <div className="line-clamp-1">{tracks[0].download_times}</div>
                 </td>
                 <td className="text-textMedium text-center pl-2">
                   <div className="line-clamp-1">{tracks[0].play_times}</div>
@@ -183,7 +188,7 @@ function ListTracksAdmin() {
                 <td className="text-textMedium pl-2 text-center">
                   <div className="line-clamp-1">{tracks[0].like_times}</div>
                 </td>
-                <td className="text-textMedium pl-2 text-center">
+                <td className="text-textMedium pl-2 text-center rounded-tr-lg rounded-br-lg">
                   <div className="line-clamp-1">{tracks[0].report_times}</div>
                 </td>
               </tr>

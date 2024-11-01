@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +36,6 @@ interface AddTrackSheetProps {
     title: string;
     main_artist: string;
     sub_artist: string[];
-    poster: string;
     audio: string;
   }) => void;
 }
@@ -59,10 +58,10 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
   const [trackTitle, setTrackTitle] = React.useState("");
   const [mainArtist, setMainArtist] = React.useState("");
   const [subArtists, setSubArtists] = React.useState<string[]>([]);
-  const [poster, setPoster] = React.useState("");
   const [audio, setAudio] = React.useState("");
   const [openMainArtist, setOpenMainArtist] = React.useState(false);
   const [openSubArtist, setOpenSubArtist] = React.useState(false);
+  const [audioSrc, setAudioSrc] = useState<string | null>(null);
 
   const handleSubArtistChange = (artist: string) => {
     setSubArtists((prevArtists) =>
@@ -72,34 +71,31 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
     );
   };
 
-  const handlePosterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPoster(URL.createObjectURL(file));
-    }
-  };
-
-  const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setAudio(URL.createObjectURL(file));
-    }
-  };
-
   const handleSave = () => {
     onSave({
       title: trackTitle,
       main_artist: mainArtist,
       sub_artist: subArtists,
-      poster,
       audio,
     });
 
     setTrackTitle("");
     setMainArtist("");
     setSubArtists([]);
-    setPoster("");
     setAudio("");
+  };
+
+  const handleAudioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (audioSrc) {
+        URL.revokeObjectURL(audioSrc);
+      }
+
+      const url = URL.createObjectURL(file);
+      setAudioSrc(url);
+      setAudio(url);
+    }
   };
 
   return (
@@ -235,18 +231,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
               </Popover>
             </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="poster" className="text-left">
-              Poster
-            </Label>
-            <Input
-              id="poster"
-              type="file"
-              accept="image/*"
-              onChange={handlePosterChange}
-              className="col-span-3 border-darkBlue"
-            />
-          </div>
+
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="audio" className="text-left">
               Audio
@@ -258,6 +243,16 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
               onChange={handleAudioChange}
               className="col-span-3 border-darkBlue"
             />
+          </div>
+          <div>
+            {audioSrc && (
+              <div className="col-span-4 flex justify-center items-center my-2">
+                <audio key={audioSrc} controls className="h-10 w-full">
+                  <source src={audioSrc} type="audio/mpeg" />
+                  Your browser not support audio display.
+                </audio>
+              </div>
+            )}
           </div>
         </div>
         <SheetFooter>
