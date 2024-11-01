@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +36,8 @@ interface AddTrackSheetProps {
     title: string;
     main_artist: string;
     sub_artist: string[];
-    audio: string;
+    audio: string | null;
+    duration: string;
   }) => void;
 }
 
@@ -58,10 +59,11 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
   const [trackTitle, setTrackTitle] = React.useState("");
   const [mainArtist, setMainArtist] = React.useState("");
   const [subArtists, setSubArtists] = React.useState<string[]>([]);
-  const [audio, setAudio] = React.useState("");
   const [openMainArtist, setOpenMainArtist] = React.useState(false);
   const [openSubArtist, setOpenSubArtist] = React.useState(false);
   const [audioSrc, setAudioSrc] = useState<string | null>(null);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null); 
 
   const handleSubArtistChange = (artist: string) => {
     setSubArtists((prevArtists) =>
@@ -71,33 +73,52 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
     );
   };
 
+  
+  const formatDuration = (duration: number) => {
+    const minutes = Math.floor(duration / 60);
+    const seconds = Math.floor(duration % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+  
+
   const handleSave = () => {
+    const formattedDuration = formatDuration(duration)
     onSave({
       title: trackTitle,
       main_artist: mainArtist,
       sub_artist: subArtists,
-      audio,
+      audio: audioSrc, 
+      duration: formattedDuration,
     });
+    console.log('Track saved with duration:', formattedDuration);
 
     setTrackTitle("");
     setMainArtist("");
     setSubArtists([]);
-    setAudio("");
+    setAudioSrc(null); 
+    setDuration(0); 
   };
 
   const handleAudioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Giải phóng URL cũ nếu có
       if (audioSrc) {
         URL.revokeObjectURL(audioSrc);
       }
 
       const url = URL.createObjectURL(file);
       setAudioSrc(url);
-      setAudio(url);
+
+      // Tạo một audio element để lấy duration
+      const audio = new Audio(url);
+      audio.onloadedmetadata = () => {
+        setDuration(audio.duration); 
+      };
     }
   };
 
+  
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -247,12 +268,13 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
           <div>
             {audioSrc && (
               <div className="col-span-4 flex justify-center items-center my-2">
-                <audio key={audioSrc} controls className="h-10 w-full">
+                <audio controls ref={audioRef} key={audioSrc} className="h-10 w-full">
                   <source src={audioSrc} type="audio/mpeg" />
                   Your browser not support audio display.
                 </audio>
               </div>
             )}
+            
           </div>
         </div>
         <SheetFooter>
