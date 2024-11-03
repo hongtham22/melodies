@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React from "react";
 import MusicPlayer from "@/components/musicPlayer";
 import ScrollContent from "@/components/scrollContent";
@@ -12,9 +12,7 @@ import { useAppContext } from "@/app/AppProvider";
 import HeaderAdmin from "@/app/layout/header/HeaderAdmin";
 import NotFound from "@/app/not-found";
 
-const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { role } = useAppContext();
   return (
     <div className="">
