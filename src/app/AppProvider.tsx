@@ -3,6 +3,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import Cookies from 'js-cookie';
 interface AppContextType {
+    search: string,
+    setSearch: (search: string) => void
     loading: boolean,
     setLoading: (loading: boolean) => void
     role: string | null,
@@ -32,6 +34,7 @@ export const AppProvider: React.FC<{
     initialRole = ''
 }) => {
         const [loading, setLoading] = useState<boolean>(false)
+        const [search, setSearch] = useState<string>('')
         const [role, setRole] = useState<string>(() => {
             return typeof window !== "undefined" ? Cookies.get('role') || "" : initialRole;
         });
@@ -51,6 +54,8 @@ export const AppProvider: React.FC<{
         }, [accessToken, role]);
 
         const value = {
+            search,
+            setSearch,
             loading,
             setLoading,
             role,

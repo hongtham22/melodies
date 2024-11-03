@@ -13,7 +13,7 @@ const AvatarArtist = () => {
     ]
     return (
         <div>
-            <div className='w-[120px] h-[120px]'>
+            <div className='w-[150px] h-[150px]'>
                 <Image
                     src={listSong[0].avatar}
                     alt="Song Poster"
@@ -22,7 +22,7 @@ const AvatarArtist = () => {
                     quality={100}
                     className='w-full h-full object-cover rounded-full'
                 />
-                <p className='text-[0.95rem] font-thin my-2'>{listSong[0].artist}</p>
+                <p className='text-[0.95rem] font-semibold mt-3 my-2'>{listSong[0].artist}</p>
                 <div className='flex gap-4 mb-3'>
                     <div title='1717 followers' className='flex items-center'>
                         <MdOutlinePeopleAlt /> <span className='text-primaryColorGray text-[0.8rem] ml-1'>1717</span>

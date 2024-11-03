@@ -36,7 +36,7 @@ const Comment: React.FC<CommentProps> = ({ data, comment, role }) => {
 
     return (
         <div>
-            <div className={`flex w-full justify-between items-center mb-5 ${role === 'children' ? 'pl-14 -mt-2' : 'mt-4'}`}>
+            <div className={`flex w-full justify-between items-center mb-5 ${role === 'children' ? 'pl-14 mb-2' : 'mb-2'}`}>
                 <div className='flex'>
                     <div className='w-[50px] mr-2'>
                         <Image

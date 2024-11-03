@@ -126,8 +126,8 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
                 />
                 <div className="flex flex-col justify-between">
                   <p
-                    className={`${showSidebarRight ? "" : "text-h4"
-                      } font-semibold mb-1 line-clamp-2 cursor-pointer hover:underline`}
+                    className={`${showSidebarRight ? "" : "text-h4"} font-semibold mb-1 line-clamp-2 cursor-pointer hover:underline`}
+                    onClick={() => router.push(`/song/${song.id}`)}
                   >
                     {song.title}
                   </p>

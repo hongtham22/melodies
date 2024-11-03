@@ -7,9 +7,15 @@ import {
     FaCaretUp,
     FaCaretDown
 } from "react-icons/fa";
+import artistimg from "@/assets/img/artist.png";
+import {
+    IoIosSend,
+    IoMdClose
+} from "react-icons/io";
 
 import { CommentProvider } from '@/components/provider/commentProvider';
 import CommentPart from '@/components/commentPart';
+import Image from 'next/image';
 
 
 const CommentSection = () => {
@@ -27,7 +33,7 @@ const CommentSection = () => {
     }
 
     return (
-        <div className='w-[40vw]'>
+        <div className='w-[100%]'>
             <div className='flex justify-between mb-2 items-end'>
                 <div className='flex items-center text-primaryColorGray'>
                     <FaCommentAlt />
@@ -68,7 +74,7 @@ const CommentSection = () => {
                     }
                 </div>
             </div>
-            <hr className='' />
+            <hr className='py-2' />
             <ScrollArea className='h-[600px] overflow-auto pr-4'>
                 <CommentProvider>
                     <CommentPart />
@@ -83,6 +89,33 @@ const CommentSection = () => {
                     <CommentPart />
                 </CommentProvider>
             </ScrollArea>
+            <div className='flex justify-between items-center mt-5'>
+                <div className='w-[100%] mr-2 flex'>
+                    <div className='w-[50px] mr-2 flex'>
+                        <Image
+                            src={artistimg}
+                            alt="avatar"
+                            className="rounded-full w-[40px] h-[40px] mr-3"
+                        />
+                    </div>
+
+                    <div className='relative w-[88%]'>
+                        <input
+                            type="text"
+                            className='w-full py-2 bg-transparent border-2 border-white text-[0.9rem] rounded-3xl pl-3 pr-10 focus:outline-none'
+                            placeholder='Write a comment'
+                        />
+                        <IoMdClose
+                            className='w-6 h-6 absolute right-3 top-2 cursor-pointer'
+                        // onClick={() => setReplyStatus(!replyStatus)}
+                        />
+                    </div>
+                </div>
+
+                <div className='border-2 p-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 cursor-pointer'>
+                    <IoIosSend />
+                </div>
+            </div>
         </div>
     )
 }

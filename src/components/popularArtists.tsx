@@ -21,8 +21,8 @@ interface PeopleListProps {
 }
 
 const PopularArtists: React.FC<PeopleListProps> = ({
-  maintitle = "Popular",
-  subtitle = "Artists",
+  maintitle,
+  subtitle,
   data = [],
 }) => {
   const { showSidebarRight } = useAppContext();
@@ -30,7 +30,7 @@ const PopularArtists: React.FC<PeopleListProps> = ({
   const avatarSize = showSidebarRight ? 120 : 150;
 
   return (
-    <div className="bg-primaryColorBg w-full mt-2 text-white">
+    <div className="bg-transparent w-full mt-2 text-white">
       <h1 className="text-h1 mb-5">
         {maintitle} <span className="text-primaryColorPink">{subtitle}</span>
       </h1>
@@ -60,14 +60,12 @@ const PopularArtists: React.FC<PeopleListProps> = ({
         {/* View All button */}
         <div className="flex flex-col items-center cursor-pointer">
           <PlusIcon
-            className={`${
-              showSidebarRight ? "w-[40px] h-[40px]" : "w-[50px] h-[50px]"
-            } bg-[#1F1F1F] rounded-full p-3 mb-2`}
+            className={`${showSidebarRight ? "w-[40px] h-[40px]" : "w-[50px] h-[50px]"
+              } bg-[#1F1F1F] rounded-full p-3 mb-2`}
           />
           <p
-            className={`${
-              showSidebarRight ? "font-semibold text-[0.9rem]" : "text-h4"
-            } whitespace-nowrap`}
+            className={`${showSidebarRight ? "font-semibold text-[0.9rem]" : "text-h4"
+              } whitespace-nowrap`}
           >
             View All
           </p>
