@@ -4,13 +4,7 @@ import tinycolor from "tinycolor2";
 import { useAppContext } from '@/components/provider/songProvider';
 import './scss/artistBanner.scss'
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-
-interface Artist {
-    id: string;
-    name: string;
-    avatar: string;
-    followersCount: number
-}
+import { Artist } from "@/types/interfaces";
 
 interface BannerProps {
     data?: Artist

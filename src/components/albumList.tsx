@@ -1,27 +1,17 @@
 "use client";
+import PropTypes from "prop-types";
 import React from "react";
 import Image from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from "@/components/provider/songProvider";
 import { useRouter } from 'next/navigation';
-import PropTypes from "prop-types";
-
-interface ImageAlbum {
-    image: string;
-    size: number;
-}
-interface AlbumList {
-    albumId: string;
-    title: string;
-    albumImages: Array<ImageAlbum>;
-    releaseDate: string;
-    albumType: string;
-}
+import { DataAlbum } from "@/types/interfaces";
+import { getPoster } from "@/utils/utils";
 
 interface AlbumListProps {
     maintitle?: string;
     subtitle?: string;
-    data?: Array<AlbumList>;
+    data?: Array<DataAlbum>;
 }
 
 const AlbumList: React.FC<AlbumListProps> = ({ maintitle, subtitle, data }) => {
@@ -42,11 +32,7 @@ const AlbumList: React.FC<AlbumListProps> = ({ maintitle, subtitle, data }) => {
             >
                 {(showSidebarRight ? sortedData?.slice(0, 4) : sortedData?.slice(0, 5))?.map(
                     (album, index) => {
-                        const poster =
-                            album.albumImages.length > 0
-                                ? album.albumImages.find(img => img.size === 300)?.image ||
-                                album.albumImages[0].image
-                                : "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
+                        const poster = getPoster(album)
                         return (
                             <div
                                 key={index}

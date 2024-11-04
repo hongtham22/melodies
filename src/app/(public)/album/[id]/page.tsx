@@ -10,53 +10,7 @@ import { IoIosMore } from "react-icons/io";
 import AlbumList from "@/components/albumList";
 import LoadingPage from "@/components/loadingPage";
 import NotFound from "@/app/not-found";
-
-interface Artists {
-  id: string;
-  name: string;
-  avatar: string;
-}
-
-interface SongPlay {
-  id: string;
-  albumId: string;
-  title: string;
-  duration: number;
-  lyric: string;
-  filePathAudio: string;
-  privacy: boolean;
-  uploadUserId: string | null;
-  releaseDate: string;
-  likeCount: string;
-  viewCount: string;
-  totalCount: string;
-  artists: Array<Artists>;
-}
-
-interface ImageAlbum {
-  image: string;
-  size: number;
-}
-interface AlbumListType {
-  albumId: string;
-  title: string;
-  albumImages: Array<ImageAlbum>;
-  releaseDate: string;
-  albumType: string;
-}
-
-interface DataAlbum {
-  albumId: string;
-  title: string;
-  albumImages: Array<ImageAlbum>;
-  releaseDate: string;
-  totalDuration: number;
-  songNumber: number;
-  albumType: string;
-  songs: Array<SongPlay>
-  artistMain: Artists;
-  albumAnother: Array<AlbumListType>
-}
+import { DataAlbum } from "@/types/interfaces";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { loading, setLoading } = useAppContext();

@@ -1,6 +1,7 @@
 "use client";
 import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from "@/app/AppProvider";
+import { useRouter } from 'next/navigation';
 import NotFound from "@/app/not-found";
 import AlbumList from "@/components/albumList";
 import SongList from "@/components/listSong";
@@ -9,50 +10,16 @@ import PopularArtists from "@/components/popularArtists";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaCirclePlay } from "react-icons/fa6";
+import { getPoster, getMainArtistName } from '@/utils/utils'
+import { DataSong, Artist } from "@/types/interfaces";
 
-interface AlbumImage {
-  image: string;
-  size: number;
-}
-
-interface Album {
-  albumId: string;
-  title: string;
-  albumImages: AlbumImage[];
-}
-
-interface ArtistSong {
-  main: boolean;
-}
-
-interface Artist {
-  id: string;
-  name: string;
-  ArtistSong: ArtistSong;
-  avatar: string
-}
-
-interface DataSong {
-  id: string;
-  title: string;
-  duration: number;
-  lyric: string;
-  filePathAudio: string;
-  privacy: boolean;
-  uploadUserId: string | null;
-  releaseDate: string;
-  viewCount: number | null;
-  createdAt: string;
-  album: Album;
-  artists: Array<Artist>;
-  playCount: string;
-}
 interface TopResults {
   artist?: Artist;
   songs?: Array<DataSong>
 }
 
 const SearchPage = ({ params }: { params: { value: string } }) => {
+  const router = useRouter();
   const { loading, setLoading } = useAppContext();
   const [notFound, setNotFound] = useState(false);
   const [topResults, setTopResults] = useState<TopResults>({})
@@ -96,23 +63,9 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
 
   const [poster, setPoster] = useState("https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da");
 
-  const getMainArtistName = (artists: Artist[]): string | undefined => {
-    const mainArtist = artists.find(artist => artist?.ArtistSong.main === true);
-    return mainArtist?.name;
-  };
-
-  const getPoster = (song: DataSong) => {
-    if (song?.album?.albumImages && song.album.albumImages.length > 0) {
-      const foundImage = song.album.albumImages.find(img => img.size === 300)?.image;
-      return foundImage || song.album.albumImages[0].image;
-    } else {
-      return "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
-    }
-  };
-
   useEffect(() => {
     if (song) {
-      setPoster(getPoster(song));
+      setPoster(getPoster(song.album));
     }
   }, [song]);
 
@@ -159,56 +112,56 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
               <div className="flex gap-5">
                 <div className="w-[30%]">
                   <p className="font-bold text-[1.5rem] mb-2">Kết quả hàng đầu</p>
-                  <div className="relative bg-[#121212]  pt-4 pb-6 px-4 rounded-xl hover:bg-[#2F2F2F] cursor-pointer group">
-                    {isEmptyTopResults ? (
-                      <>
+                  {isEmptyTopResults ? (
+                    <div className="relative bg-[#121212]  pt-4 pb-6 px-4 rounded-xl hover:bg-[#2F2F2F] cursor-pointer group">
+                      <Image
+                        src={poster}
+                        alt="Song Poster"
+                        width={110}
+                        height={110}
+                        quality={100}
+                        className="object-cover rounded-md mb-3"
+                      />
+                      <p className="w-[70%] text-3xl font-bold line-clamp-2">
+                        {song?.title}
+                      </p>
+                      <div className="flex items-center gap-2 text-[0.95rem]">
+                        <p className="text-primaryColorGray">Bài hát</p>
+                        <div className="h-[6px] w-[6px] bg-primaryColorGray rounded-full"></div>
+                        <p>{song?.artists ? getMainArtistName(song.artists) : ''}</p>
+                      </div>
+                      <div className="absolute right-3 bottom-7 opacity-0 group-hover:text-primaryColorPink group-hover:opacity-100">
+                        <FaCirclePlay className="mx-3 w-[45px] h-[45px]" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="relative bg-[#121212]  pt-4 pb-6 px-4 rounded-xl hover:bg-[#2F2F2F] cursor-pointer group"
+                      onClick={() => router.push(`/artist/${topResults?.artist?.id}`)}
+                    >
+                      <div className="w-[110px] h-[110px] overflow-hidden rounded-full mb-3">
                         <Image
-                          src={poster}
+                          src={topResults?.artist?.avatar || "https://via.placeholder.com/110"}
                           alt="Song Poster"
                           width={110}
                           height={110}
                           quality={100}
-                          className="object-cover rounded-md mb-3"
+                          className="object-cover w-full h-full"
                         />
-                        <p className="w-[70%] text-3xl font-bold line-clamp-2">
-                          {song?.title}
-                        </p>
-                        <div className="flex items-center gap-2 text-[0.95rem]">
-                          <p className="text-primaryColorGray">Bài hát</p>
-                          <div className="h-[6px] w-[6px] bg-primaryColorGray rounded-full"></div>
-                          <p>{song?.artists ? getMainArtistName(song.artists) : ''}</p>
-                        </div>
-                        <div className="absolute right-3 bottom-7 opacity-0 group-hover:text-primaryColorPink group-hover:opacity-100">
-                          <FaCirclePlay className="mx-3 w-[45px] h-[45px]" />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-[110px] h-[110px] overflow-hidden rounded-full mb-3">
-                          <Image
-                            src={topResults?.artist?.avatar || "https://via.placeholder.com/110"}
-                            alt="Song Poster"
-                            width={110}
-                            height={110}
-                            quality={100}
-                            className="object-cover w-full h-full"
-                          />
-                        </div>
-                        <p className="w-[70%] text-3xl font-bold line-clamp-2">
-                          {topResults?.artist?.name}
-                        </p>
-                        <p className="text-primaryColorGray mt-1">Nghệ sĩ</p>
-                      </>
-                    )
-                    }
-                  </div>
+                      </div>
+                      <p className="w-[70%] text-3xl font-bold line-clamp-2 group-hover:underline">
+                        {topResults?.artist?.name}
+                      </p>
+                      <p className="text-primaryColorGray mt-1">Nghệ sĩ</p>
+                    </div>
+                  )}
 
                 </div>
                 <div className="w-[60%]">
                   <p className="font-bold text-[1.5rem] mb-2">Bài hát</p>
                   <div className="flex flex-col gap-1 w-full">
                     {(isEmptyTopResults ? songs : topResults?.songs)?.slice(0, 4).map((song: DataSong, index) => {
-                      const poster = getPoster(song)
+                      const poster = getPoster(song.album)
                       return (
                         <div
                           key={index}
@@ -226,7 +179,7 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                             <div className="ml-3">
                               <p className="font-bold">{song?.title}</p>
                               <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                                {song?.artists[0].name}
+                                {song?.artists ? getMainArtistName(song.artists) : ''}
                               </p>
                             </div>
                           </div>

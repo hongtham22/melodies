@@ -4,44 +4,13 @@ import { HeartIcon } from "@radix-ui/react-icons";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
-
-interface Album {
-  albumId: string;
-  title: string;
-  albumImages: Array<ImageAlbum>;
-}
-interface Artists {
-  id: string;
-  name: string;
-  avatar: string;
-}
-interface ImageAlbum {
-  albumId: string;
-  image: string;
-  size: number;
-}
-interface SongPlay {
-  id: string;
-  albumId: string;
-  title: string;
-  duration: number;
-  lyric: string;
-  filePathAudio: string;
-  privacy: boolean;
-  uploadUserId: string | null;
-  createdAt: string;
-  releaseDate: string;
-  likeCount: string;
-  viewCount: string;
-  totalCount: string;
-  album: Album;
-  artists: Array<Artists>;
-}
+import { getMainArtistName, getPoster } from "@/utils/utils";
+import { DataSong } from "@/types/interfaces";
 
 interface SongListProps {
   maintitle?: string;
   subtitle?: string;
-  data?: Array<SongPlay>;
+  data?: Array<DataSong>;
 }
 
 const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
@@ -87,17 +56,10 @@ const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) =
           </thead>
           <tbody className="">
             {data?.slice(0, 10)?.map((song, index) => {
-              const nameArtist =
-                song.artists && song.artists.length > 0
-                  ? song.artists[0].name
-                  : "Unknown Artist";
+              const nameArtist = getMainArtistName(song.artists);
+              // const nameArtist = 'no';
+              const poster = getPoster(song.album);
               const nameAlbum = song.album ? song.album.title : "";
-              const poster =
-                song.album &&
-                  song.album.albumImages &&
-                  song.album.albumImages.length > 0
-                  ? song.album.albumImages[0].image
-                  : "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
               return (
                 <tr
                   key={index}

@@ -5,45 +5,13 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from "@/components/provider/songProvider";
 import { useRouter } from 'next/navigation';
 import PropTypes from "prop-types";
-
-// Define an interface for the props
-interface Album {
-  albumId: string;
-  title: string;
-  albumImages: Array<ImageAlbum>;
-}
-interface Artists {
-  id: string;
-  name: string;
-  avatar: string;
-}
-interface ImageAlbum {
-  albumId: string;
-  image: string;
-  size: number;
-}
-interface SongPlay {
-  id: string;
-  albumId: string;
-  title: string;
-  duration: number;
-  lyric: string;
-  filePathAudio: string;
-  privacy: boolean;
-  uploadUserId: string | null;
-  createdAt: string;
-  updatedAt: string;
-  likeCount: string;
-  viewCount: string;
-  totalCount: string;
-  album: Album;
-  artists: Array<Artists>;
-}
+import { DataSong } from "@/types/interfaces";
+import { getMainArtistName, getPoster } from "@/utils/utils";
 
 interface SongListProps {
   maintitle?: string;
   subtitle?: string;
-  data?: Array<SongPlay>;
+  data?: Array<DataSong>;
 }
 
 const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
@@ -91,20 +59,13 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
       >
         {(showSidebarRight ? data?.slice(0, 4) : data?.slice(0, 5))?.map(
           (song, index) => {
-            const nameArtist =
-              song.artists && song.artists.length > 0
-                ? song.artists[0].name
-                : "Unknown Artist";
-            const poster =
-              song.album.albumImages.length > 0
-                ? song.album.albumImages.find(img => img.size === 300)?.image ||
-                song.album.albumImages[0].image
-                : "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
+            const nameArtist = getMainArtistName(song.artists);
+            const poster = getPoster(song.album);
             const songData = {
               audio: song.filePathAudio,
               poster: poster,
               name: song.title,
-              artist: nameArtist,
+              artist: nameArtist || "Unknown Artist",
             };
             listSong.push(songData);
             return (
