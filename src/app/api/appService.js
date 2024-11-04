@@ -3,18 +3,18 @@ import envConfig from "@/config";
 
 const API_BASE_URL = envConfig.NEXT_PUBLIC_API_ENDPOINT;
 
-export const fetchApiData = async (endpoint, method, body, token = null, offset) => {
+export const fetchApiData = async (endpoint, method, body, token, offset) => {
   let url = `${API_BASE_URL}${endpoint}`;
-  
+
   if (offset !== undefined && offset !== null) {
     url += `?offset=${offset}`;
   }
-  
+
   const headers = {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` }),
   };
-  
+
   const options = {
     method,
     headers,

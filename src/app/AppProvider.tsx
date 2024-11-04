@@ -3,6 +3,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import Cookies from 'js-cookie';
 interface AppContextType {
+    id: string,
+    setId: (id: string) => void
     search: string,
     setSearch: (search: string) => void
     loading: boolean,
@@ -28,15 +30,21 @@ export const AppProvider: React.FC<{
     children: ReactNode
     initialAccessToken?: string
     initialRole?: string
+    initialId?: string
 }> = ({
     children,
     initialAccessToken = '',
-    initialRole = ''
+    initialRole = '',
+    initialId = ''
 }) => {
         const [loading, setLoading] = useState<boolean>(false)
         const [search, setSearch] = useState<string>('')
         const [role, setRole] = useState<string>(() => {
             return typeof window !== "undefined" ? Cookies.get('role') || "" : initialRole;
+        });
+
+        const [id, setId] = useState<string>(() => {
+            return typeof window !== "undefined" ? Cookies.get('id') || "" : initialId;
         });
 
         const [accessToken, setAccessToken] = useState<string>(() => {
@@ -47,11 +55,13 @@ export const AppProvider: React.FC<{
             if (accessToken && role) {
                 Cookies.set('role', role, { expires: 7 }); // Expire in 7 days
                 Cookies.set('accessToken', accessToken, { expires: 7 }); // Expire in 7 days
+                Cookies.set('id', id, { expires: 7 }); // Expire in 7 days
             } else {
                 Cookies.remove('accessToken');
                 Cookies.remove('role');
+                Cookies.remove('id');
             }
-        }, [accessToken, role]);
+        }, [accessToken, role, id]);
 
         const value = {
             search,
@@ -61,7 +71,9 @@ export const AppProvider: React.FC<{
             role,
             setRole,
             accessToken,
-            setAccessToken
+            setAccessToken,
+            id,
+            setId
         };
         return (
             <AppContext.Provider value={value}>

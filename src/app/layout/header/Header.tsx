@@ -14,20 +14,35 @@ import { BellIcon } from "@radix-ui/react-icons";
 
 import Image from "next/image";
 import songimg from "@/assets/img/songs.png";
+import { fetchApiData } from "@/app/api/appService";
+import { User } from "@/types/interfaces";
 
 const Header = () => {
-    const { accessToken, setSearch } = useAppContext();
+    const { accessToken, id, setSearch } = useAppContext();
     const { scrollAreaRef } = useScrollArea();
     const { showSidebarRight } = useSongContext();
     const headerRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter();
     const [searchTerm, setSearchTerm] = useState('');
-
+    const [user, setUser] = useState<User>()
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
     }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const result = await fetchApiData(`/api/user/info`, "GET", null, accessToken ?? null);
+            if (result.success) {
+                setUser(result.data.user)
+            } else {
+                console.error("Login error:", result.error);
+            }
+        };
+
+        fetchData();
+    }, [id]);
 
     const handleSignUpClick = () => {
         router.push('/signup');
@@ -118,15 +133,15 @@ const Header = () => {
                     <BellIcon className="w-6 h-6" />
                     <div className="flex gap-2">
                         <Image
-                            src={songimg}
-                            alt="song"
+                            src={user?.image || 'https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da'}
+                            alt="avatar"
                             width={40}
                             height={40}
                             className="rounded-full"
                         />
                         <div className="flex  flex-col">
                             <p className="text-textSmall">Welcome</p>
-                            <p className="text-textMedium line-clamp-1">Hùng</p>
+                            <p className="text-textMedium font-bold line-clamp-1">{user?.name || user?.username}</p>
                         </div>
                     </div>
                 </div>

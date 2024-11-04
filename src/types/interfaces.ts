@@ -27,10 +27,12 @@ export interface Artist {
     name: string;
     ArtistSong: ArtistSong;
     avatar: string;
-    followersCount: number;
+    totalSong: number;
+    totalFollow: number;
     bio: string | null;
     createdAt: string;
     updatedAt: string;
+    popSong: Array<DataSong>
 }
 
 //song
@@ -48,4 +50,25 @@ export interface DataSong {
     album: DataAlbum;
     artists: Array<Artist>;
     playCount: string;
+}
+
+//user
+export interface User {
+    id: string;
+    username: string;
+    image: string | null;
+    accountType: string;
+    name: string
+}
+
+//comment
+export interface Comment {
+    id: string;
+    commentParentId: string | null;
+    userId: string;
+    content: string;
+    createdAt: string;
+    user: User;
+    hasChild: number;
+    myComment: boolean;
 }

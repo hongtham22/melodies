@@ -12,7 +12,7 @@ import CommentSection from "@/components/commentSection";
 import AvatarArtist from "@/components/avatarArtist";
 import SongList from "@/components/listSong";
 import PopularArtists from "@/components/popularArtists";
-import { DataSong } from "@/types/interfaces";
+import { DataSong, Comment } from "@/types/interfaces";
 import { getMainArtistId, getMainArtistName, getPoster } from "@/utils/utils";
 
 const Page = ({ params }: { params: { id: string } }) => {
@@ -23,6 +23,8 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [anotherSong, setAnotherSong] = useState<DataSong[]>([])
     const [songImage, setSongImage] = useState<string>("https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da")
     const [mainArtist, setMainArtist] = useState<string | undefined>()
+    const [comment, setComment] = useState<Comment[]>([])
+    const [totalCmt, setTotalCmt] = useState<number>(0)
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -36,6 +38,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     const responses = await Promise.all([
                         fetch(`/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`),
                         fetchApiData(`/api/songs/otherByArtist/${getMainArtistId(result.data.song.artists)}`, "GET", null, null, 0),
+                        fetchApiData(`/api/songs/comment/${params.id}`, 'GET', null, null, 0)
                     ]);
                     const data = await responses[0].json();
                     if (responses[0].ok) {
@@ -44,7 +47,11 @@ const Page = ({ params }: { params: { id: string } }) => {
                     } else {
                         console.error("Error fetching dominant color:", data.error);
                     }
-                    if (responses[1].success) setAnotherSong(responses[1].data.songs)
+                    if (responses[1].success) setAnotherSong(responses[1].data.songs);
+                    if (responses[2].success) {
+                        setComment(responses[2].data.comments)
+                        setTotalCmt(responses[2].data.totalComment)
+                    }
                 } catch (error) {
                     console.error("Error fetching dominant color:", error);
                 }
@@ -165,8 +172,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                     </div>
                 </div>
                 <div className="flex pl-5 pr-16 gap-16">
-                    <AvatarArtist />
-                    <CommentSection />
+                    <AvatarArtist id={dataSong?.artists ? getMainArtistId(dataSong.artists) : undefined} />
+                    <CommentSection data={comment} totalCmt={totalCmt} />
                 </div>
                 <div className="mx-5 mt-8">
                     <SongList maintitle="Other songs by " subtitle={mainArtist} data={anotherSong} />

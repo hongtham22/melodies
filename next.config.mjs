@@ -7,6 +7,11 @@ const nextConfig = {
                 hostname: 'i.scdn.co',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'audiomelodies.nyc3.cdn.digitaloceanspaces.com',
+                pathname: '/**',
+            },
         ],
     },
 

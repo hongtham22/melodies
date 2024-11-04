@@ -16,9 +16,14 @@ import {
 import { CommentProvider } from '@/components/provider/commentProvider';
 import CommentPart from '@/components/commentPart';
 import Image from 'next/image';
+import { Comment } from '@/types/interfaces';
 
+interface CommentSectionProps {
+    data?: Array<Comment>
+    totalCmt: number
+}
 
-const CommentSection = () => {
+const CommentSection: React.FC<CommentSectionProps> = ({ data, totalCmt }) => {
     const sorts = ['Newest', 'Oldest']
     const [valueSort, setValueSort] = useState('Newest')
     const [isClickSort, setIsClickSort] = useState(false)
@@ -37,7 +42,7 @@ const CommentSection = () => {
             <div className='flex justify-between mb-2 items-end'>
                 <div className='flex items-center text-primaryColorGray'>
                     <FaCommentAlt />
-                    <p className='ml-2'>17 Comment</p>
+                    <p className='ml-2'>{totalCmt} Comment</p>
                 </div>
                 <div className='relative'>
                     <button
@@ -76,18 +81,15 @@ const CommentSection = () => {
             </div>
             <hr className='py-2' />
             <ScrollArea className='h-[600px] overflow-auto pr-4'>
-                <CommentProvider>
-                    <CommentPart />
-                </CommentProvider>
-                <CommentProvider>
-                    <CommentPart />
-                </CommentProvider>
-                <CommentProvider>
-                    <CommentPart />
-                </CommentProvider>
-                <CommentProvider>
-                    <CommentPart />
-                </CommentProvider>
+                {
+                    data?.map((comment, index: number) => (
+                        <div key={index}>
+                            <CommentProvider>
+                                <CommentPart data={comment} />
+                            </CommentProvider>
+                        </div>
+                    ))
+                }
             </ScrollArea>
             <div className='flex justify-between items-center mt-5'>
                 <div className='w-[100%] mr-2 flex'>

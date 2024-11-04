@@ -11,15 +11,17 @@ import {
 import { FiMoreHorizontal } from "react-icons/fi";
 import { GoReport } from "react-icons/go";
 import { useAppContext } from '@/components/provider/commentProvider';
+import { User } from '@/types/interfaces';
 
 
 interface CommentProps {
-    data: { name: string; time: string };
-    comment: string;
+    dataUser?: User;
+    time: string | undefined;
+    comment?: string;
     role: string
 }
 
-const Comment: React.FC<CommentProps> = ({ data, comment, role }) => {
+const Comment: React.FC<CommentProps> = ({ dataUser, time, comment, role }) => {
     const [tymCmt, setTymCmt] = useState<boolean>(false)
     const [isReply, setIsReply] = useState<boolean | null>(false)
     const [isReport, setIsReport] = useState<boolean>(false)
@@ -34,23 +36,46 @@ const Comment: React.FC<CommentProps> = ({ data, comment, role }) => {
         setReplyStatus(!isReply)
     }
 
+    function formatTime(createdAt: string): string {
+        const now = new Date();
+        const createdDate = new Date(createdAt);
+        const diffInSeconds = Math.floor((now.getTime() - createdDate.getTime()) / 1000);
+
+        if (diffInSeconds < 60) {
+            return `${diffInSeconds} giây trước`;
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes} phút trước`;
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours} tiếng trước`;
+        } else {
+            return createdDate.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            });
+        }
+    }
+
     return (
         <div>
             <div className={`flex w-full justify-between items-center mb-5 ${role === 'children' ? 'pl-14 mb-2' : 'mb-2'}`}>
                 <div className='flex'>
                     <div className='w-[50px] mr-2'>
                         <Image
-                            src={artistimg}
+                            src={dataUser?.image || artistimg}
+                            width={40}
+                            height={40}
                             alt="avatar"
                             className="rounded-full w-[40px] h-[40px]"
                         />
                     </div>
                     <div className='w-[86%]'>
                         <div className='flex items-center'>
-                            <p className='font-semibold'>{data.name}</p>
+                            <p className='font-semibold'>{dataUser?.username}</p>
                             <FaCircle className='w-[6px] h-[6px] text-primaryColorGray mx-3' />
-                            <p className='font-light text-primaryColorGray text-[0.9rem]'>{data.time}</p>
-
+                            <p className='font-light text-primaryColorGray text-[0.9rem]'>{formatTime(time || '')}</p>
                         </div>
                         <div className='text-[0.9rem]'>
                             <div className='text-[0.9rem] line-clamp-3 hover:line-clamp-none'>
