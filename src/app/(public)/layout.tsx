@@ -36,7 +36,7 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({
       <Sidebar />
       <ScrollContent>
         <div className="ml-[16.66vw]">
-          <main className="flex flex-col items-center">
+          <main className="flex flex-col items-center relative">
             <Header />
             {children}
             <LyricPage />

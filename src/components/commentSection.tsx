@@ -1,7 +1,5 @@
 'use client'
-import React, { useState } from 'react'
-import { ScrollArea } from "@/components/ui/scroll-area"
-
+import React, { useEffect, useState } from 'react'
 import {
     FaCommentAlt,
     FaCaretUp,
@@ -17,16 +15,21 @@ import { CommentProvider } from '@/components/provider/commentProvider';
 import CommentPart from '@/components/commentPart';
 import Image from 'next/image';
 import { Comment } from '@/types/interfaces';
+import { fetchApiData } from '@/app/api/appService';
 
 interface CommentSectionProps {
-    data?: Array<Comment>
-    totalCmt: number
+    id: string
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ data, totalCmt }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
     const sorts = ['Newest', 'Oldest']
     const [valueSort, setValueSort] = useState('Newest')
     const [isClickSort, setIsClickSort] = useState(false)
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [totalPage, setTotalPage] = useState<number>(100)
+    const [totalComment, setTotalCmt] = useState<number>()
 
     const handleClickSort = () => {
         setIsClickSort(!isClickSort)
@@ -37,12 +40,40 @@ const CommentSection: React.FC<CommentSectionProps> = ({ data, totalCmt }) => {
         setIsClickSort(!isClickSort)
     }
 
+    const fetchComments = async () => {
+        setLoading(true);
+        const response = await fetchApiData(`/api/songs/comment/${id}`, 'GET', null, null, null, page)
+        if (response.success) {
+            const data = await response.data;
+            setComments(prevComments => [...prevComments, ...data.comments]);
+            setPage(prevPage => prevPage + 1);
+            setTotalPage(data.totalPage)
+            setTotalCmt(data.totalComment)
+        }
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        setComments([])
+        setPage(1)
+        fetchComments(); // Fetch dữ liệu trang đầu tiên
+    }, [id]);
+
+    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+        const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
+        if (scrollHeight - scrollTop <= clientHeight + 50 && !loading) {
+            if (page <= totalPage) {
+                fetchComments()
+            }
+        }
+    };
+
     return (
         <div className='w-[100%]'>
             <div className='flex justify-between mb-2 items-end'>
                 <div className='flex items-center text-primaryColorGray'>
                     <FaCommentAlt />
-                    <p className='ml-2'>{totalCmt} Comment</p>
+                    <p className='ml-2'>{totalComment} Comment</p>
                 </div>
                 <div className='relative'>
                     <button
@@ -80,17 +111,16 @@ const CommentSection: React.FC<CommentSectionProps> = ({ data, totalCmt }) => {
                 </div>
             </div>
             <hr className='py-2' />
-            <ScrollArea className='h-[600px] overflow-auto pr-4'>
-                {
-                    data?.map((comment, index: number) => (
-                        <div key={index}>
-                            <CommentProvider>
-                                <CommentPart data={comment} />
-                            </CommentProvider>
-                        </div>
-                    ))
-                }
-            </ScrollArea>
+            <div className="h-[600px] overflow-auto pr-4 scrollbar-thin scrollbar-thumb-transparent/30 scrollbar-track-transparent" onScroll={handleScroll}>
+                {comments?.map((comment, index) => (
+                    <div key={index}>
+                        <CommentProvider>
+                            <CommentPart data={comment} />
+                        </CommentProvider>
+                    </div>
+                ))}
+                {loading && <p>Đang tải thêm bình luận...</p>}
+            </div>
             <div className='flex justify-between items-center mt-5'>
                 <div className='w-[100%] mr-2 flex'>
                     <div className='w-[50px] mr-2 flex'>

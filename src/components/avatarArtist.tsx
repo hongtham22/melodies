@@ -16,16 +16,19 @@ interface AvatarArtistProps {
 const AvatarArtist: React.FC<AvatarArtistProps> = ({ id }) => {
     const [artist, setArtist] = useState<Artist>()
     useEffect(() => {
-        const fetchData = async () => {
-            const result = await fetchApiData(`/api/artist/more/${id}`, "GET");
-            if (result.success) {
-                setArtist(result.data.artist)
-            } else {
-                console.error("Login error:", result.error);
-            }
-        };
+        if (id) {
+            const fetchData = async () => {
+                const result = await fetchApiData(`/api/artist/more/${id}`, "GET");
+                if (result.success) {
+                    setArtist(result.data.artist)
+                } else {
+                    console.error("Login error:", result.error);
+                }
+            };
 
-        fetchData();
+            fetchData();
+        }
+
     }, [id]);
     return (
         <div>

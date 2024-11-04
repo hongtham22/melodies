@@ -4,13 +4,14 @@ import React, { useState, useEffect } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
 import { HeartIcon, HeartFilledIcon } from "@radix-ui/react-icons";
-import { FaPlay } from "react-icons/fa";
+import { IoPlayCircleOutline } from "react-icons/io5";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { IoIosMore } from "react-icons/io";
 import AlbumList from "@/components/albumList";
 import LoadingPage from "@/components/loadingPage";
 import NotFound from "@/app/not-found";
 import { DataAlbum } from "@/types/interfaces";
+import { getMainArtistName, getPoster } from "@/utils/utils";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { loading, setLoading } = useAppContext();
@@ -26,11 +27,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       const result = await fetchApiData(`/api/album/more/${params.id}`, "GET");
       if (result.success) {
         setDataAlbum(result.data.albumWithSong)
-        const imageUrl =
-          result.data.albumWithSong.albumImages.length > 0
-            ? result.data.albumWithSong.albumImages.find((img: { size: number; }) => img.size === 300)?.image ||
-            result.data.albumWithSong.albumImages[0].image
-            : "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
+        const imageUrl = getPoster(result.data)
         setAlbumImage(imageUrl)
         try {
           const response = await fetch(
@@ -122,9 +119,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         {/* Song lists */}
         <div className="m-3 flex flex-col ">
           <div className="flex gap-5 items-center">
-            <button className=" ml-3 h-14 w-14 mt-1 bg-transparent text-primaryColorPink rounded-[50%] flex items-center justify-center shadow-[0_4px_60px_rgba(0,0,0,0.3)] border-4 border-primaryColorPink">
-              <FaPlay className="w-5 h-5 " />
-            </button>
+            <IoPlayCircleOutline className="ml-3 mt-1 w-16 h-16 text-primaryColorPink" />
             <button className=" text-primaryColorPink">
               <TfiMoreAlt className="w-5 h-5 shadow-[0_4px_60px_rgba(0,0,0,0.3)]" />
             </button>
@@ -134,8 +129,8 @@ const Page = ({ params }: { params: { id: string } }) => {
               <tr>
                 <th className="w-[3%] pl-4"></th>
                 <th className="w-[4%] pl-4"></th>
-                <th className="w-[30%] pl-4"></th>
-                <th className="w-[18%] text-textMedium ">Time</th>
+                <th className="w-[70%] pl-4"></th>
+                <th className="w-[10%] text-textMedium ">Time</th>
               </tr>
             </thead>
             <tbody>
@@ -147,21 +142,21 @@ const Page = ({ params }: { params: { id: string } }) => {
                   <td className="pl-4 pr-8 text-h4 rounded-tl-lg rounded-bl-lg">
                     #{index + 1}
                   </td>
-                  <td>
+                  <td className="py-1">
                     <Image
                       src={albumImage}
                       alt="song"
-                      width={60}
-                      height={60}
+                      width={50}
+                      height={50}
                       className="rounded-lg"
                     />
                   </td>
                   <td className="pl-4">
-                    <h3 className="text-h3 mb-1 hover:underline">
+                    <h3 className="text-h4 mb-1 hover:underline">
                       {song.title}
                     </h3>
                     <p className="text-textSmall hover:underline">
-                      {song.artists[0].name}
+                      {getMainArtistName(song.artists)}
                     </p>
                   </td>
                   <td className="text-center pl-4 rounded-tr-lg rounded-br-lg align-middle">

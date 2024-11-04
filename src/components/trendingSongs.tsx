@@ -16,18 +16,6 @@ interface SongListProps {
 const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const formatDate = (isoDate: string) => {
-    const date = new Date(isoDate);
-    return date.toLocaleString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-  };
-
   const formatTime = (duration: number) => {
     const min = Math.floor(duration / 1000 / 60);
     const sec = Math.floor((duration / 1000) % 60);
@@ -36,6 +24,8 @@ const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) =
 
     return min + ":" + formattedSec;
   };
+
+  const options = { year: 'numeric' as 'numeric' | '2-digit', month: 'short' as 'numeric' | '2-digit', day: 'numeric' as 'numeric' | '2-digit' };
 
   return (
     <div className="w-full mt-2">
@@ -86,7 +76,7 @@ const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) =
                     </p>
                   </td>
                   <td className="text-textMedium pl-4 text-center">
-                    {formatDate(song.releaseDate)}
+                    {new Date(song?.releaseDate).toLocaleDateString('en-US', options)}
                   </td>
                   {/* <td className="text-textMedium pl-4 line-clamp-2 text-center align-middle">
                     {nameAlbum}

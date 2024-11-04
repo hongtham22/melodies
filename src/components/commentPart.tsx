@@ -31,7 +31,8 @@ const CommentPart: React.FC<CommentPartProps> = ({ data }) => {
                 "GET",
                 null,
                 null,
-                0
+                null,
+                1
             );
 
             if (result.success) {
