@@ -13,13 +13,22 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon, CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AddArtistSheetProps {
   onSave: (artistData: {
@@ -46,6 +55,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
   const [artistBio, setArtistBio] = React.useState("");
   const [artistAvatar, setArtistAvatar] = React.useState("");
   const [artistGenre, setArtistGenre] = React.useState<string[]>([]);
+  const [openGenre, setOpenGenre] = React.useState(false);
 
   const handleGenreChange = (genre: string) => {
     setArtistGenre((prevGenres) =>
@@ -135,7 +145,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
               Genre
             </Label>
             <div className="col-span-3">
-              <Popover>
+              {/* <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -161,6 +171,51 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
                       </div>
                     ))}
                   </div>
+                </PopoverContent>
+              </Popover> */}
+               <Popover open={openGenre} onOpenChange={setOpenGenre}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openGenre}
+                    className="w-62 justify-between border-darkBlue col-span-3 truncate"
+                  >
+                    {artistGenre.length > 0
+                      ? artistGenre.join(", ")
+                      : "Select sub artists"}
+                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-62 p-0 border-darkBlue">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search artist..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No artist found.</CommandEmpty>
+                      <ScrollArea className="h-40">
+                        <CommandGroup>
+                          {availableGenres.map((genre) => (
+                            <CommandItem
+                              key={genre}
+                              onSelect={() => handleGenreChange(genre)}
+                            >
+                              {genre}
+                              <CheckIcon
+                                className={`ml-auto h-4 w-4 ${
+                                  artistGenre.includes(genre)
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                }`}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </ScrollArea>
+                    </CommandList>
+                  </Command>
                 </PopoverContent>
               </Popover>
             </div>

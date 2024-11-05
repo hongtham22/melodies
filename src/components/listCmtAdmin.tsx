@@ -11,7 +11,7 @@ function ListCmtAdmin() {
           content:
             "This song captures my emotions and paints my world with its beautiful melody and heartfelt lyrics. It's truly special. This song captures my emotions and paints my world with .This song captures my emotions and paints my world with .This song captures my emotions and paints my world with .This song captures my emotions and paints my world with ",
           time: "12 hours",
-          status: "Pending",
+          status: "Denied",
         },
         {
           poster:
@@ -29,7 +29,7 @@ function ListCmtAdmin() {
           content:
             "This song captures my emotions and paints my world with its beautiful melody and heartfelt lyrics. It's truly special.",
           time: "12 hours",
-          status: "Pending",
+          status: "Denied",
         },
         {
           poster:
