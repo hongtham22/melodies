@@ -9,7 +9,10 @@ import {
 } from "react-icons/io";
 import Comment from '@/components/comment'
 import { useAppContext } from '@/components/provider/commentProvider'
-import { FaChevronDown } from "react-icons/fa";
+import {
+    FaChevronDown,
+    FaChevronUp
+} from "react-icons/fa";
 import { Comment as CommentInterface } from '@/types/interfaces';
 import { fetchApiData } from '@/app/api/appService';
 
@@ -21,26 +24,42 @@ const CommentPart: React.FC<CommentPartProps> = ({ data }) => {
     const { replyStatus, setReplyStatus } = useAppContext()
     const [childrenCmt, setChildrenCmt] = useState<CommentInterface[]>([])
     const [showCmtChild, setShowCmtChild] = useState<boolean>(false)
-    const [hasFetched, setHasFetched] = useState<boolean>(false);
+    const [totalPage, setTotalPage] = useState<number>(100)
+    const [isHidden, setIsHidden] = useState<boolean>(false)
+    const [page, setPage] = useState<number>(1)
+    const [cmtRemain, setCmtRemain] = useState<number>(data?.hasChild ?? 0)
 
     const ViewChildrenComment = async () => {
-        setShowCmtChild(!showCmtChild)
-        if (!hasFetched) {
+        setShowCmtChild(true)
+        setIsHidden(true)
+        if (cmtRemain > 0 && page <= totalPage) {
             const result = await fetchApiData(
                 `/api/songs/comment/replies/${data?.id}`,
                 "GET",
                 null,
                 null,
-                0
+                null,
+                page
             );
 
             if (result.success) {
-                setChildrenCmt(result.data.comments);
-                setHasFetched(true);
+                setChildrenCmt(prevComments => [...prevComments, ...result.data.comments]);
+                setTotalPage(result.data.totalPage)
+                setPage(prevPage => prevPage + 1)
+                setCmtRemain((prevCmt) => Math.max(prevCmt - 3, 0));
             } else {
                 console.error("Login error:", result.error);
             }
+        } else {
+            setCmtRemain(0)
         }
+    }
+
+
+    const handleHidden = () => {
+        setIsHidden(false)
+        setShowCmtChild(false)
+        setCmtRemain(data?.hasChild ?? 0)
     }
 
     return (
@@ -61,18 +80,33 @@ const CommentPart: React.FC<CommentPartProps> = ({ data }) => {
                     )}
                 </div>
             )}
-            {
-                (data?.hasChild ?? 0) > 0 && (
-                    <div
-                        className='ml-14 -mt-3 flex items-center mb-5 cursor-pointer'
-                        onClick={ViewChildrenComment}
-                    >
-                        <div className="w-[4%] h-[0.1rem] bg-gray-200 font-bold mr-3"></div>
-                        <p className='text-[0.85rem] text-gray-200'>Xem thêm {data?.hasChild} câu trả lời</p>
-                        <FaChevronDown className='ml-2 w-3 h-3 text-gray-200' />
-                    </div>
-                )
-            }
+            <div className='flex ml-14 mb-5'>
+                {
+                    (data?.hasChild ?? 0) > 0 && cmtRemain !== 0 && (
+                        <div
+                            className='flex items-center cursor-pointer group'
+                            onClick={ViewChildrenComment}
+                        >
+                            <div className="w-[2rem] h-[0.1rem] bg-gray-200 font-bold mr-3"></div>
+                            <p className='text-[0.85rem] text-gray-200 text-nowrap group-hover:underline'>Xem thêm {cmtRemain} câu trả lời</p>
+                            <FaChevronDown className='ml-2 w-3 h-3 text-gray-200 mr-5' />
+                        </div>
+                    )
+                }
+                {
+                    isHidden && (
+                        <div
+                            className='flex items-center cursor-pointer group'
+                            onClick={handleHidden}
+                        >
+                            <p className='group-hover:underline text-[0.85rem] text-gray-200'>Ẩn</p>
+                            <FaChevronUp className='ml-2 w-2 h-2 text-gray-200' />
+                        </div>
+
+                    )
+                }
+            </div>
+
             {
                 replyStatus && (
                     <div className='flex justify-between pl-14 items-center my-5 mb-7'>

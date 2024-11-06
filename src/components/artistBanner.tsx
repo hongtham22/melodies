@@ -61,7 +61,7 @@ const ArtistBanner: React.FC<BannerProps> = ({ data, color }) => {
                     ) : (
                         <FaRegHeart className="text-[#F75050] ml-[0.75%] mt-[0.75%] text-[1.7rem] transition-transform duration-300 hover:scale-[1.1]" />
                     )}
-                    <p className="ml-2 text-[0.95rem]">{data?.followersCount.toLocaleString()} followers</p>
+                    <p className="ml-2 text-[0.95rem]">{data?.totalFollow.toLocaleString()} followers</p>
                 </div>
             </div>
         </div>
