@@ -1,43 +1,76 @@
-"use client"
-import * as React from "react"
-import { TrendingUp } from "lucide-react"
-import { Label, Pie, PieChart } from "recharts"
+"use client";
+import * as React from "react";
+import { TrendingUp } from "lucide-react";
+import { Label, Pie, PieChart } from "recharts";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 
-export const description = "A donut chart with text"
-
-const chartData = [
-  { type: "Regular", users: 575, fill: "var(--color-regular)" },
-  { type: "Premium", users: 190, fill: "var(--color-premium)" },
-]
+interface UserGrowthData {
+  growth: number;
+  totalUser: number;
+  totalUserFree: number;
+  totalUserPremium: number;
+  totalUserThisMonth: number;
+  totalUserLastMonth: number;
+}
+interface UserChartProps {
+  data: UserGrowthData;
+}
 
 const chartConfig = {
   regular: {
     label: "Regular",
     color: "hsl(var(--chart-1))",
   },
-  premium: { 
+  premium: {
     label: "Premium",
     color: "hsl(var(--chart-5))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-function UserChart() {
+function UserChart({ data }: UserChartProps) {
+  // Memoize chartData to prevent re-creation on each render
+  const chartData = React.useMemo(() => [
+    {
+      type: "Regular",
+      users: data.totalUserFree,
+      fill: "var(--color-regular)",
+    },
+    {
+      type: "Premium",
+      users: data.totalUserPremium,
+      fill: "var(--color-premium)",
+    },
+  ], [data.totalUserFree, data.totalUserPremium]);
+
   const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.users, 0)
-  }, [])
+    return chartData.reduce((acc, curr) => acc + curr.users, 0);
+  }, [chartData]);
+
+  // Calculate the percentage change in users this month vs last month
+  const userGrowthPercentage =
+    ((data.totalUserThisMonth - data.totalUserLastMonth) /
+      data.totalUserLastMonth) *
+    100;
+
+  // Fix to ensure userGrowthPercentage is a number before calling toFixed()
+  const formattedGrowthPercentage = Number(userGrowthPercentage.toFixed(2));
+  const growthLabel = userGrowthPercentage > 0 ? "Increase" : "Decrease";
+  const growthColor =
+    userGrowthPercentage > 0
+      ? "text-primaryColorPink"
+      : "text-primaryColorBlue";
 
   return (
     <div className="w-full h-full">
@@ -57,8 +90,8 @@ function UserChart() {
               />
               <Pie
                 data={chartData}
-                dataKey="users"  
-                nameKey="type"  
+                dataKey="users"
+                nameKey="type"
                 innerRadius={60}
                 strokeWidth={5}
               >
@@ -87,7 +120,7 @@ function UserChart() {
                             Users
                           </tspan>
                         </text>
-                      )
+                      );
                     }
                   }}
                 />
@@ -97,12 +130,19 @@ function UserChart() {
         </CardContent>
         <CardFooter className="flex-col gap-2 text-sm">
           <div className="flex items-center gap-2 font-medium leading-none">
-            Increase by <span className="text-primaryColorPink"> 5.2%</span>  user numbers this month <TrendingUp className="h-4 w-4" />
+            {growthLabel} by{" "}
+            <span className={growthColor}>
+              {Math.abs(formattedGrowthPercentage)}%
+            </span>{" "}
+            user numbers this month
+            <TrendingUp className="h-4 w-4" />
           </div>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
 
-export default UserChart
+export default UserChart;
+
+
