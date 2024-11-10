@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import songimg from "@/assets/img/songs.png";
-import { LockClosedIcon, CaretSortIcon } from "@radix-ui/react-icons";
+import { CaretSortIcon } from "@radix-ui/react-icons";
 import {
   Pagination,
   PaginationContent,
@@ -18,7 +18,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -77,13 +76,20 @@ function ListUser() {
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>(
     users.map((user) => user.status)
   );
+
   const handleStatusChange = (index: number, newStatus: string) => {
-    setSelectedStatuses((prevStatuses) => {
-      const updatedStatuses = [...prevStatuses];
-      updatedStatuses[index] = newStatus;
-      return updatedStatuses;
-    });
+    const confirmed = window.confirm(
+      `Please confirm change to "${newStatus}"`
+    );
+    if (confirmed) {
+      setSelectedStatuses((prevStatuses) => {
+        const updatedStatuses = [...prevStatuses];
+        updatedStatuses[index] = newStatus;
+        return updatedStatuses;
+      });
+    }
   };
+  
   return (
     <div className=" w-[90%] p-4 flex flex-col items-start rounded-xl">
       <h1 className="text-h2 text-primaryColorPink">List User</h1>

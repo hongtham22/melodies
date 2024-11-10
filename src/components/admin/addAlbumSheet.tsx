@@ -20,7 +20,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Command,
   CommandEmpty,
@@ -31,7 +30,7 @@ import {
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface AddTrackSheetProps {
+interface AddAlbumSheetProps {
   onSave: (trackData: {
     title: string;
     main_artist: string;
@@ -55,7 +54,7 @@ const availableArtists = [
   "Phan Mạnh Quỳnh",
 ];
 
-const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
+const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave }) => {
   const [trackTitle, setTrackTitle] = React.useState("");
   const [mainArtist, setMainArtist] = React.useState("");
   const [subArtists, setSubArtists] = React.useState<string[]>([]);
@@ -124,13 +123,13 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
       <SheetTrigger asChild>
         <button className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover">
           <PlusIcon className="text-white w-5 h-5" />
-          Add New Track
+          Add New Album
         </button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
           <SheetTitle className="text-primaryColorPink">
-            Add New Track
+            Add New Album
           </SheetTitle>
           <SheetDescription>Enter details to add a new track.</SheetDescription>
         </SheetHeader>
@@ -293,4 +292,4 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
   );
 };
 
-export default AddTrackSheet;
+export default AddAlbumSheet;

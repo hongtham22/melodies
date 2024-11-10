@@ -10,6 +10,9 @@ import {
     ExitIcon,
     GearIcon,
 } from '@radix-ui/react-icons'
+import { MdQueueMusic } from "react-icons/md";
+import { FaMicrophoneAlt } from "react-icons/fa";
+import { TbPlaylistAdd } from "react-icons/tb";
 import Link from 'next/link';
 
 const SidebarAdmin = () => {
@@ -46,28 +49,23 @@ const SidebarAdmin = () => {
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('track')} py-2 items-center`}
                     onClick={() => handleMenuClick('track')}
                 >
-                    <GlobeIcon className='w-[24px] h-[24px] mr-3' />
+                    <DiscIcon className='w-[24px] h-[24px] mr-3' />
                     <Link href="/admin/tracks">Tracks</Link>
                 </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('album')} py-2 items-center`}
                     onClick={() => handleMenuClick('album')}
                 >
-                    <DiscIcon className='w-[24px] h-[24px] mr-3' />
-                    <Link href="/">Albums</Link>
+                    <MdQueueMusic className='w-[24px] h-[24px] mr-3' />
+                    <Link href="/admin/albums">Albums</Link>
 
                 </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('artist')} py-2 items-center`}
                     onClick={() => handleMenuClick('artist')}
                 >
-                    <AvatarIcon className='w-[24px] h-[24px] mr-3' />
+                    <FaMicrophoneAlt className='w-[24px] h-[24px] mr-3' />
                     <Link href="/admin/artists">Artists</Link>
                 </div>
-                <div className={`flex my-2 cursor-pointer ${getMenuClass('playlist')} py-2 items-center`}
-                    onClick={() => handleMenuClick('user')}
-                >
-                    <AvatarIcon className='w-[24px] h-[24px] mr-3' />
-                    <Link href="/">Playlists</Link>
-                </div>
+
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('user')} py-2 items-center`}
                     onClick={() => handleMenuClick('user')}
                 >

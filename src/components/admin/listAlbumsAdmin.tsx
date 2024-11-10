@@ -1,3 +1,4 @@
+
 "use client";
 import Image from "next/image";
 import songimg from "@/assets/img/songs.png";
@@ -15,7 +16,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 
-function ListTracksAdmin() {
+function ListAlbumsAdmin() {
   const tracks = [
     {
       name: "Đừng bao giờ nói yêu em",
@@ -218,4 +219,4 @@ function ListTracksAdmin() {
   );
 }
 
-export default ListTracksAdmin;
+export default ListAlbumsAdmin;

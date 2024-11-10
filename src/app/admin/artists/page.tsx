@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import { MdDeleteOutline } from "react-icons/md";
-import ListArtistAdmin from "@/components/listArtistAdmin";
-import AddArtistSheet from "@/components/addArtistSheet";
+import ListArtistAdmin from "@/components/admin/listArtistAdmin";
+import AddArtistSheet from "@/components/admin/addArtistSheet";
 
 function Page() {
   const handleAddArtist = (artistData: {
