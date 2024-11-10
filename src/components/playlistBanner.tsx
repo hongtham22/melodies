@@ -35,7 +35,7 @@ const PlaylistBanner = () => {
     const songImage = "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
 
     return (
-        <div className=" w-full h-[50vh] p-5 flex flex-col justify-end gap-6 rounded-t-lg bg-gradient-to-b from-transparent to-black/30">
+        <div className=" w-full h-[50vh] p-5 pl-8 flex flex-col justify-end gap-6 rounded-t-lg bg-gradient-to-b from-transparent to-black/30">
             {/* Header */}
             {/* Content albums */}
             <div className="flex items-end gap-8">

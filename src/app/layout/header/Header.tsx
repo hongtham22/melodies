@@ -13,12 +13,11 @@ import { FaArrowLeft } from "react-icons/fa";
 import { BellIcon } from "@radix-ui/react-icons";
 
 import Image from "next/image";
-import songimg from "@/assets/img/songs.png";
 import { fetchApiData } from "@/app/api/appService";
 import { User } from "@/types/interfaces";
 
 const Header = () => {
-    const { accessToken, id, setSearch } = useAppContext();
+    const { accessToken, setSearch } = useAppContext();
     const { scrollAreaRef } = useScrollArea();
     const { showSidebarRight } = useSongContext();
     const headerRef = useRef<HTMLDivElement | null>(null);
@@ -42,7 +41,7 @@ const Header = () => {
         };
 
         fetchData();
-    }, [id]);
+    }, [accessToken]);
 
     const handleSignUpClick = () => {
         router.push('/signup');

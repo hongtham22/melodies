@@ -5,7 +5,7 @@ import Link from "next/link";
 function NotFound() {
   return (
     <div
-      className="bg-cover bg-center flex flex-col items-center justify-center h-screen w-full text-white gap-2"
+      className="bg-cover bg-center flex flex-col items-center justify-center h-screen w-screen text-white gap-2"
       style={{
         backgroundImage: `url(${notfoundimg.src})`,
       }}

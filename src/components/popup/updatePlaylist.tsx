@@ -33,7 +33,7 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose }) => {
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 shadow-md"
             onClick={handleBackgroundClick}
         >
-            <div className="bg-[#222222] w-[35%] rounded-lg p-5">
+            <div className="bg-[#222222] w-[35%] rounded-lg p-5 border border-primaryColorBlue">
                 <div className="flex justify-between items-center w-full mb-5">
                     <h1 className="font-semibold text-[1.3rem]">Edit details</h1>
                     <IoMdClose className="w-[1.5rem] h-[1.5rem] cursor-pointer"

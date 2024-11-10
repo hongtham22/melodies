@@ -21,9 +21,9 @@ export default function Home() {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/songs/weeklytopsongs", "GET", null, null, 0),
-          fetchApiData("/api/songs/newRaleaseSong", "GET", null, null, 23),
-          fetchApiData("/api/songs/trending", "GET", null, null, 5),
+          fetchApiData("/api/songs/weeklytopsongs", "GET", null, null, null, 1),
+          fetchApiData("/api/songs/newRaleaseSong", "GET", null, null, null, 1),
+          fetchApiData("/api/songs/trending", "GET", null, null, null, 1),
           fetchApiData("/api/artist/popular", "GET", null, null, 0)
         ]);
         if (responses[0].success) setWeekSong(responses[0].data.weeklyTopSongs);
