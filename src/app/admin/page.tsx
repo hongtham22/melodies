@@ -5,11 +5,12 @@ import { useAppContext } from "@/app/AppProvider";
 
 import { RocketIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
-import SongsChart from "@/components/songsChart";
-import UserChart from "@/components/userChart";
-import ListCmtAdmin from "@/components/listCmtAdmin";
-import ListRecentUserAdmin from "@/components/listRecentUserAdmin";
-import OverallAdmin from "@/components/overallAdmin";
+import SongsChart from "@/components/admin/songsChart";
+import UserChart from "@/components/admin/userChart";
+import ListCmtAdmin from "@/components/admin/listCmtAdmin";
+import ListRecentUserAdmin from "@/components/admin/listRecentUserAdmin";
+import OverallAdmin from "@/components/admin/overallAdmin";
+import LoadingPage from "@/components/loadingPage";
 
 interface Artist {
   id: string;
@@ -47,6 +48,8 @@ const Page = () => {
     totalPlaylist: 0,
     totalUsers: 0,
   });
+  const { loading, setLoading } = useAppContext();
+
   const [recentCommentData, setRecentCommentData] = useState([]);
   const [todayBestSongData, setTodayBestSongData] = useState<TodayBestSong | null>(null);
   const [userGrowthData, setUserGrowthData] = useState([]);
@@ -54,6 +57,7 @@ const Page = () => {
   const [recentUserData, setRecentUserData] = useState([]);
   useEffect(() => {
     const fetchAdminDashboard = async () => {
+      setLoading(true);
       try {
         const responses = await Promise.all([
           fetchApiData("/api/admin/total", "GET", null, null, 0),
@@ -81,17 +85,17 @@ const Page = () => {
         if (responses[5].success) {
           setRecentUserData(responses[5].data.users);
         }
-        console.log(
-          "Data received in Admin Dashboard:",
-          responses[4].data
-        );
       } catch (error) {
         console.error("Error fetching songs:", error);
       } finally {
+        setLoading(false);
       }
     };
     fetchAdminDashboard();
-  }, []);
+  }, [setLoading]);
+
+  if (loading) return <LoadingPage />;
+
   return (
     <div className="p-8 my-20 w-full space-y-6">
       <OverallAdmin data={overallAdminData} />

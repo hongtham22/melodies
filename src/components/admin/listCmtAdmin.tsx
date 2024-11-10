@@ -44,10 +44,10 @@ function ListCmtAdmin({ data }: ListCmtAdminProps) {
               className="object-cover rounded-md w-[52px] h-[52px]"
             />
             <div className="w-3/4 flex flex-col gap-2 mb-2">
-              <p className=" text-primaryColorGray line-clamp-1">
+              <p className="text-gray-400 line-clamp-1">
                 {content}
               </p>
-              <p className="text-textMedium text-gray-400 line-clamp-1">
+              <p className="text-textMedium  line-clamp-1">
                 <span>By </span>
                 {name}
               </p>
