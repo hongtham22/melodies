@@ -72,3 +72,23 @@ export interface Comment {
     hasChild: number;
     myComment: boolean;
 }
+
+//playlist
+
+export interface PlaylistImage {
+    image: string;
+    size: number;
+}
+
+export interface DataPlaylist {
+    username: string;
+    playlistId: string;
+    title: string;
+    name: string;
+    image: PlaylistImage[];
+    description: string;
+    totalTime: number;
+    totalSong: number;
+    createdAt: string;
+    songsOfPlaylist: DataSong[];
+}

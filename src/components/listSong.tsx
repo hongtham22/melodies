@@ -1,12 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from "@/components/provider/songProvider";
 import { useRouter } from 'next/navigation';
 import PropTypes from "prop-types";
 import { DataSong } from "@/types/interfaces";
-import { getMainArtistName, getPoster } from "@/utils/utils";
+import { getMainArtistId, getMainArtistName, getPoster } from "@/utils/utils";
 
 interface SongListProps {
   maintitle?: string;
@@ -60,10 +60,12 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
         {(showSidebarRight ? data?.slice(0, 4) : data?.slice(0, 5))?.map(
           (song, index) => {
             const nameArtist = getMainArtistName(song.artists);
-            const poster = getPoster(song.album);
+            const poster = typeof getPoster(song.album) === "string"
+              ? getPoster(song.album)
+              : `${process.env.NEXT_PUBLIC_FE}${(getPoster(song.album) as StaticImageData).src}`;
             const songData = {
               audio: song.filePathAudio,
-              poster: poster,
+              poster: poster as string,
               name: song.title,
               artist: nameArtist || "Unknown Artist",
             };
@@ -73,10 +75,6 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
                 key={index}
                 className={`bg-[#1F1F1F] p-2 px-3 mr-3 ${showSidebarRight ? "w-[12vw]" : "w-[13vw]"
                   } rounded-lg cursor-pointer flex flex-col`}
-                onClick={() => {
-                  setCurrentSong(songData);
-                  setIndex(index);
-                }}
               >
                 <Image
                   src={poster}
@@ -84,6 +82,10 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
                   width={400}
                   height={400}
                   className="mb-2 rounded-md"
+                  onClick={() => {
+                    setCurrentSong(songData);
+                    setIndex(index);
+                  }}
                 />
                 <div className="flex flex-col justify-between">
                   <p
@@ -94,7 +96,7 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
                   </p>
                   <p
                     className="text-[0.8rem] font-thin mb-1 line-clamp-1 cursor-pointer hover:underline"
-                    onClick={() => router.push(`/artist/${song.artists[0].id}`)}
+                    onClick={() => router.push(`/artist/${getMainArtistId(song.artists)}`)}
                   >
                     {nameArtist}
                   </p>

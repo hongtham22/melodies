@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import React, { useState, useEffect } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
@@ -11,12 +11,11 @@ import AlbumList from "@/components/albumList";
 import LoadingPage from "@/components/loadingPage";
 import NotFound from "@/app/not-found";
 import { DataAlbum } from "@/types/interfaces";
-import { getMainArtistName, getPoster } from "@/utils/utils";
+import { formatTime, getMainArtistName, getPoster } from "@/utils/utils";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { loading, setLoading } = useAppContext();
   const [dataAlbum, setDataAlbum] = useState<DataAlbum>()
-  const [albumImage, setAlbumImage] = useState<string>("https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da")
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [dominantColor, setDominantColor] = useState<string>();
   const [notFound, setNotFound] = useState(false);
@@ -27,11 +26,12 @@ const Page = ({ params }: { params: { id: string } }) => {
       const result = await fetchApiData(`/api/album/more/${params.id}`, "GET");
       if (result.success) {
         setDataAlbum(result.data.albumWithSong)
-        const imageUrl = getPoster(result.data)
-        setAlbumImage(imageUrl)
+        const imageUrl = typeof getPoster(result.data.albumWithSong) === "string"
+          ? getPoster(result.data.albumWithSong)
+          : `${process.env.NEXT_PUBLIC_FE}${(getPoster(result.data.albumWithSong) as StaticImageData).src}`;
         try {
           const response = await fetch(
-            `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`
+            `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl as string)}`
           );
           console.log("API response:", response);
           const data = await response.json();
@@ -53,15 +53,6 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     fetchData();
   }, [params.id]);
-
-  const formatTime = (duration: number) => {
-    const min = Math.floor(duration / 1000 / 60);
-    const sec = Math.floor((duration / 1000) % 60);
-
-    const formattedSec = sec < 10 ? "0" + sec : sec;
-
-    return min + ":" + formattedSec;
-  };
 
   function formatDuration(totalMilliseconds: number) {
     const totalSeconds = Math.floor(totalMilliseconds / 1000);
@@ -93,14 +84,16 @@ const Page = ({ params }: { params: { id: string } }) => {
           {/* Content albums */}
           <div className="flex items-end gap-8">
             <div className="shadow-[0_4px_60px_rgba(0,0,0,0.5)] rounded-md ">
-              <Image
-                src={albumImage}
-                alt="Album Cover"
-                width={220}
-                height={220}
-                priority
-                className="rounded-md"
-              />
+              {dataAlbum && (
+                <Image
+                  src={getPoster(dataAlbum)}
+                  alt="Album Cover"
+                  width={220}
+                  height={220}
+                  priority
+                  className="rounded-md"
+                />
+              )}
             </div>
             <div className="flex gap-4 flex-col">
               <h3 className="uppercase">{dataAlbum?.albumType}</h3>
@@ -110,7 +103,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <span className="text-gray-300">•</span>
                 <p className="text-gray-300">{dataAlbum?.releaseDate ? new Date(dataAlbum.releaseDate).getFullYear() : "Unknown"}</p>
                 <span className="text-gray-300">•</span>
-                <p className="text-gray-300">{dataAlbum?.songNumber} songs, {formatDuration(dataAlbum?.totalDuration ?? 0)}</p>
+                <p className="text-gray-300">{dataAlbum?.songNumber ?? 0} {(dataAlbum?.songNumber ?? 0) > 1 ? 'songs' : 'song'}</p>
+                <span className="text-gray-300">•</span>
+                <p className="text-gray-300">{formatDuration(dataAlbum?.totalDuration ?? 0)}</p>
               </div>
             </div>
           </div>
@@ -126,10 +121,10 @@ const Page = ({ params }: { params: { id: string } }) => {
           </div>
           <table className="max-w-full text-white border-separate border-spacing-y-3 ">
             <thead className="w-full max-h-[32px]">
-              <tr>
-                <th className="w-[3%] pl-4"></th>
+              <tr className="text-primaryColorGray text-[0.9rem]">
+                <th className="w-[4%] pl-4 text-start">#</th>
                 <th className="w-[4%] pl-4"></th>
-                <th className="w-[70%] pl-4"></th>
+                <th className="w-[70%] pl-4 text-start">Tiêu đề</th>
                 <th className="w-[10%] text-textMedium ">Time</th>
               </tr>
             </thead>
@@ -144,7 +139,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                   </td>
                   <td className="py-1">
                     <Image
-                      src={albumImage}
+                      src={getPoster(dataAlbum)}
                       alt="song"
                       width={50}
                       height={50}

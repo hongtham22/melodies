@@ -111,7 +111,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
                 </div>
             </div>
             <hr className='py-2' />
-            <div className="h-[600px] overflow-auto pr-4 scrollbar-thin scrollbar-thumb-transparent/30 scrollbar-track-transparent" onScroll={handleScroll}>
+            <div className="min-h-[120px] max-h-[600px] overflow-auto pr-4 scrollbar-thin scrollbar-thumb-transparent/30 scrollbar-track-transparent" onScroll={handleScroll}>
                 {comments?.map((comment, index) => (
                     <div key={index}>
                         <CommentProvider>

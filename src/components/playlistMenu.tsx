@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
 import { useAppContext as useSongContext } from '@/components/provider/songProvider';
 import { useAppContext } from "@/app/AppProvider";
 import { BiSolidPlaylist } from "react-icons/bi";
@@ -13,8 +14,14 @@ import {
 } from "react-icons/io5";
 import '@/components/scss/playlistMenu.scss'
 import Image from "next/image";
+import { fetchApiData } from "@/app/api/appService";
+import { DataPlaylist } from "@/types/interfaces";
+import { getPosterPlaylist } from "@/utils/utils";
 const PlaylistMenu = () => {
+    const router = useRouter();
+    const { accessToken, setShowPlaylistMenu } = useAppContext()
     const { currentSong } = useSongContext();
+    const [listPlayer, setListPlayer] = useState<DataPlaylist[]>()
     const [pb, setPb] = useState(false)
 
     useEffect(() => {
@@ -22,79 +29,42 @@ const PlaylistMenu = () => {
             setPb(true);
         }
     }, [currentSong]);
-    const listUser = [
-        {
-            poster:
-                "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-        {
-            poster:
-                "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-        {
-            poster:
-                "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-        {
-            poster:
-                "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-        {
-            poster:
-                "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-        {
-            poster:
-                "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-        {
-            poster:
-                "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-        {
-            poster:
-                "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-        {
-            poster:
-                "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-        {
-            poster:
-                "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-            name: "Keshi",
-            gmail: "example@gmail.com",
-            time: "12 hours",
-        },
-    ];
-    const { setShowPlaylistMenu } = useAppContext()
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const result = await fetchApiData(
+                "/api/user/playlist",
+                "GET",
+                null,
+                accessToken,
+                null,
+                1
+            );
+            if (result.success) {
+                setListPlayer(result.data.playlists)
+            } else {
+
+            }
+        };
+
+        fetchData();
+    }, [accessToken])
+
+    const handleAddPlaylist = async () => {
+        const result = await fetchApiData(
+            "/api/user/playlist/create",
+            "POST",
+            null,
+            accessToken
+        );
+        if (result.success && result.data?.newPlaylist) {
+            setListPlayer(prevList => [result.data?.newPlaylist, ...(prevList || [])])
+            router.push(`/playlist/${result.data.newPlaylist.id}`)
+        } else {
+
+        }
+    }
+
     return (
         <div
             className='mt-5 drop-shadow-lg animate-slide-up'>
@@ -105,7 +75,10 @@ const PlaylistMenu = () => {
                 </div>
                 <div className="flex items-center">
                     <div className="rounded-full bg-transparent p-2 hover:bg-[#1F1F1F]">
-                        <FaPlus className="text-[1.2rem] cursor-pointer text-gray-400 hover:scale-105 hover:text-white" />
+                        <FaPlus
+                            className="text-[1.2rem] cursor-pointer text-gray-400 hover:scale-105 hover:text-white"
+                            onClick={handleAddPlaylist}
+                        />
                     </div>
                     <IoMdClose
                         className="text-[1.5rem] cursor-pointer text-gray-400 hover:scale-105 hover:text-white"
@@ -125,11 +98,14 @@ const PlaylistMenu = () => {
                     ${pb ? 'pb-[15.5rem]' : 'pb-[10rem]'} 
                 `}>
                 {
-                    listUser?.map((playlist, index) => (
-                        <div key={index} className="relative group flex items-center p-2 hover:bg-[#1F1F1F] cursor-pointer rounded-md">
+                    listPlayer?.map((playlist, index) => (
+                        <div key={index}
+                            className="relative group flex items-center p-2 hover:bg-[#1F1F1F] cursor-pointer rounded-md"
+                            onClick={() => router.push(`/playlist/${playlist.playlistId}`)}
+                        >
                             <div className="relative w-[50px] h-[50px]">
                                 <Image
-                                    src={playlist.poster}
+                                    src={getPosterPlaylist(playlist)}
                                     alt="Song Poster"
                                     width={50}
                                     height={50}
@@ -142,7 +118,7 @@ const PlaylistMenu = () => {
                             </div>
 
                             <div className="ml-3">
-                                <p className="font-bold text-[0.9rem] line-clamp-1">{playlist.name}</p>
+                                <p className="font-bold text-[0.9rem] line-clamp-1">{playlist.name || playlist.title}</p>
                             </div>
                         </div>
                     ))

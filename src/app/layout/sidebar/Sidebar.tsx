@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect } from 'react'
 import { useState } from 'react';
-import envConfig from "@/config"
 
 import {
     HomeIcon,
@@ -21,6 +20,7 @@ import { useToast } from "@/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { useAppContext } from '@/app/AppProvider';
 import { useAppContext as useSongContext } from '@/components/provider/songProvider';
+import { fetchApiData } from '@/app/api/appService';
 
 
 const Sidebar = () => {
@@ -52,49 +52,46 @@ const Sidebar = () => {
         setActiveMenu(menuItem);
     };
 
-    const handleLogout = async () => {
+    async function handleLogout() {
         try {
-            const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/api/auth/logout`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                    },
-                    method: 'POST'
-                }).then(async (res) => {
-                    // console.log(res);
+            const result = await fetchApiData(
+                "/api/auth/logout",
+                "POST",
+                null,
+                accessToken
+            );
 
-                    const payload = await res.json()
-                    const data = {
-                        status: res.status,
-                        payload
-                    }
-                    if (!res.ok) {
-                        throw data
-                    }
-                    return data
+            if (result.success) {
+                document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                document.cookie = 'role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                setAccessToken('');
+                setRole('');
+                router.push('/');
+                window.location.reload();
+
+                toast({
+                    variant: "success",
+                    title: "Congratulation!",
+                    description: "Logout Successfully",
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
                 })
-            console.log(result);
-            document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            setAccessToken('')
-            setRole('')
-            router.push('/');
-            window.location.reload();
-            toast({
-                variant: "success",
-                title: "Congratulation!!",
-                description: "Logout Successfully",
-            })
+            }
         } catch (error) {
-            console.log(error);
+            console.error("Logout error:", error);
             toast({
                 variant: "destructive",
                 title: "Uh oh! Something went wrong.",
-                // description:,
+                description: (error as Error).message,
                 action: <ToastAction altText="Try again">Try again</ToastAction>,
-            })
+            });
         }
     }
+
 
     const getMenuClass = (menuItem: string) => {
         return activeMenu === menuItem ? 'bg-primaryColorPink rounded-xl px-2 font-semibold' : 'text-[0.9rem]';

@@ -38,6 +38,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { formatTime } from '@/utils/utils';
 
 const MusicPlayer: React.FC = () => {
     const {
@@ -110,12 +111,6 @@ const MusicPlayer: React.FC = () => {
         const progress = (startTime / endTime) * 100;
         setProgressWidth(progress);
     }, [startTime, endTime]);
-
-    const formatTime = (timeInSeconds: number) => {
-        const minutes = Math.floor(timeInSeconds / 60);
-        const seconds = Math.floor(timeInSeconds % 60);
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    };
 
     const handleClickOnProgress = (e: React.MouseEvent<HTMLDivElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();

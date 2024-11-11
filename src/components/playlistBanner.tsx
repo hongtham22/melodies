@@ -1,10 +1,16 @@
 'use client'
 import UpdatePlaylist from '@/components/popup/updatePlaylist';
+import { DataPlaylist } from '@/types/interfaces';
+import { getPosterPlaylist } from '@/utils/utils';
 import Image from 'next/image'
 import React, { useState } from 'react'
 import { LuPen } from "react-icons/lu";
 
-const PlaylistBanner = () => {
+interface PlaylistBannerProps {
+    data: DataPlaylist;
+}
+
+const PlaylistBanner: React.FC<PlaylistBannerProps> = ({ data }) => {
     const [isUpdate, setIsUpdate] = useState<boolean>()
     function formatDuration(totalMilliseconds: number) {
         const totalSeconds = Math.floor(totalMilliseconds / 1000);
@@ -19,20 +25,6 @@ const PlaylistBanner = () => {
         timeParts.push(`${seconds} sec`);
         return timeParts.join(' ');
     }
-    const dataPlaylist = {
-        title: "Top Hits 2024",
-        artists: [
-            { name: "Artist Name" },
-        ],
-        album: {
-            title: "Album Title",
-        },
-        releaseDate: "2024-10-01T00:00:00Z", // ISO format date
-        duration: 3600, // Duration in seconds
-        playCount: 1500000, // Number of plays
-    };
-
-    const songImage = "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
 
     return (
         <div className=" w-full h-[50vh] p-5 pl-8 flex flex-col justify-end gap-6 rounded-t-lg bg-gradient-to-b from-transparent to-black/30">
@@ -41,7 +33,7 @@ const PlaylistBanner = () => {
             <div className="flex items-end gap-8">
                 <div className="relative shadow-[0_4px_60px_rgba(0,0,0,0.5)] rounded-md ">
                     <Image
-                        src={songImage}
+                        src={getPosterPlaylist(data)}
                         alt="Album Cover"
                         width={220}
                         height={220}
@@ -63,17 +55,16 @@ const PlaylistBanner = () => {
                     <h1
                         className="mt-2 text-6xl font-bold cursor-pointer"
                         onClick={() => setIsUpdate(true)}
-                    >{dataPlaylist?.title}</h1>
-                    <div className="mt-3 flex items-center space-x-2 text-h4 font-semibold">
-                        <p>{dataPlaylist?.artists[0].name}</p>
+                    >{data?.name}</h1>
+                    <p>{data.description}</p>
+                    <div className="mt-1 flex items-center space-x-2 text-h4 font-semibold">
+                        <p>{data.username}</p>
                         <span className="text-gray-300">•</span>
-                        <p className="">{dataPlaylist?.album?.title}</p>
+                        <p className="text-gray-300">{new Date(data.createdAt).getFullYear()}</p>
                         <span className="text-gray-300">•</span>
-                        <p className="text-gray-300">{dataPlaylist?.releaseDate ? new Date(dataPlaylist.releaseDate).getFullYear() : "Unknown"}</p>
+                        <p className="text-gray-300">{data?.totalSong} {data.totalSong > 1 ? 'songs' : 'song'}</p>
                         <span className="text-gray-300">•</span>
-                        <p className="text-gray-300">{formatDuration(dataPlaylist?.duration ?? 0)}</p>
-                        <span className="text-gray-300">•</span>
-                        <p className="text-gray-300">{dataPlaylist?.playCount}</p>
+                        <p className="text-gray-300">{formatDuration(data?.totalTime ?? 0)}</p>
                     </div>
                 </div>
             </div>
