@@ -1,17 +1,18 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from "@/components/provider/songProvider";
 import { useRouter } from 'next/navigation';
 import PropTypes from "prop-types";
 import { DataSong } from "@/types/interfaces";
-import { getMainArtistId, getMainArtistName, getPoster } from "@/utils/utils";
+import { getMainArtistId, getMainArtistName, getPosterSong } from "@/utils/utils";
 
 interface SongListProps {
   maintitle?: string;
   subtitle?: string;
   data?: Array<DataSong>;
+  type?: string
 }
 
 const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
@@ -60,9 +61,7 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
         {(showSidebarRight ? data?.slice(0, 4) : data?.slice(0, 5))?.map(
           (song, index) => {
             const nameArtist = getMainArtistName(song.artists);
-            const poster = typeof getPoster(song.album) === "string"
-              ? getPoster(song.album)
-              : `${process.env.NEXT_PUBLIC_FE}${(getPoster(song.album) as StaticImageData).src}`;
+            const poster = getPosterSong(song.album).image;
             const songData = {
               audio: song.filePathAudio,
               poster: poster as string,

@@ -71,7 +71,7 @@ const Comment: React.FC<CommentProps> = ({ dataUser, time, comment, role }) => {
                             className="rounded-full w-[40px] h-[40px]"
                         />
                     </div>
-                    <div className='w-[86%]'>
+                    <div className='w-[100%]'>
                         <div className='flex items-center'>
                             <p className='font-semibold'>{dataUser?.username}</p>
                             <FaCircle className='w-[6px] h-[6px] text-primaryColorGray mx-3' />

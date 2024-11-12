@@ -47,7 +47,7 @@ export interface DataSong {
     releaseDate: string;
     viewCount: number | null;
     createdAt: string;
-    album: DataAlbum;
+    album: Array<DataAlbum>;
     artists: Array<Artist>;
     playCount: string;
 }

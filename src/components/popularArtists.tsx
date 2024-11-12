@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from "@/components/provider/songProvider";
 
@@ -26,7 +27,7 @@ const PopularArtists: React.FC<PeopleListProps> = ({
   data = [],
 }) => {
   const { showSidebarRight } = useAppContext();
-
+  const router = useRouter()
   const avatarSize = showSidebarRight ? 120 : 150;
 
   return (
@@ -40,7 +41,8 @@ const PopularArtists: React.FC<PeopleListProps> = ({
         {data?.slice(0, 6).map((artist, index) => (
           <div
             key={artist.id || index}
-            className="flex flex-col gap-6 justify-center items-center"
+            className="flex flex-col gap-6 justify-center items-center group cursor-pointer"
+            onClick={() => router.push(`artist/${artist.id}`)}
           >
             <div style={{ width: avatarSize, height: avatarSize }}>
               <Image
@@ -52,8 +54,7 @@ const PopularArtists: React.FC<PeopleListProps> = ({
                 className="rounded-full w-full h-full"
               />
             </div>
-
-            <h3 className="text-textMedium line-clamp-1">{artist.name}</h3>
+            <h3 className="text-textMedium line-clamp-1 group-hover:underline">{artist.name}</h3>
           </div>
         ))}
 

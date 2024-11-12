@@ -1,6 +1,7 @@
 import { fetchApiData } from '@/app/api/appService';
 import { Artist } from '@/types/interfaces';
 import Image from 'next/image'
+import ImageArtist from '@/assets/img/placeholderUser.jpg'
 import React, { useEffect, useState } from 'react'
 
 import { FiUserPlus } from "react-icons/fi";
@@ -18,9 +19,9 @@ const AvatarArtist: React.FC<AvatarArtistProps> = ({ id }) => {
     useEffect(() => {
         if (id) {
             const fetchData = async () => {
-                const result = await fetchApiData(`/api/artist/more/${id}`, "GET");
+                const result = await fetchApiData(`/api/artist/${id}`, "GET");
                 if (result.success) {
-                    setArtist(result.data.artist)
+                    setArtist(result.data.artists)
                 } else {
                     console.error("Login error:", result.error);
                 }
@@ -34,12 +35,12 @@ const AvatarArtist: React.FC<AvatarArtistProps> = ({ id }) => {
         <div>
             <div className='w-[150px] h-[150px]'>
                 <Image
-                    src={artist?.avatar || "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da"}
+                    src={artist?.avatar || ImageArtist}
                     alt="Song Poster"
                     width={500}
                     height={500}
                     quality={100}
-                    className='w-full h-full object-cover rounded-full'
+                    className='w-full h-full object-cover rounded-full shadow-md'
                 />
                 <p className='text-[0.95rem] font-semibold mt-3 my-2'>{artist?.name}</p>
                 <div className='flex gap-4 mb-3'>

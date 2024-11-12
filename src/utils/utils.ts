@@ -14,13 +14,36 @@ export const getMainArtistId = (artists: Artist[]): string | undefined => {
     return mainArtist?.id;
 };
 
+export const getPosterSong = (albums: Array<DataAlbum>, albumType?: string) => {
+    if (albums?.length) {
+        const filteredAlbums = albumType
+            ? albums.filter(album => album.albumType === albumType)
+            : albums;
+
+        for (const album of filteredAlbums) {
+            const foundImage = album.albumImages.find(img => img.size === 300)?.image;
+            if (foundImage) {
+                return { title: album.title, image: foundImage };
+            }
+        }
+        const fallbackAlbum = filteredAlbums[0];
+        return {
+            title: fallbackAlbum?.title || "Unknown Title",
+            image: fallbackAlbum?.albumImages[0]?.image || ImageSong,
+        };
+    }
+    return { title: "Unknown Title", image: ImageSong };
+};
+
+
+
 // Hàm lấy poster của album
 export const getPoster = (album: DataAlbum): string | StaticImageData => {
     if (album?.albumImages && album.albumImages.length > 0) {
         const foundImage = album.albumImages.find(img => img.size === 300)?.image;
         return foundImage || album.albumImages[0].image;
     } else {
-        return ImageSong;
+        return ImagePlaylist;
     }
 };
 

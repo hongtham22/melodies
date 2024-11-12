@@ -24,7 +24,7 @@ export default function Home() {
           fetchApiData("/api/songs/weeklytopsongs", "GET", null, null, null, 1),
           fetchApiData("/api/songs/newRaleaseSong", "GET", null, null, null, 1),
           fetchApiData("/api/songs/trending", "GET", null, null, null, 1),
-          fetchApiData("/api/artist/popular", "GET", null, null, 0)
+          fetchApiData("/api/artist/popular", "GET", null, null, null, 1)
         ]);
         if (responses[0].success) setWeekSong(responses[0].data.weeklyTopSongs);
         if (responses[1].success) setNewReleaseSong(responses[1].data.newReleaseSongs);

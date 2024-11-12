@@ -13,6 +13,11 @@ const nextConfig = {
                 hostname: 'audiomelodies.nyc3.cdn.digitaloceanspaces.com',
                 pathname: '/**',
             },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                pathname: '/**',
+            },
         ],
     },
 

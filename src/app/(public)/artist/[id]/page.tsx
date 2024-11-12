@@ -5,51 +5,61 @@ import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
 import ArtistBanner from "@/components/artistBanner";
 import TrendingSongs from "@/components/trendingSongs";
-import AlbumList from "@/components/albumList";
 import LoadingPage from "@/components/loadingPage";
 import NotFound from "@/app/not-found";
+import AlbumList from "@/components/albumList";
 
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { loading, setLoading } = useAppContext();
     const [dataArtist, setDataArtist] = useState()
     const [dataSongArtist, setDataSongArtist] = useState()
-    const [dominantColor, setDominantColor] = useState<string>();
     const [dataAlbumArtist, setDataAlbumArtist] = useState()
+    const [dominantColor, setDominantColor] = useState<string>();
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true)
-            const result = await fetchApiData(`/api/artist/more/${params.id}`, "GET");
-            if (result.success) {
-                setDataArtist(result.data.artist)
-                setDataSongArtist(result.data.artist.popSong)
-                setDataAlbumArtist(result.data.artist.artistAlbum)
-                const imageUrl = result.data.artist.avatar;
-                try {
-                    const response = await fetch(
-                        `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`
-                    );
-                    console.log("API response:", response);
-                    const data = await response.json();
-                    if (response.ok) {
-                        console.log("Dominant color:", data.dominantColor);
-                        setDominantColor(data.dominantColor);
-                    } else {
-                        console.error("Error fetching dominant color:", data.error);
+        const fetchSong = async () => {
+            setLoading(true);
+            try {
+                const responses = await Promise.all([
+                    fetchApiData(`/api/artist/${params.id}`, "GET"),
+                    fetchApiData(`/api/artist/popSong/${params.id}`, "GET", null, null, null, 1),
+                    fetchApiData(`/api/artist/album/${params.id}`, "GET", null, null, null, 1),
+                ]);
+                if (responses[0].success) {
+                    setDataArtist(responses[0].data.artists)
+                    const imageUrl = responses[0].data.artists.avatar
+                    try {
+                        const response = await fetch(
+                            `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`
+                        );
+                        console.log("API response:", response);
+                        const data = await response.json();
+                        if (response.ok) {
+                            console.log("Dominant color:", data.dominantColor);
+                            setDominantColor(data.dominantColor);
+                        } else {
+                            console.error("Error fetching dominant color:", data.error);
+                        }
+                    } catch (error) {
+                        console.error("Error fetching dominant color:", error);
                     }
-                } catch (error) {
-                    console.error("Error fetching dominant color:", error);
                 }
-            } else {
-                console.error("Login error:", result.error);
+                if (responses[1].success) {
+                    setDataSongArtist(responses[1].data.popSong)
+                }
+                if (responses[2].success) {
+                    setDataAlbumArtist(responses[2].data.artistAlbum)
+                }
+            } catch (error) {
+                console.error("Error fetching songs:", error);
                 setNotFound(true)
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
-
-        fetchData();
+        fetchSong();
     }, [params.id]);
 
     if (loading) return <LoadingPage />

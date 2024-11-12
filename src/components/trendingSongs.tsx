@@ -4,7 +4,7 @@ import { HeartIcon } from "@radix-ui/react-icons";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
-import { getMainArtistName, getPoster } from "@/utils/utils";
+import { getMainArtistName, getPosterSong } from "@/utils/utils";
 import { DataSong } from "@/types/interfaces";
 
 interface SongListProps {
@@ -47,9 +47,10 @@ const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) =
           <tbody className="">
             {data?.slice(0, 10)?.map((song, index) => {
               const nameArtist = getMainArtistName(song.artists);
-              // const nameArtist = 'no';
-              const poster = getPoster(song.album);
-              const nameAlbum = song.album ? song.album.title : "";
+              const poster = getPosterSong(song.album).image;
+              console.log(typeof poster);
+
+              const nameAlbum = getPosterSong(song.album).title;
               return (
                 <tr
                   key={index}

@@ -13,7 +13,7 @@ import AvatarArtist from "@/components/avatarArtist";
 import SongList from "@/components/listSong";
 import PopularArtists from "@/components/popularArtists";
 import { DataSong } from "@/types/interfaces";
-import { getMainArtistId, getMainArtistName, getPoster } from "@/utils/utils";
+import { getMainArtistId, getMainArtistName, getPosterSong } from "@/utils/utils";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { loading, setLoading } = useAppContext();
@@ -21,7 +21,6 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [dominantColor, setDominantColor] = useState<string>();
     const [dataSong, setDataSong] = useState<DataSong>()
     const [anotherSong, setAnotherSong] = useState<DataSong[]>([])
-    const [songImage, setSongImage] = useState<string>("https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da")
     const [mainArtist, setMainArtist] = useState<string | undefined>()
     useEffect(() => {
         const fetchData = async () => {
@@ -29,12 +28,11 @@ const Page = ({ params }: { params: { id: string } }) => {
             const result = await fetchApiData(`/api/songs/${params.id}`, "GET");
             if (result.success) {
                 setDataSong(result.data.song)
-                const imageUrl = getPoster(result.data.song.album)
-                setSongImage(imageUrl)
+                const imageUrl = typeof getPosterSong(result.data.song.album).image === 'string' ? getPosterSong(result.data.song.album).image : ''
                 setMainArtist(getMainArtistName(result.data.song.artists))
                 try {
                     const responses = await Promise.all([
-                        fetch(`/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`),
+                        fetch(`/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl as string)}`),
                         fetchApiData(`/api/songs/otherByArtist/${getMainArtistId(result.data.song.artists)}`, "GET", null, null, 0),
                     ]);
                     const data = await responses[0].json();
@@ -57,47 +55,6 @@ const Page = ({ params }: { params: { id: string } }) => {
 
         fetchData();
     }, [params.id]);
-
-    // useEffect(() => {
-    //     const fetchSong = async () => {
-    //         setLoading(true);
-    //         try {
-    //             const responses = await Promise.all([
-    //                 fetchApiData(`/api/songs/${params.id}`, "GET"),
-    //                 fetchApiData("/api/songs/newRaleaseSong", "GET", null, null, 23),
-    //                 fetchApiData("/api/songs/trending", "GET", null, null, 5),
-    //                 fetchApiData("/api/artist/popular", "GET", null, null, 0)
-    //             ]);
-    //             if (responses[0].success) {
-    //                 setDataSong(responses[0].data.song)
-    //                 const imageUrl = getPoster(responses[0].data.song.album)
-    //                 setSongImage(imageUrl)
-    //                 try {
-    //                     const response = await fetch(
-    //                         `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`
-    //                     );
-    //                     console.log("API response:", response);
-    //                     const data = await response.json();
-    //                     if (response.ok) {
-    //                         console.log("Dominant color:", data.dominantColor);
-    //                         setDominantColor(data.dominantColor);
-    //                     } else {
-    //                         console.error("Error fetching dominant color:", data.error);
-    //                     }
-    //                 } catch (error) {
-    //                     console.error("Error fetching dominant color:", error);
-    //                 }
-    //             }
-
-    //         } catch (error) {
-    //             console.error("Error fetching songs:", error);
-    //             setNotFound(true)
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-    //     fetchSong();
-    // }, [params.id]);
 
     function formatDuration(totalMilliseconds: number) {
         const totalSeconds = Math.floor(totalMilliseconds / 1000);
@@ -130,7 +87,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     <div className="flex items-end gap-8">
                         <div className="shadow-[0_4px_60px_rgba(0,0,0,0.5)] rounded-md ">
                             <Image
-                                src={songImage}
+                                src={dataSong?.album ? getPosterSong(dataSong.album).image : ""}
                                 alt="Album Cover"
                                 width={220}
                                 height={220}
@@ -144,7 +101,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                             <div className="mt-3 flex items-center space-x-2 text-h4 font-semibold">
                                 <p>{dataSong?.artists ? getMainArtistName(dataSong.artists) : "Unknown Artist"}</p>
                                 <span className="text-gray-300">•</span>
-                                <p className="">{dataSong?.album?.title}</p>
+                                <p className="">{dataSong?.album ? getPosterSong(dataSong.album).title : "Unknown Album"}</p>
                                 <span className="text-gray-300">•</span>
                                 <p className="text-gray-300">{dataSong?.releaseDate ? new Date(dataSong.releaseDate).getFullYear() : "Unknown"}</p>
                                 <span className="text-gray-300">•</span>
