@@ -11,10 +11,18 @@ interface Artist {
   name: string;
 }
 
+interface AlbumImage {
+  image: string;
+}
+
+interface Album {
+  albumImages: AlbumImage[];
+  title: string;
+}
+
 interface Track {
   id: string;
   title: string;
-  albumTitle: string;
   duration: number;
   createdAt: string;
   releaseDate: string;
@@ -23,7 +31,7 @@ interface Track {
   totalComment: number;
   totalLike: number;
   artists: Artist[];
-  images: { image: string }[];
+  album: Album[];
 }
 
 function ListTracksAdmin({ data, page }: { data: Track[]; page: number; }) {
@@ -162,7 +170,7 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number; }) {
                   <td className="pl-2 line-clamp-1">
                     <div className="w-full flex gap-2">
                       <Image
-                        src={track.images[0].image || songimg}
+                        src={track.album[0].albumImages[0].image || songimg}
                         alt="song"
                         width={50}
                         height={50}
@@ -181,7 +189,7 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number; }) {
                     </div>
                   </td>
                   <td className="text-textMedium pl-6 text-center">
-                    <div className="line-clamp-1">{capitalizeWords(track.albumTitle)}</div>
+                    <div className="line-clamp-1">{capitalizeWords(track.album[0].title)}</div>
                   </td>
                   <td className="text-textMedium pl-2 text-center">
                     <div className="line-clamp-1">

@@ -3,6 +3,12 @@ import AddAlbumSheet from '@/components/admin/addAlbumSheet';
 import ListAlbumsAdmin from '@/components/admin/listAlbumsAdmin'
 import React from 'react'
 import { MdDeleteOutline } from "react-icons/md";
+import { useEffect, useState } from "react";
+import { fetchApiData } from "@/app/api/appService";
+import { useAppContext } from "@/app/AppProvider";
+import { PaginationWithLinks } from "@/components/paginationWithLinks";
+import { useSearchParams } from "next/navigation";
+import LoadingPage from "@/components/loadingPage";
 
 function Page() {
     const handleAddAlbum = (trackData: {
@@ -13,6 +19,38 @@ function Page() {
       }) => {
         console.log("New track added:", trackData);
       };
+      const { loading, setLoading } = useAppContext();
+      const [listAlbumsAdminData, setListAlbumsAdminData] = useState([]);
+      const searchParams = useSearchParams();
+      const page = parseInt(searchParams?.get("page") || "1", 10); 
+      const [totalPage, setTotalPage] = useState(1); 
+      useEffect(() => {
+        const fetchAlbumsAdmin = async () => {
+      setLoading(true);
+          try {
+            const responses = await Promise.all([
+              fetchApiData("/api/admin/allAlbum", "GET", null, null,{page: page} ),
+              
+            ]);
+            if (responses[0].success) {
+              setListAlbumsAdminData(responses[0].data.data);
+              setTotalPage(responses[0].data.totalPage);
+
+              console.log("List albums:", responses[0].data.data);
+            }
+            
+          } catch (error) {
+            console.error("Error fetching songs:", error);
+          } finally {
+        setLoading(false);
+          }
+        };
+        fetchAlbumsAdmin();
+    
+        
+      }, [setLoading, page]);
+  if (loading) return <LoadingPage />;
+    
   return (
     <div className='w-full my-20 m-6 p-8 '>
         <div className="p-4 flex flex-col items-start rounded-xl">
@@ -29,7 +67,8 @@ function Page() {
             </div>
         </div>
       </div>
-        <ListAlbumsAdmin />
+        <ListAlbumsAdmin data={listAlbumsAdminData} page={page} />
+      <PaginationWithLinks page={page} totalPage={totalPage} /> 
 
     </div>
   )

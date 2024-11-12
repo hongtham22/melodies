@@ -23,7 +23,7 @@ function Page() {
       setLoading(true);
         try {
                 const responses = await Promise.all([
-                  fetchApiData("/api/admin/allSong", "GET", null, null, null, page),
+                  fetchApiData("/api/admin/allSong", "GET", null, null,{page: page}),
                 ]);
                 if (responses[0].success) {
                   setListTracksData(responses[0].data.song);
@@ -43,7 +43,8 @@ function Page() {
     title: string;
     main_artist: string;
     sub_artist: string[];
-    audio: string;
+    audio: string | null;
+    duration: string;
   }) => {
     console.log("New track added:", trackData);
   };
