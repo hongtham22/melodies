@@ -9,80 +9,15 @@ import { IoIosMore } from "react-icons/io";
 import Image, { StaticImageData } from "next/image";
 import { fetchApiData } from "@/app/api/appService";
 import LoadingPage from "@/components/loadingPage";
-import { DataPlaylist } from "@/types/interfaces";
-import { formatTime, getPoster, getPosterPlaylist } from "@/utils/utils";
+import { DataPlaylist, DataSong } from "@/types/interfaces";
+import { formatTime, getMainArtistName, getPoster, getPosterPlaylist, getPosterSong } from "@/utils/utils";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const [playlist, setPlaylist] = useState<DataPlaylist>()
     const [searchTerm, setSearchTerm] = useState("");
     const [dominantColor, setDominantColor] = useState<string>();
     const { loading, setLoading } = useAppContext();
-    const [filteredSongs, setFilteredSongs] = useState<{ title: string; artist: string; album: string; imageUrl: string; }[]>([]);
-    const songs = [
-        // Quốc tế
-        {
-            title: "Flowers",
-            artist: "Miley Cyrus",
-            album: "Endless Summer Vacation",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        },
-        {
-            title: "Kill Bill",
-            artist: "SZA",
-            album: "SOS",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        },
-        {
-            title: "As It Was",
-            artist: "Harry Styles",
-            album: "Harry's House",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        },
-        {
-            title: "Calm Down",
-            artist: "Rema feat. Selena Gomez",
-            album: "Single",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        },
-        {
-            title: "Anti-Hero",
-            artist: "Taylor Swift",
-            album: "Midnights",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        },
-
-        // Việt Nam
-        {
-            title: "Bên Trên Tầng Lầu",
-            artist: "Tăng Duy Tân",
-            album: "Single",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        },
-        {
-            title: "Thích Em Hơi Nhiều",
-            artist: "Wren Evans",
-            album: "Single",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        },
-        {
-            title: "Nàng Thơ",
-            artist: "Hoàng Dũng",
-            album: "Single",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        },
-        {
-            title: "Chìm Sâu",
-            artist: "MCK feat. Trung Trần",
-            album: "Single",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        },
-        {
-            title: "Hẹn Em Kiếp Sau",
-            artist: "Dương Edward",
-            album: "Single",
-            imageUrl: "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da",
-        }
-    ];
+    const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -114,20 +49,18 @@ const Page = ({ params }: { params: { id: string } }) => {
             }
             setLoading(false);
         };
-
         fetchData();
     }, [params.id]);
 
     useEffect(() => {
-        const handler = setTimeout(() => {
+        const handler = setTimeout(async () => {
             if (searchTerm === "") {
                 setFilteredSongs([]);
             } else {
-                const results = songs.filter(song =>
-                    song.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    song.artist.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-                setFilteredSongs(results);
+                const results = await fetchApiData(`/api/songs/search`, "GET", null, null, { query: searchTerm, page: 1 });
+                if (results.success) {
+                    setFilteredSongs(results.data.songs)
+                }
             }
         }, 500);
 
@@ -150,7 +83,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     background: `linear-gradient(to bottom, ${dominantColor} 20%, rgba(0, 0, 0, 1) 80%)`,
                 }}
             >
-                {playlist && <PlaylistBanner data={playlist} />}
+                {playlist && <PlaylistBanner data={playlist} setPlaylist={setPlaylist} />}
                 <div className="m-3 flex flex-col pl-5">
                     <div className="flex gap-5 items-center">
                         <IoPlayCircleOutline className="mt-1 w-16 h-16 text-primaryColorPink" />
@@ -233,7 +166,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                     <tr key={index}>
                                         <td className="relative group flex" >
                                             <Image
-                                                src={song.imageUrl}
+                                                src={getPosterSong(song.album).image}
                                                 alt="Song Poster"
                                                 width={48}
                                                 height={48}
@@ -241,15 +174,15 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                 className="object-cover rounded-md"
                                             />
                                             <div className="ml-3">
-                                                <p className="font-bold text-primaryColorPink">{song.title}</p>
+                                                <p className="font-bold text-white">{song.item.title}</p>
                                                 <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                                                    {song.artist}
+                                                    {getMainArtistName(song.item.artists)}
                                                 </p>
                                             </div>
                                         </td>
                                         <td>
                                             <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                                                {song.album}
+                                                {getPosterSong(song.item.album).title}
                                             </p>
                                         </td>
                                         <td>

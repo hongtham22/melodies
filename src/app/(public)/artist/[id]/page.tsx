@@ -24,8 +24,8 @@ const Page = ({ params }: { params: { id: string } }) => {
             try {
                 const responses = await Promise.all([
                     fetchApiData(`/api/artist/${params.id}`, "GET"),
-                    fetchApiData(`/api/artist/popSong/${params.id}`, "GET", null, null, null, 1),
-                    fetchApiData(`/api/artist/album/${params.id}`, "GET", null, null, null, 1),
+                    fetchApiData(`/api/artist/popSong/${params.id}`, "GET", null, null, { page: 1 }),
+                    fetchApiData(`/api/artist/album/${params.id}`, "GET", null, null, { page: 1 }),
                 ]);
                 if (responses[0].success) {
                     setDataArtist(responses[0].data.artists)

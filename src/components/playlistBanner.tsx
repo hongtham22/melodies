@@ -8,9 +8,10 @@ import { LuPen } from "react-icons/lu";
 
 interface PlaylistBannerProps {
     data: DataPlaylist;
+    setPlaylist: React.Dispatch<React.SetStateAction<DataPlaylist | undefined>>
 }
 
-const PlaylistBanner: React.FC<PlaylistBannerProps> = ({ data }) => {
+const PlaylistBanner: React.FC<PlaylistBannerProps> = ({ data, setPlaylist }) => {
     const [isUpdate, setIsUpdate] = useState<boolean>()
     function formatDuration(totalMilliseconds: number) {
         const totalSeconds = Math.floor(totalMilliseconds / 1000);
@@ -40,7 +41,7 @@ const PlaylistBanner: React.FC<PlaylistBannerProps> = ({ data }) => {
                         priority
                         className="rounded-md"
                     />
-                    <div className='absolute bg-black/60 top-0 w-full h-full flex items-center justify-center opacity-0 hover:opacity-100'>
+                    <div className='absolute bg-black/60 top-0 w-full h-full flex items-center justify-center opacity-0 hover:opacity-100 rounded-md'>
                         <div
                             className='flex flex-col items-center cursor-pointer gap-1'
                             onClick={() => setIsUpdate(true)}
@@ -70,7 +71,9 @@ const PlaylistBanner: React.FC<PlaylistBannerProps> = ({ data }) => {
             </div>
             {
                 isUpdate && (
-                    <UpdatePlaylist onClose={() => setIsUpdate(false)} />
+                    <UpdatePlaylist onClose={() => setIsUpdate(false)}
+                        setPlaylist={setPlaylist}
+                        data={data} />
                 )
             }
         </div>

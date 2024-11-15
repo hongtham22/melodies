@@ -1,23 +1,31 @@
 'use client'
-import Image from "next/image";
 import { useState } from "react";
+import { DataPlaylist } from "@/types/interfaces";
+import ImageSong from '@/assets/img/placeholderPlaylist.png'
+import { getPosterPlaylist } from "@/utils/utils";
+import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { LuPen } from "react-icons/lu";
-
-
+import { fetchApiData } from "@/app/api/appService";
+import { useAppContext } from "@/app/AppProvider";
 interface UpdatePlaylistProps {
-    onClose: () => void
+    onClose: () => void,
+    data?: DataPlaylist,
+    setPlaylist: React.Dispatch<React.SetStateAction<DataPlaylist | undefined>>
 }
-const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose }) => {
+const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose, data, setPlaylist }) => {
     const handleBackgroundClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if (event.target === event.currentTarget) {
             onClose();
         }
     };
-    const [updateName, setUpdateName] = useState('')
-    const [updateBio, setUpdateBio] = useState('')
-    const songImage = "https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da";
+    const { accessToken } = useAppContext()
+    const [updateName, setUpdateName] = useState(data?.name || '')
+    const [updateBio, setUpdateBio] = useState(data?.description || '')
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [selectedImageType, setSelectedImageType] = useState<string | null>(null);
+    const [selectedImageName, setSelectedImageName] = useState<string | null>(null);
+
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -25,8 +33,39 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose }) => {
             const file = files[0];
             const imageUrl = URL.createObjectURL(file);
             setSelectedImage(imageUrl);
+            setSelectedImageName(file.name)
+            setSelectedImageType(file.type)
+            console.log(selectedImage, selectedImageType)
         }
     };
+
+    const handleUpdate = async () => {
+        if (updateName.trim() === '') {
+            alert('Name cannot be left blank');
+            return;
+        }
+        const payload = {
+            playlistId: data?.playlistId,
+            data: {
+                fileName: selectedImageName,
+                fileType: selectedImageType,
+                title: updateName,
+                description: updateBio
+            }
+        }
+        const result = await fetchApiData(`/api/user/playlist/update`, 'PATCH', JSON.stringify(payload), accessToken)
+        if (result.success) {
+            setPlaylist((prevData) => {
+                if (!prevData) return prevData;
+                return {
+                    ...prevData,
+                    name: updateName,
+                    description: updateBio,
+                };
+            });
+            onClose();
+        }
+    }
 
     return (
         <div
@@ -43,7 +82,7 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose }) => {
                 <div className="flex gap-3">
                     <div className="relative w-[180px] h-[180px]">
                         <Image
-                            src={selectedImage || songImage}
+                            src={selectedImage ? selectedImage : data ? getPosterPlaylist(data) : ImageSong}
                             alt="Album Cover"
                             width={180}
                             height={180}
@@ -99,7 +138,10 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose }) => {
                     </div>
                 </div>
                 <div className="w-full flex justify-end mt-3">
-                    <button className='bg-white font-semibold px-6 py-1 text-black rounded-lg'>Save</button>
+                    <button
+                        className='bg-white font-semibold px-6 py-1 text-black rounded-lg'
+                        onClick={handleUpdate}
+                    >Save</button>
                 </div>
                 <p className="text-wrap text-[0.8rem] mt-3 text-justify font-bold">By continuing, you agree to allow Melodies to access the images you have selected to upload. Please make sure you have permission to upload the images.</p>
 

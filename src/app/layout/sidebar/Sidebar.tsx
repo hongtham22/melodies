@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useState } from 'react';
 
 import {
@@ -10,8 +10,6 @@ import {
     ExitIcon,
     GearIcon,
     HeartIcon,
-    CounterClockwiseClockIcon,
-    ClockIcon,
     ListBulletIcon
 } from '@radix-ui/react-icons'
 import Link from 'next/link';
@@ -19,14 +17,11 @@ import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { useAppContext } from '@/app/AppProvider';
-import { useAppContext as useSongContext } from '@/components/provider/songProvider';
 import { fetchApiData } from '@/app/api/appService';
 
 
 const Sidebar = () => {
     const { accessToken, setAccessToken, setRole, setShowPlaylistMenu } = useAppContext()
-    const { currentSong } = useSongContext();
-    const [pb, setPb] = useState(false)
     const [showRequireLogin, setShowRequireLogin] = useState(false)
 
     const handleShowPlaylist = () => {
@@ -37,12 +32,6 @@ const Sidebar = () => {
             setShowRequireLogin(true)
         }
     }
-
-    useEffect(() => {
-        if (currentSong) {
-            setPb(true);
-        }
-    }, [currentSong]);
 
     const [activeMenu, setActiveMenu] = useState('');
     const { toast } = useToast()
@@ -99,7 +88,7 @@ const Sidebar = () => {
     return (
         <div
             className={
-                `${pb ? 'pb-[9rem] overflow-auto h-screen [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-inherit hover:[&::-webkit-scrollbar-thumb]:bg-white/30 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 hover:dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 ' : ''} 
+                `pb-[9rem] overflow-auto h-screen [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-inherit hover:[&::-webkit-scrollbar-thumb]:bg-white/30 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 hover:dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 ' : ''} 
                 mt-3 pl-9 pr-7 drop-shadow-lg relative`
             }
         >
@@ -133,23 +122,6 @@ const Sidebar = () => {
                     <AvatarIcon className='w-[24px] h-[24px] mr-3' />
                     <Link href="/artists">Artists</Link>
                     {/* <p>Artists</p> */}
-                </div>
-            </div>
-            <div id="library-section" className='mb-5'>
-                <p className='text-primaryColorPink/60 text-[0.8rem]'>Library</p>
-                <div className={`flex my-2 cursor-pointer ${getMenuClass('recently-added')} py-2 items-center`}
-                    onClick={() => handleMenuClick('recently-added')}
-                >
-                    <ClockIcon className='w-[24px] h-[24px] mr-3' />
-                    <Link href="/recently_added">Recently added</Link>
-                    {/* <p>Recently Added</p> */}
-                </div>
-                <div className={`flex my-2 cursor-pointer ${getMenuClass('most-played')} py-2 items-center`}
-                    onClick={() => handleMenuClick('most-played')}
-                >
-                    <CounterClockwiseClockIcon className='w-[24px] h-[24px] mr-3' />
-                    <Link href="/most_played">Most played</Link>
-                    {/* <p>Most played</p> */}
                 </div>
             </div>
             <div id="playlist-section" className='mb-5'>

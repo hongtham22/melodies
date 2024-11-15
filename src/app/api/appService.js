@@ -3,15 +3,19 @@ import envConfig from "@/config";
 
 const API_BASE_URL = envConfig.NEXT_PUBLIC_API_ENDPOINT;
 
-export const fetchApiData = async (endpoint, method, body, token, offset, page) => {
+export const fetchApiData = async (endpoint, method, body, token, params) => {
   let url = `${API_BASE_URL}${endpoint}`;
 
-  if (offset !== undefined && offset !== null) {
-    url += `?offset=${offset}`;
+  const urlParams = new URLSearchParams();
+  if (params) {
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== null) {
+        urlParams.append(key, params[key]);
+      }
+    });
   }
-
-  if (page !== undefined && page !== null) {
-    url += `?page=${page}`;
+  if (urlParams.toString()) {
+    url += `?${urlParams.toString()}`;
   }
 
   const headers = {

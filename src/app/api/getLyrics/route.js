@@ -4,13 +4,14 @@ import { getLyrics } from 'genius-lyrics-api';
 
 export async function POST(request) {
     const { artist, title } = await request.json();
+    console.log(artist, title);
 
     if (!artist || !title) {
         return NextResponse.json({ error: 'Artist and title are required' }, { status: 400 });
     }
 
     const options = {
-        apiKey: process.env.GENIUS_API_KEY,
+        apiKey: process.env.NEXT_PUBLIC_GENIUS_API_KEY,
         artist,
         title,
         optimizeQuery: true,

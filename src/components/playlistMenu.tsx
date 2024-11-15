@@ -37,8 +37,7 @@ const PlaylistMenu = () => {
                 "GET",
                 null,
                 accessToken,
-                null,
-                1
+                { page: 1 }
             );
             if (result.success) {
                 setListPlayer(result.data.playlists)

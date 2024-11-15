@@ -29,6 +29,8 @@ const Page = ({ params }: { params: { id: string } }) => {
         const imageUrl = typeof getPoster(result.data.albumWithSong) === "string"
           ? getPoster(result.data.albumWithSong)
           : `${process.env.NEXT_PUBLIC_FE}${(getPoster(result.data.albumWithSong) as StaticImageData).src}`;
+        console.log(imageUrl);
+
         try {
           const response = await fetch(
             `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl as string)}`

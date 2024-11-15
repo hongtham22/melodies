@@ -42,7 +42,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
 
     const fetchComments = async () => {
         setLoading(true);
-        const response = await fetchApiData(`/api/songs/comment/${id}`, 'GET', null, null, null, page)
+        const response = await fetchApiData(`/api/songs/comment/${id}`, 'GET', null, null, { page: page })
         if (response.success) {
             const data = await response.data;
             setComments(prevComments => [...prevComments, ...data.comments]);
