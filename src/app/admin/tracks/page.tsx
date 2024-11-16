@@ -23,7 +23,7 @@ function Page() {
       setLoading(true);
         try {
                 const responses = await Promise.all([
-                  fetchApiData("/api/admin/allSong", "GET", null, null,{page: page}),
+                  fetchApiData("/api/songs", "GET", null, null,{page: page}),
                 ]);
                 if (responses[0].success) {
                   setListTracksData(responses[0].data.song);

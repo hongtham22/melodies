@@ -30,6 +30,10 @@ import {
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+interface Genre {
+  genreId: string;
+  name: string;
+}
 interface AddArtistSheetProps {
   onSave: (artistData: {
     name: string;
@@ -37,42 +41,55 @@ interface AddArtistSheetProps {
     avatar: string;
     genre: string[];
   }) => void;
+  genre: Genre[];
 }
-
-const availableGenres = [
-  "Pop",
-  "Rock",
-  "Jazz",
-  "Hip-Hop",
-  "Classical",
-  "Country",
-  "Electronic",
-  "R&B",
-];
-
-const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
+const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
   const [artistName, setArtistName] = React.useState("");
   const [artistBio, setArtistBio] = React.useState("");
-  const [artistAvatar, setArtistAvatar] = React.useState("");
+  // const [artistAvatar, setArtistAvatar] = React.useState("");
+  const [artistAvatar, setArtistAvatar] = React.useState<File | null>(null);
   const [artistGenre, setArtistGenre] = React.useState<string[]>([]);
   const [openGenre, setOpenGenre] = React.useState(false);
 
-  const handleGenreChange = (genre: string) => {
+  const [reorderedGenre, setGenre] = React.useState<Genre[]>(genre || []);
+
+  React.useEffect(() => {
+    setGenre(genre);
+  }, [genre]);
+
+  const handleGenreChange = (genreId: string) => {
     setArtistGenre((prevGenres) =>
-      prevGenres.includes(genre)
-        ? prevGenres.filter((g) => g !== genre)
-        : [...prevGenres, genre]
+      prevGenres.includes(genreId)
+        ? prevGenres.filter((id) => id !== genreId)
+        : [...prevGenres, genreId]
     );
+
+    const reorderedGenres = genre
+      .filter(
+        (item) => artistGenre.includes(item.genreId) || item.genreId === genreId
+      )
+      .concat(
+        genre.filter(
+          (item) =>
+            !artistGenre.includes(item.genreId) && item.genreId !== genreId
+        )
+      );
+    setGenre(reorderedGenres); // Cập nhật danh sách thể loại theo thứ tự mới
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setArtistAvatar(URL.createObjectURL(file));
+      // setArtistAvatar(URL.createObjectURL(file));
+      setArtistAvatar(file);
+
     }
   };
+  console.log("Genres:", genre);
+  console.log("Reordered Genres:", reorderedGenre);
 
   const handleSave = () => {
+    console.log("Genre add sheet:", genre)
     onSave({
       name: artistName,
       bio: artistBio,
@@ -145,67 +162,45 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
               Genre
             </Label>
             <div className="col-span-3">
-              {/* <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between border-darkBlue truncate"
-                  >
-                    {artistGenre.length > 0
-                      ? artistGenre.join(", ")
-                      : "Select genres"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent>
-                  <div className="w-full flex flex-col gap-2">
-                    {availableGenres.map((genre) => (
-                      <div key={genre} className="flex items-center">
-                        <Checkbox
-                          checked={artistGenre.includes(genre)}
-                          onCheckedChange={() => handleGenreChange(genre)}
-                          id={`genre-${genre}`}
-                        />
-                        <Label htmlFor={`genre-${genre}`} className="ml-2">
-                          {genre}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover> */}
-               <Popover open={openGenre} onOpenChange={setOpenGenre}>
+              <Popover open={openGenre} onOpenChange={setOpenGenre}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
                     aria-expanded={openGenre}
-                    className="w-62 justify-between border-darkBlue col-span-3 truncate"
+                    className="w-full justify-between border-darkBlue col-span-3 truncate capitalize"
                   >
+                    {/* {artistGenre.length > 0
+                     ? artistGenre.join(", ")
+                     : "Select genre"} */}
                     {artistGenre.length > 0
-                      ? artistGenre.join(", ")
-                      : "Select sub artists"}
+                      ? reorderedGenre
+                          .filter((g) => artistGenre.includes(g.genreId))
+                          .map((g) => g.name)
+                          .join(", ")
+                      : "Select genre"}
                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-62 p-0 border-darkBlue">
+                <PopoverContent className="w-full p-0 border-darkBlue">
                   <Command>
                     <CommandInput
-                      placeholder="Search artist..."
+                      placeholder="Search genre..."
                       className="h-9"
                     />
                     <CommandList>
-                      <CommandEmpty>No artist found.</CommandEmpty>
+                      <CommandEmpty>No genre found.</CommandEmpty>
                       <ScrollArea className="h-40">
-                        <CommandGroup>
-                          {availableGenres.map((genre) => (
+                        <CommandGroup className="capitalize">
+                          {reorderedGenre.map((genreItem) => (
                             <CommandItem
-                              key={genre}
-                              onSelect={() => handleGenreChange(genre)}
+                              key={genreItem.genreId}
+                              onSelect={() => handleGenreChange(genreItem.genreId)}
                             >
-                              {genre}
+                              {genreItem.name}
                               <CheckIcon
                                 className={`ml-auto h-4 w-4 ${
-                                  artistGenre.includes(genre)
+                                  artistGenre.includes(genreItem.genreId)
                                     ? "opacity-100"
                                     : "opacity-0"
                                 }`}

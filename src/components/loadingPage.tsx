@@ -1,5 +1,4 @@
 import React from 'react'
-import './scss/loadingPage.scss'
 import Lottie from 'react-lottie-player';
 import animationData from '../../public/animation/Animation - 1730129529264.json';
 

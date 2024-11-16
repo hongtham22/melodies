@@ -75,8 +75,7 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
   };
 
   return (
-    <div className=" w-[90%] p-4 flex flex-col items-start rounded-xl">
-      <h1 className="text-h2 text-primaryColorPink">List User</h1>
+
       <div className="w-full flex flex-col justify-center items-center">
         <table className="w-full text-white border-separate border-spacing-y-3 ">
           <thead className="w-full text-textMedium text-primaryColorBlue">
@@ -200,7 +199,6 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
         </table>
        
       </div>
-    </div>
   );
 }
 

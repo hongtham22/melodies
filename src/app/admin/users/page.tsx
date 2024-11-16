@@ -9,6 +9,8 @@ import { useAppContext } from "@/app/AppProvider";
 import LoadingPage from "@/components/loadingPage";
 import { PaginationWithLinks } from "@/components/paginationWithLinks";
 import { useSearchParams } from "next/navigation";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+
 interface UserGrowthData {
   totalUser: number;
   totalUserPremium: number;
@@ -31,8 +33,8 @@ function Page() {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/admin/allUser", "GET", null, null, null, page),
-          fetchApiData("/api/admin/userGrowth", "GET", null, null, 0),
+          fetchApiData("/api/admin/allUser", "GET", null, null, { page: page }),
+          fetchApiData("/api/admin/userGrowth", "GET", null, null),
         ]);
         if (responses[0].success) {
           setListUsersData(responses[0].data.users);
@@ -56,14 +58,16 @@ function Page() {
 
   return (
     <div className="w-full my-20 m-6 p-8 flex flex-col items-center justify-center ">
-      <div className="w-full flex justify-around items-center px-4">
+      <div className="w-full flex justify-around items-center px-4 mb-3">
         <div className="w-1/5 flex justify-center items-center gap-4 px-4 py-1 bg-secondColorBg shadow-sm shadow-primaryColorBlue rounded-md">
           <div className="w-18 h-18 bg-primaryColorBg rounded-full flex items-center justify-center">
             <BiUser className="w-10 h-10 text-primaryColorPink" />
           </div>
           <div className="flex flex-col items-center">
             <p className="text-textBig">Total Users</p>
-            <p className="text-h2 text-primaryColorBlue">{userGrowthData.totalUser}</p>
+            <p className="text-h2 text-primaryColorBlue">
+              {userGrowthData.totalUser}
+            </p>
           </div>
         </div>
         <div className="w-1/5 flex justify-center items-center gap-4 px-4 py-1 bg-secondColorBg shadow-sm shadow-primaryColorBlue rounded-md">
@@ -72,7 +76,9 @@ function Page() {
           </div>
           <div className="flex flex-col items-center">
             <p className="text-textBig">Premium Users</p>
-            <p className="text-h2 text-primaryColorBlue">{userGrowthData.totalUserPremium}</p>
+            <p className="text-h2 text-primaryColorBlue">
+              {userGrowthData.totalUserPremium}
+            </p>
           </div>
         </div>
         <div className="w-1/5 flex justify-center items-center gap-3 px-4 py-1 bg-secondColorBg shadow-sm shadow-primaryColorBlue rounded-md">
@@ -81,12 +87,31 @@ function Page() {
           </div>
           <div className="flex flex-col items-center">
             <p className="text-textBig">Regular Users</p>
-            <p className="text-h2 text-primaryColorBlue">{userGrowthData.totalUserFree}</p>
+            <p className="text-h2 text-primaryColorBlue">
+              {userGrowthData.totalUserFree}
+            </p>
           </div>
         </div>
       </div>
-      <ListUser data={listUsersData} page={page} />
-      <PaginationWithLinks page={page} totalPage={totalPage} />
+      <div className=" w-[90%] p-4 flex flex-col items-start rounded-xl gap-4">
+        <div className="w-full flex items-center justify-between px-3 mb-3">
+          <h1 className="text-h2 text-primaryColorPink">List User</h1>
+
+          <div
+            id="search-header"
+            className="w-1/4 h-[35px] flex bg-transparent border border-darkBlueHover items-center px-2 rounded-full hover:bg-darkerBlue"
+          >
+            <MagnifyingGlassIcon className="w-[20px] h-[20px] text-primaryColorBlue font-extrabold stroke-2" />
+            <input
+              type="text"
+              placeholder="Search for user"
+              className="ml-2 py-2 pr-2 bg-transparent border-none outline-none placeholder:text-white/70"
+            />
+          </div>
+        </div>
+        <ListUser data={listUsersData} page={page} />
+        <PaginationWithLinks page={page} totalPage={totalPage} />
+      </div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ const config: Config = {
     extend: {
       colors: {
         primaryColorBg: "#121212",
-        secondColorBg: "#1E1E1E",
+        secondColorBg: "#262626",
 
         primaryColorPink: "#EE10B0",
         primaryColorPinkHover: "#D60E9E",

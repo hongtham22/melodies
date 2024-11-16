@@ -39,7 +39,6 @@ interface TodayBestSong {
   playCount: string;
 }
 
-
 const Page = () => {
 
   const [overallAdminData, setOverallAdminData] = useState({
@@ -136,7 +135,6 @@ const Page = () => {
             </div>
           )}
           {userGrowthData && <UserChart data={userGrowthData} />}
-          {/* <UserChart data={userGrowthData} /> */}
         </div>
       </div>
 

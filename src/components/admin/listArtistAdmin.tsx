@@ -18,19 +18,12 @@ interface Artist {
 interface ListArtistAdminProps {
   data: Artist[];
 }
-function ListArtistAdmin({ data }: ListArtistAdminProps)  {
-    const tracks = [
-        {
-          name: "Văn Mai Hương",
-          tracks: "100000",
-          albums: "100000",
-          follow_times: "10000",
-        },
-      ];
+function ListArtistAdmin({ data, page }: {data: ListArtistAdminProps; page: number;})  {
     
       const [selectedItems, setSelectedItems] = useState<number[]>([]);
       const [isHeaderChecked, setIsHeaderChecked] = useState(false);
-    
+      const itemsPerPage = 10;
+
       const handleHeaderCheckboxChange = () => {
         if (isHeaderChecked) {
           setSelectedItems([]);
@@ -49,7 +42,7 @@ function ListArtistAdmin({ data }: ListArtistAdminProps)  {
       };
   return (
     <div className="w-[90%] flex flex-col justify-center items-center rounded-md border-primaryColorBg mb-2">
-      <table className="w-full text-white border-separate border-spacing-y-3 mb-5 ">
+      <table className="w-full text-white border-separate border-spacing-y-3 mb-2 ">
         <thead className="w-full text-textMedium text-primaryColorBlue">
           <tr>
             <th className="w-[5%] pl-3">
@@ -66,7 +59,7 @@ function ListArtistAdmin({ data }: ListArtistAdminProps)  {
             </th>
             <th className="w-[22%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
-                <p>Artist</p>
+                <p>Artists</p>
                 <CaretSortIcon className="text-white  w-4 h-4" />
               </div>
             </th>
@@ -93,45 +86,7 @@ function ListArtistAdmin({ data }: ListArtistAdminProps)  {
         </thead>
         <tbody className="">
           {/* {Array.from({ length: 10 }, (_, index) => ( */}
-          {data.map((artist, index) => (
-            // <tr
-            //   key={index}
-            //   className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
-            // >
-            //   <td className="pl-2 text-h4 rounded-tl-lg rounded-bl-lg text-center">
-            //     <Checkbox
-            //       checked={selectedItems.includes(index)}
-            //       onCheckedChange={() => handleItemCheckboxChange(index)}
-            //     />
-            //   </td>
-            //   <td className="pl-1 text-h4 text-center">{index + 1}</td>
-            //   <td className="">
-            //     <div className="pl-4 flex felx-col gap-2 justify-start items-center">
-            //       <Image
-            //         src={songimg}
-            //         alt="song"
-            //         width={50}
-            //         height={50}
-            //         className="rounded-lg"
-            //       />
-            //         <h3 className="text-h4 mb-1 hover:underline line-clamp-1">
-            //           {tracks[0].name}
-            //         </h3>
-                 
-            //     </div>
-            //   </td>
-            //   <td className="text-textMedium pl-2 text-center">
-            //     <div className="line-clamp-1">{tracks[0].tracks}</div>
-            //   </td>
-            //   <td className="text-textMedium pl-2 text-center">
-            //     <div className="line-clamp-1"> {tracks[0].albums}</div>
-            //   </td>
-
-            //   <td className="text-textMedium pl-2 text-center">
-            //     <div className="line-clamp-1"> {tracks[0].follow_times}</div>
-            //   </td>
-
-            // </tr>
+          {data && data.map((artist, index) => (
             <tr
             key={artist.id}
             className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
@@ -142,7 +97,7 @@ function ListArtistAdmin({ data }: ListArtistAdminProps)  {
                 onCheckedChange={() => handleItemCheckboxChange(index)}
               />
             </td>
-            <td className="pl-1 text-h4 text-center">{index + 1}</td>
+            <td className="pl-1 text-h4 text-center">{(page - 1) * itemsPerPage + index + 1}</td>
             <td className="">
               <div className="pl-4 flex felx-col gap-2 justify-start items-center">
                 <Image
@@ -150,7 +105,7 @@ function ListArtistAdmin({ data }: ListArtistAdminProps)  {
                   alt={artist.name}
                   width={50}
                   height={50}
-                  className="rounded-lg"
+                  className="rounded-lg w-12 h-12"
                 />
                 <h3 className="text-h4 mb-1 hover:underline line-clamp-1">
                   {artist.name}
@@ -163,7 +118,7 @@ function ListArtistAdmin({ data }: ListArtistAdminProps)  {
             <td className="text-textMedium pl-2 text-center">
               <div className="line-clamp-1">{artist.totalAlbum}</div>
             </td>
-            <td className="text-textMedium pl-2 text-center">
+            <td className="text-textMedium pl-2 text-center rounded-tr-lg rounded-br-lg">
               <div className="line-clamp-1">{artist.totalFollow}</div>
             </td>
           </tr>
