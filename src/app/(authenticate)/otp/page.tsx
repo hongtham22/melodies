@@ -67,7 +67,7 @@ function Page() {
       email: localStorage.getItem("email"),
       password: localStorage.getItem("password"),
     };
-  
+
     const result = await fetchApiData(
       "/api/user/register",
       "POST",
@@ -98,8 +98,7 @@ function Page() {
         action: <ToastAction altText="Try again">Try again</ToastAction>,
       })
     }
-  }  
-  
+  }
 
   function handleResend() {
     form.reset({ otp: "" });
