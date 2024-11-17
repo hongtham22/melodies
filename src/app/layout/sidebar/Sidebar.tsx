@@ -88,8 +88,7 @@ const Sidebar = () => {
     return (
         <div
             className={
-                `pb-[9rem] overflow-auto h-screen [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-inherit hover:[&::-webkit-scrollbar-thumb]:bg-white/30 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 hover:dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 ' : ''} 
-                mt-3 pl-9 pr-7 drop-shadow-lg relative`
+                `h-screen w-full mt-3 pl-9 pr-7 drop-shadow-lg z-20`
             }
         >
             <div id="menu-section" className='mb-5'>
@@ -140,7 +139,7 @@ const Sidebar = () => {
                     >Your playlists</p>
                     {
                         showRequireLogin && (
-                            <div className="absolute w-[21rem] z-50 transition-opacity duration-300 ease-in-out px-6 py-4 text-sm text-black bg-[#69BFFF] rounded-lg shadow-lg transform -translate-y-1/2 left-48 top-1/2">
+                            <div className="absolute z-20 w-[21rem] transition-opacity duration-300 ease-in-out px-6 py-4 text-sm text-black bg-[#69BFFF] rounded-lg shadow-lg transform -translate-y-1/2 left-48 top-1/2">
                                 <p className="font-bold mb-2">Create playlist</p>
                                 <p className="font-thin text-[0.9rem]">Sign in to create and share playlists.</p>
                                 <div className="mt-7 flex space-x-2 justify-end w-full">

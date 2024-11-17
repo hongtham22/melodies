@@ -85,7 +85,7 @@ export interface DataPlaylist {
     playlistId: string;
     title: string;
     name: string;
-    image: PlaylistImage[];
+    image: string;
     description: string;
     totalTime: number;
     totalSong: number;

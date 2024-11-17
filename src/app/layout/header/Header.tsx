@@ -31,16 +31,18 @@ const Header = () => {
     }, []);
 
     useEffect(() => {
-        const fetchData = async () => {
-            const result = await fetchApiData(`/api/user/info`, "GET", null, accessToken ?? null);
-            if (result.success) {
-                setUser(result.data.user)
-            } else {
-                console.error("Login error:", result.error);
-            }
-        };
+        if (accessToken) {
+            const fetchData = async () => {
+                const result = await fetchApiData(`/api/user/info`, "GET", null, accessToken ?? null);
+                if (result.success) {
+                    setUser(result.data.user)
+                } else {
+                    console.error("Login error:", result.error);
+                }
+            };
 
-        fetchData();
+            fetchData();
+        }
     }, [accessToken]);
 
     const handleSignUpClick = () => {
@@ -122,7 +124,7 @@ const Header = () => {
                         </Link>
                     </li>
                     <li className={`${showSidebarRight ? 'mx-6 text-[0.9rem]' : 'mx-8'} text-nowrap font-semibold`}>
-                        <a href="">Premium</a>
+                        <a href="/premium">Premium</a>
                     </li>
                 </ul>
             </div>

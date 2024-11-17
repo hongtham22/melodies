@@ -19,7 +19,7 @@ export const fetchApiData = async (endpoint, method, body, token, params) => {
   }
 
   const headers = {
-    'Content-Type': 'application/json',
+    // 'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` }),
   };
 
@@ -28,6 +28,12 @@ export const fetchApiData = async (endpoint, method, body, token, params) => {
     headers,
     ...(body && { body }),
   };
+
+  if (body instanceof FormData) {
+    delete headers['Content-Type'];
+  } else {
+    headers['Content-Type'] = 'application/json';
+  }
 
   try {
     const response = await fetch(url, options);

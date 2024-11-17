@@ -1,18 +1,15 @@
 'use client'
-import UpdatePlaylist from '@/components/popup/updatePlaylist';
 import { DataPlaylist } from '@/types/interfaces';
-import { getPosterPlaylist } from '@/utils/utils';
+import Playlist from '@/assets/img/placeholderPlaylist.png'
 import Image from 'next/image'
-import React, { useState } from 'react'
 import { LuPen } from "react-icons/lu";
 
 interface PlaylistBannerProps {
-    data: DataPlaylist;
-    setPlaylist: React.Dispatch<React.SetStateAction<DataPlaylist | undefined>>
+    data?: DataPlaylist;
+    setIsUpdate: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const PlaylistBanner: React.FC<PlaylistBannerProps> = ({ data, setPlaylist }) => {
-    const [isUpdate, setIsUpdate] = useState<boolean>()
+const PlaylistBanner: React.FC<PlaylistBannerProps> = ({ data, setIsUpdate }) => {
     function formatDuration(totalMilliseconds: number) {
         const totalSeconds = Math.floor(totalMilliseconds / 1000);
         const hours = Math.floor(totalSeconds / 3600);
@@ -34,7 +31,7 @@ const PlaylistBanner: React.FC<PlaylistBannerProps> = ({ data, setPlaylist }) =>
             <div className="flex items-end gap-8">
                 <div className="relative shadow-[0_4px_60px_rgba(0,0,0,0.5)] rounded-md ">
                     <Image
-                        src={getPosterPlaylist(data)}
+                        src={data?.image || Playlist}
                         alt="Album Cover"
                         width={220}
                         height={220}
@@ -57,25 +54,18 @@ const PlaylistBanner: React.FC<PlaylistBannerProps> = ({ data, setPlaylist }) =>
                         className="mt-2 text-6xl font-bold cursor-pointer"
                         onClick={() => setIsUpdate(true)}
                     >{data?.name}</h1>
-                    <p>{data.description}</p>
+                    <p>{data?.description}</p>
                     <div className="mt-1 flex items-center space-x-2 text-h4 font-semibold">
-                        <p>{data.username}</p>
+                        <p>{data?.username}</p>
                         <span className="text-gray-300">•</span>
-                        <p className="text-gray-300">{new Date(data.createdAt).getFullYear()}</p>
+                        <p className="text-gray-300">{data?.createdAt ? new Date(data.createdAt).getFullYear() : ''}</p>
                         <span className="text-gray-300">•</span>
-                        <p className="text-gray-300">{data?.totalSong} {data.totalSong > 1 ? 'songs' : 'song'}</p>
+                        <p className="text-gray-300">{data?.totalSong ?? 0} {(data?.totalSong ?? 0) > 1 ? 'songs' : 'song'}</p>
                         <span className="text-gray-300">•</span>
                         <p className="text-gray-300">{formatDuration(data?.totalTime ?? 0)}</p>
                     </div>
                 </div>
             </div>
-            {
-                isUpdate && (
-                    <UpdatePlaylist onClose={() => setIsUpdate(false)}
-                        setPlaylist={setPlaylist}
-                        data={data} />
-                )
-            }
         </div>
     )
 }

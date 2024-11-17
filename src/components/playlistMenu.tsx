@@ -14,9 +14,9 @@ import {
 } from "react-icons/io5";
 import '@/components/scss/playlistMenu.scss'
 import Image from "next/image";
+import Playlist from '@/assets/img/placeholderPlaylist.png'
 import { fetchApiData } from "@/app/api/appService";
 import { DataPlaylist } from "@/types/interfaces";
-import { getPosterPlaylist } from "@/utils/utils";
 const PlaylistMenu = () => {
     const router = useRouter();
     const { accessToken, setShowPlaylistMenu } = useAppContext()
@@ -104,7 +104,7 @@ const PlaylistMenu = () => {
                         >
                             <div className="relative w-[50px] h-[50px]">
                                 <Image
-                                    src={getPosterPlaylist(playlist)}
+                                    src={playlist.image || Playlist}
                                     alt="Song Poster"
                                     width={50}
                                     height={50}

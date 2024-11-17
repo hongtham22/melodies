@@ -54,15 +54,13 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({
         )}
       </div>
       <ScrollContent>
-        <div className="ml-[16.66vw] border-l-2 border-primaryColorPink">
-          <main className="flex flex-col items-center relative">
-            <Header />
-            {children}
-            <LyricPage />
-            <ToastProvider />
-            <Footer />
-          </main>
-        </div>
+        <main className="ml-[16.66vw] border-l-2 border-primaryColorPink flex flex-col items-center relative">
+          <Header />
+          {children}
+          <LyricPage />
+          <ToastProvider />
+          <Footer />
+        </main>
       </ScrollContent>
       <SongIntroduce />
       <WaitingList />

@@ -1,8 +1,7 @@
 'use client'
 import { useState } from "react";
 import { DataPlaylist } from "@/types/interfaces";
-import ImageSong from '@/assets/img/placeholderPlaylist.png'
-import { getPosterPlaylist } from "@/utils/utils";
+import ImagePlaylist from '@/assets/img/placeholderPlaylist.png'
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { LuPen } from "react-icons/lu";
@@ -22,10 +21,8 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose, data, setPlayl
     const { accessToken } = useAppContext()
     const [updateName, setUpdateName] = useState(data?.name || '')
     const [updateBio, setUpdateBio] = useState(data?.description || '')
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [selectedImageType, setSelectedImageType] = useState<string | null>(null);
-    const [selectedImageName, setSelectedImageName] = useState<string | null>(null);
-
+    const [selectedImage, setSelectedImage] = useState(data?.image || '');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -33,27 +30,29 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose, data, setPlayl
             const file = files[0];
             const imageUrl = URL.createObjectURL(file);
             setSelectedImage(imageUrl);
-            setSelectedImageName(file.name)
-            setSelectedImageType(file.type)
-            console.log(selectedImage, selectedImageType)
+            setSelectedFile(file)
         }
     };
 
-    const handleUpdate = async () => {
+    const handleUpdate = async (idPlaylist: string) => {
         if (updateName.trim() === '') {
             alert('Name cannot be left blank');
             return;
         }
-        const payload = {
-            playlistId: data?.playlistId,
-            data: {
-                fileName: selectedImageName,
-                fileType: selectedImageType,
-                title: updateName,
-                description: updateBio
-            }
+
+        const data = {
+            title: updateName,
+            description: updateBio
         }
-        const result = await fetchApiData(`/api/user/playlist/update`, 'PATCH', JSON.stringify(payload), accessToken)
+
+        const payload = new FormData();
+        payload.append('playlistId', idPlaylist);
+        payload.append('data', JSON.stringify(data))
+        if (selectedFile) {
+            payload.append('playlistAvatar', selectedFile);
+        }
+
+        const result = await fetchApiData(`/api/user/playlist/update`, 'PATCH', payload, accessToken)
         if (result.success) {
             setPlaylist((prevData) => {
                 if (!prevData) return prevData;
@@ -61,6 +60,7 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose, data, setPlayl
                     ...prevData,
                     name: updateName,
                     description: updateBio,
+                    image: result.data.playlist.image
                 };
             });
             onClose();
@@ -82,7 +82,7 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose, data, setPlayl
                 <div className="flex gap-3">
                     <div className="relative w-[180px] h-[180px]">
                         <Image
-                            src={selectedImage ? selectedImage : data ? getPosterPlaylist(data) : ImageSong}
+                            src={selectedImage || data?.image || ImagePlaylist}
                             alt="Album Cover"
                             width={180}
                             height={180}
@@ -113,7 +113,7 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose, data, setPlayl
                                 onChange={(e) => setUpdateName(e.target.value)}
                                 value={updateName}
                                 placeholder=" "
-                                maxLength={100}
+                                maxLength={50}
                             />
                             <label className={`absolute cursor-text bg-transparent px-1 left-[0.55rem] text-gray-400 text-sm transition-all transform origin-left 
                                         ${updateName ? "-top-2 left-2 text-xs scale-90 bg-gradient-to-b from-[#222222] to-[#333333]" : "top-[0.55rem] left-3 scale-100"}`}>
@@ -140,7 +140,7 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose, data, setPlayl
                 <div className="w-full flex justify-end mt-3">
                     <button
                         className='bg-white font-semibold px-6 py-1 text-black rounded-lg'
-                        onClick={handleUpdate}
+                        onClick={() => data?.playlistId && handleUpdate(data.playlistId)}
                     >Save</button>
                 </div>
                 <p className="text-wrap text-[0.8rem] mt-3 text-justify font-bold">By continuing, you agree to allow Melodies to access the images you have selected to upload. Please make sure you have permission to upload the images.</p>

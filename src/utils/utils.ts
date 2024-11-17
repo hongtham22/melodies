@@ -1,4 +1,4 @@
-import { Artist, DataAlbum, DataPlaylist } from '@/types/interfaces';
+import { Artist, DataAlbum } from '@/types/interfaces';
 import ImageSong from '@/assets/img/placeholderSong.jpg'
 import ImagePlaylist from '@/assets/img/placeholderPlaylist.png'
 import { StaticImageData } from 'next/image';
@@ -42,16 +42,6 @@ export const getPoster = (album: DataAlbum): string | StaticImageData => {
     if (album?.albumImages && album.albumImages.length > 0) {
         const foundImage = album.albumImages.find(img => img.size === 300)?.image;
         return foundImage || album.albumImages[0].image;
-    } else {
-        return ImagePlaylist;
-    }
-};
-
-// Hàm lấy poster của playlist
-export const getPosterPlaylist = (playlist: DataPlaylist): string | StaticImageData => {
-    if (playlist?.image && playlist.image.length > 0) {
-        const foundImage = playlist.image.find(img => img.size === 300)?.image;
-        return foundImage || playlist.image[0].image;
     } else {
         return ImagePlaylist;
     }
