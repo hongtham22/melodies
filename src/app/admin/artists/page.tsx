@@ -9,6 +9,7 @@ import { PaginationWithLinks } from "@/components/paginationWithLinks";
 import { useSearchParams } from "next/navigation";
 import LoadingPage from "@/components/loadingPage";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { useToast } from "@/hooks/use-toast"
 
 function Page() {
   const { loading, setLoading } = useAppContext();
@@ -17,35 +18,46 @@ function Page() {
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsAdminData, setListArtistsAdminData] = useState([]);
   const [genreList, setGenreList] = useState([]);
-
-  const fetchData = useCallback(async (page: number) => {
+  const { toast } = useToast()
+ 
+  const fetchArtists = useCallback(async (page: number) => {
     setLoading(true);
     try {
-      const [artistsResponse, genresResponse] = await Promise.all([
-        fetchApiData("/api/artist/allArtist", "GET", null, null, {
-          page: page,
-        }),
-        fetchApiData("/api/admin/allGenre", "GET", null, null),
-      ]);
+      const artistsResponse = await fetchApiData("/api/artist/allArtist", "GET", null, null, {
+        page: page,
+      });
 
       if (artistsResponse.success) {
         setListArtistsAdminData(artistsResponse.data.artists);
         setTotalPage(artistsResponse.data.totalPage);
       }
+    } catch (error) {
+      console.error("Error fetching artists:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [setLoading]);
+
+  // Hàm fetch Genres
+  const fetchGenres = useCallback(async () => {
+    setLoading(true);
+    try {
+      const genresResponse = await fetchApiData("/api/admin/allGenre", "GET", null, null);
 
       if (genresResponse.success) {
         setGenreList(genresResponse.data.genres);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching genres:", error);
     } finally {
       setLoading(false);
     }
   }, [setLoading]);
 
   useEffect(() => {
-    fetchData(page);
-  }, [fetchData, page]);
+    fetchArtists(page);
+    fetchGenres();
+  }, [fetchArtists, fetchGenres, page]);
 
   const handleAddArtist = async (artistData: { name: string; bio: string; avatar: File; genre: string[] }) => {
     const { name, bio, avatar, genre } = artistData;
@@ -62,8 +74,12 @@ function Page() {
       const response = await fetchApiData('/api/admin/create/artist', 'POST', formData);
   
       if (response.success) {
-        alert('Artist added successfully!');
-        fetchData(page);
+        toast({
+          title: "Success",
+          description: `Artist "${name}" added successfully.`,
+          variant: "success",
+        });
+        fetchArtists(page);
       } else {
         alert('Error: ' + response.error);
       }

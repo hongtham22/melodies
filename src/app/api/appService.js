@@ -30,7 +30,7 @@ export const fetchApiData = async (endpoint, method, body, token, params) => {
   };
 
   if (body instanceof FormData) {
-    delete headers['Content-Type'];  // FormData sẽ tự động set Content-Type
+    delete headers['Content-Type']; 
   } else {
     headers['Content-Type'] = 'application/json';
   }

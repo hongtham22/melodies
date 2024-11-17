@@ -29,6 +29,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import AddGenre from "@/components/admin/addGenre";
 
 interface Genre {
   genreId: string;
@@ -43,19 +44,22 @@ interface AddArtistSheetProps {
   }) => void;
   genre: Genre[];
 }
+
 const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
   const [artistName, setArtistName] = React.useState("");
   const [artistBio, setArtistBio] = React.useState("");
-  // const [artistAvatar, setArtistAvatar] = React.useState("");
   const [artistAvatar, setArtistAvatar] = React.useState<File | null>(null);
   const [artistGenre, setArtistGenre] = React.useState<string[]>([]);
   const [openGenre, setOpenGenre] = React.useState(false);
 
   const [reorderedGenre, setGenre] = React.useState<Genre[]>(genre || []);
-
+  
   React.useEffect(() => {
-    setGenre(genre);
-  }, [genre]);
+    setGenre(genre.map((item) => ({
+      ...item,
+      selected: artistGenre.includes(item.genreId),
+    })));    
+  }, [genre, artistGenre]);
 
   const handleGenreChange = (genreId: string) => {
     setArtistGenre((prevGenres) =>
@@ -74,22 +78,27 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
             !artistGenre.includes(item.genreId) && item.genreId !== genreId
         )
       );
-    setGenre(reorderedGenres); // Cập nhật danh sách thể loại theo thứ tự mới
+    setGenre(reorderedGenres); 
+  };
+
+  const handleAddGenre = (newGenre: Genre) => {
+    setArtistGenre((prevGenres) => [...prevGenres, newGenre.genreId]);
+
+    setGenre((prev) => {
+      const updatedGenres = [newGenre, ...prev]; 
+      return updatedGenres;
+    });
+    window.location.reload();
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // setArtistAvatar(URL.createObjectURL(file));
       setArtistAvatar(file);
-
     }
   };
-  console.log("Genres:", genre);
-  console.log("Reordered Genres:", reorderedGenre);
 
   const handleSave = () => {
-    console.log("Genre add sheet:", genre)
     onSave({
       name: artistName,
       bio: artistBio,
@@ -99,7 +108,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
 
     setArtistName("");
     setArtistBio("");
-    setArtistAvatar("");
+    setArtistAvatar(null);
     setArtistGenre([]);
   };
 
@@ -113,18 +122,12 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle className="text-primaryColorPink">
-            Add New Artist
-          </SheetTitle>
-          <SheetDescription>
-            Enter details to add a new artist.
-          </SheetDescription>
+          <SheetTitle className="text-primaryColorPink">Add New Artist</SheetTitle>
+          <SheetDescription>Enter details to add a new artist.</SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4 items-start">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="artistName" className="text-left">
-              Name
-            </Label>
+            <Label htmlFor="artistName" className="text-left">Name</Label>
             <Input
               id="artistName"
               value={artistName}
@@ -134,9 +137,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="artistBio" className="text-left">
-              Bio
-            </Label>
+            <Label htmlFor="artistBio" className="text-left">Bio</Label>
             <textarea
               id="artistBio"
               value={artistBio}
@@ -146,9 +147,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="artistAvatar" className="text-left">
-              Avatar
-            </Label>
+            <Label htmlFor="artistAvatar" className="text-left">Avatar</Label>
             <Input
               id="artistAvatar"
               type="file"
@@ -158,10 +157,8 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="genre" className="text-left">
-              Genre
-            </Label>
-            <div className="col-span-3">
+            <Label htmlFor="genre" className="text-left">Genre</Label>
+            <div className="col-span-3 flex gap-1">
               <Popover open={openGenre} onOpenChange={setOpenGenre}>
                 <PopoverTrigger asChild>
                   <Button
@@ -170,9 +167,6 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
                     aria-expanded={openGenre}
                     className="w-full justify-between border-darkBlue col-span-3 truncate capitalize"
                   >
-                    {/* {artistGenre.length > 0
-                     ? artistGenre.join(", ")
-                     : "Select genre"} */}
                     {artistGenre.length > 0
                       ? reorderedGenre
                           .filter((g) => artistGenre.includes(g.genreId))
@@ -184,14 +178,12 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
                 </PopoverTrigger>
                 <PopoverContent className="w-full p-0 border-darkBlue">
                   <Command>
-                    <CommandInput
-                      placeholder="Search genre..."
-                      className="h-9"
-                    />
+                    <CommandInput placeholder="Search genre..." className="h-9" />
                     <CommandList>
                       <CommandEmpty>No genre found.</CommandEmpty>
                       <ScrollArea className="h-40">
                         <CommandGroup className="capitalize">
+                          <AddGenre onAddGenre={handleAddGenre} />
                           {reorderedGenre.map((genreItem) => (
                             <CommandItem
                               key={genreItem.genreId}
