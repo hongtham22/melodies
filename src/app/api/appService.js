@@ -19,7 +19,7 @@ export const fetchApiData = async (endpoint, method, body, token, params) => {
   }
 
   const headers = {
-    // 'Content-Type': 'application/json',
+    'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` }),
   };
 

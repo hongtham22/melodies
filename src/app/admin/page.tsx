@@ -18,11 +18,14 @@ interface Artist {
   avatar: string;
   main: boolean;
 }
-
-interface ImageData {
+interface AlbumImage {
   image: string;
-  size: number;
 }
+interface Album {
+  albumImages: AlbumImage[];
+  title: string;
+}
+
 
 interface TodayBestSong {
   id: string;
@@ -31,13 +34,10 @@ interface TodayBestSong {
   duration: number;
   lyric: string | null;
   filePathAudio: string;
-  albumId: string;
-  albumTitle: string;
-  images: ImageData[];
+  album: Album[];
   artists: Artist[];
   playCount: string;
 }
-
 
 const Page = () => {
 
@@ -60,12 +60,12 @@ const Page = () => {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/admin/total", "GET", null, null, 0),
-          fetchApiData("/api/admin/recentComment", "GET", null, null, null, 1),
-          fetchApiData("/api/admin/todayBestSong", "GET", null, null, 0),
-          fetchApiData("/api/admin/userGrowth", "GET", null, null, 0),
-          fetchApiData("/api/admin/totalPlayAndCmtYear", "GET", null, null, 0),
-          fetchApiData("/api/admin/recentUser", "GET", null, null, null, 1),
+          fetchApiData("/api/admin/total", "GET", null, null),
+          fetchApiData("/api/admin/recentComment", "GET", null, null, {page: 1}),
+          fetchApiData("/api/admin/todayBestSong", "GET", null, null),
+          fetchApiData("/api/admin/userGrowth", "GET", null, null),
+          fetchApiData("/api/admin/totalPlayAndCmtYear", "GET", null, null),
+          fetchApiData("/api/admin/recentUser", "GET", null, null,  {page: 1}),
         ]);
         if (responses[0].success) {
           setOverallAdminData(responses[0].data.data);
@@ -105,41 +105,12 @@ const Page = () => {
           <SongsChart data={totalPlayAndCmtYearData} />
         </div>
         <div className=" w-1/3 flex  flex-col gap-7">
-          {/* TodayBestSong */}
-          {/* <div className="bg-secondColorBg shadow-sm shadow-primaryColorBlue rounded-lg p-3">
-            <p className="text-h3 text-primaryColorPink">Today Best Song</p>
-
-            <div className="flex gap-3 w-full mt-2">
-              <Image
-                src={todayBestSong.poster}
-                alt="user Poster"
-                width={60}
-                height={60}
-                quality={100}
-                className="object-cover rounded-md w-[60px] h-[60px]"
-              />
-              <div className="w-3/4 flex flex-col gap-2">
-                <p className=" text-primaryColorGray line-clamp-2">
-                  {todayBestSong.name}
-                </p>
-                <p className="text-textMedium text-gray-400 line-clamp-1">
-                  {todayBestSong.artist}
-                </p>
-                <div className="flex gap-2">
-                  <RocketIcon></RocketIcon>
-                  <p className="text-textMedium text-gray-400 line-clamp-1">
-                    {todayBestSong.plays_count}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div> */}
           {todayBestSongData && (
             <div className="bg-secondColorBg shadow-sm shadow-primaryColorBlue rounded-lg p-3">
               <p className="text-h3 text-primaryColorPink">Today Best Song</p>
               <div className="flex gap-3 w-full mt-2">
                 <Image
-                  src={todayBestSongData.images[1]?.image}
+                  src={todayBestSongData.album[0].albumImages[0].image || "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8"}
                   alt="Today Best Song Poster"
                   width={60}
                   height={60}
@@ -164,7 +135,6 @@ const Page = () => {
             </div>
           )}
           {userGrowthData && <UserChart data={userGrowthData} />}
-          {/* <UserChart data={userGrowthData} /> */}
         </div>
       </div>
 

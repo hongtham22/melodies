@@ -3,39 +3,53 @@
 import Image from "next/image";
 import songimg from "@/assets/img/songs.png";
 import { CaretSortIcon} from "@radix-ui/react-icons";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 
-function ListAlbumsAdmin() {
-  const tracks = [
-    {
-      name: "Đừng bao giờ nói yêu em",
-      artist: "Văn Mai Hương",
-      albums: "Đừng bao giờ nói yêu em",
-      writer: "Văn Mai Hương",
-      duration: "03:45",
-      upload_date: "22/10/2024",
-      release_date: "22/10/2024",
-      download_times: "10000",
-      play_times: "10000",
-      cmt_times: "10000",
-      like_times: "100000",
-      report_times: "100000",
-    },
-  ];
+export interface Album {
+  albumId: string;
+  title: string;
+  releaseDate: string;
+  albumType: string;
+  createdAt: string;
+  totalSong: string;
+  mainArtist: MainArtist[];
+}
+
+export interface MainArtist {
+  id: string;
+  name: string;
+  avatar: string;
+  bio: string | null;
+  createdAt: string;
+  genres: Genre[];
+}
+
+export interface Genre {
+  genreId: string;
+  name: string;
+}
+
+interface ListAlbumsAdminProps {
+  data: Album[];
+}
+
+
+function ListAlbumsAdmin({ data, page }: {data: ListAlbumsAdminProps; page: number;}) {
+  // const tracks = [
+  //   {
+  //     name: "Đừng bao giờ nói yêu em",
+  //     tracks_count: "10",
+  //     main_artist: "Văn Mai Hương",
+  //     upload_date: "22/10/2024",
+  //     release_date: "22/10/2024",
+  //     type: "Album",
+  //   },
+  // ];
 
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [isHeaderChecked, setIsHeaderChecked] = useState(false);
+  const itemsPerPage = 10;
 
   const handleHeaderCheckboxChange = () => {
     if (isHeaderChecked) {
@@ -53,10 +67,17 @@ function ListAlbumsAdmin() {
         : [...prev, index]
     );
   };
+
+    
+  const options: Intl.DateTimeFormatOptions = { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  };
+
   return (
     <div className="w-full flex flex-col justify-center items-center">
-      <ScrollArea className="w-[1150px] whitespace-nowrap rounded-md border-primaryColorBg mb-2">
-        <table className=" table-fixed w-[140%] text-white border-separate border-spacing-y-3 mb-5 ">
+        <table className=" table-fixed w-[100%] text-white border-separate border-spacing-y-3 mb-5 ">
           <thead className="w-full text-textMedium text-primaryColorBlue">
             <tr>
               <th className="w-[3%] pl-3">
@@ -71,21 +92,21 @@ function ListAlbumsAdmin() {
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
-              <th className="w-[30%] pl-2">
+              <th className="w-[25%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
-                  <p>Track</p>
+                  <p>Album</p>
                   <CaretSortIcon className="text-white  w-4 h-4" />
                 </div>
               </th>
-              <th className="w-[25%] pl-2">
+              <th className="w-[20%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
-                  <p> Album</p>
+                  <p> Number of Tracks</p>
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[12%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
-                  <p>Duration</p>
+                  <p>Main Artist</p>
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
@@ -103,37 +124,14 @@ function ListAlbumsAdmin() {
               </th>
               <th className="w-[17%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
-                  <p>Download Times</p>
+                  <p>Type</p>
                   <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
-              <th className="w-[15%] pl-2">
-                <div className="flex gap-1 justify-center items-center cursor-pointer">
-                  <p>Play Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
-                </div>
-              </th>
-              <th className="w-[15%] pl-2">
-                <div className="flex gap-1 justify-center items-center cursor-pointer">
-                  <p>Comment Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
-                </div>
-              </th>
-              <th className="w-[15%] pl-2">
-                <div className="flex gap-1 justify-center items-center cursor-pointer">
-                  <p>Like Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
-                </div>
-              </th>
-              <th className="w-[15%] pl-2 ">
-                <div className="flex gap-1 justify-center items-center cursor-pointer">
-                  <p>Report Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
-                </div>
-              </th>
+             
             </tr>
           </thead>
-          <tbody className="">
+          {/* <tbody className="">
             {Array.from({ length: 10 }, (_, index) => (
               <tr
                 key={index}
@@ -155,21 +153,18 @@ function ListAlbumsAdmin() {
                       height={50}
                       className="rounded-lg"
                     />
-                    <div>
+                    <div className="flex items-center">
                       <h3 className="text-h4 mb-1 hover:underline line-clamp-1">
                         {tracks[0].name}
                       </h3>
-                      <p className="text-textSmall hover:underline line-clamp-1">
-                        {tracks[0].artist}
-                      </p>
                     </div>
                   </div>
                 </td>
                 <td className="text-textMedium pl-2 text-center">
-                  <div className="line-clamp-1">{tracks[0].albums}</div>
+                  <div className="line-clamp-1">{tracks[0].tracks_count}</div>
                 </td>
                 <td className="text-textMedium pl-2 text-center">
-                  <div className="line-clamp-1"> {tracks[0].duration}</div>
+                  <div className="line-clamp-1"> {tracks[0].main_artist}</div>
                 </td>
                 <td className="text-textMedium pl-2 text-center">
                   <div className="line-clamp-1"> {tracks[0].upload_date}</div>
@@ -177,44 +172,68 @@ function ListAlbumsAdmin() {
                 <td className="text-textMedium pl-2 text-center">
                   <div className="line-clamp-1"> {tracks[0].release_date}</div>
                 </td>
-                <td className="text-textMedium text-center pl-2">
-                  <div className="line-clamp-1">{tracks[0].download_times}</div>
-                </td>
-                <td className="text-textMedium text-center pl-2">
-                  <div className="line-clamp-1">{tracks[0].play_times}</div>
-                </td>
-                <td className="text-textMedium pl-2 text-center">
-                  <div className="line-clamp-1">{tracks[0].cmt_times}</div>
-                </td>
-                <td className="text-textMedium pl-2 text-center">
-                  <div className="line-clamp-1">{tracks[0].like_times}</div>
-                </td>
-                <td className="text-textMedium pl-2 text-center rounded-tr-lg rounded-br-lg">
-                  <div className="line-clamp-1">{tracks[0].report_times}</div>
+                <td className="text-textMedium text-center pl-2 rounded-tr-lg rounded-br-lg">
+                  <div className="line-clamp-1">{tracks[0].type}</div>
                 </td>
               </tr>
             ))}
-          </tbody>
+          </tbody> */}
+                  <tbody className="">
+          {data && data.map((album, index) => (
+            <tr
+              key={album.albumId}
+              className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
+            >
+              <td className="pl-2 text-h4 rounded-tl-lg rounded-bl-lg text-center">
+                <Checkbox
+                  checked={selectedItems.includes(index)}
+                  onCheckedChange={() => handleItemCheckboxChange(index)}
+                />
+              </td>
+              <td className="pl-1 text-h4 text-center">{(page - 1) * itemsPerPage + index + 1}</td>
+              <td className="">
+                <div className="pl-2 flex felx-col gap-2 justify-start">
+                  <Image
+                    src={album.mainArtist[0].avatar || songimg}
+                    alt="song"
+                    width={50}
+                    height={50}
+                    className="rounded-lg"
+                  />
+                  <div className="flex items-center">
+                    <h3 className="text-h4 mb-1 hover:underline line-clamp-1">
+                      {album.title}
+                    </h3>
+                  </div>
+                </div>
+              </td>
+              <td className="text-textMedium pl-2 text-center">
+                <div className="line-clamp-1">{album.totalSong}</div>
+              </td>
+              <td className="text-textMedium pl-2 text-center">
+                <div className="line-clamp-1">{album.mainArtist[0].name}</div>
+              </td>
+              <td className="text-textMedium pl-2 text-center">
+                <div className="line-clamp-1">
+                  {new Date(album?.createdAt).toLocaleDateString('en-US', options)}
+                  </div>
+              </td>
+              <td className="text-textMedium pl-2 text-center">
+                <div className="line-clamp-1">
+                  {new Date(album?.releaseDate).toLocaleDateString('en-US', options)}
+
+                  </div>
+              </td>
+              <td className="text-textMedium text-center pl-2 rounded-tr-lg rounded-br-lg">
+                <div className="line-clamp-1">{album.albumType}</div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
         </table>
 
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+        
+     
     </div>
   );
 }

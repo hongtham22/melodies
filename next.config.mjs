@@ -18,6 +18,12 @@ const nextConfig = {
                 hostname: 'localhost',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'audiomelodies.nyc3.digitaloceanspaces.com',
+                pathname: '/**',
+
+            }
         ],
     },
 

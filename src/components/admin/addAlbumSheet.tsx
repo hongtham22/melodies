@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { PlusIcon, CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
+import { PlusIcon, CaretSortIcon, CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import {
   Popover,
   PopoverContent,
@@ -34,9 +34,8 @@ interface AddAlbumSheetProps {
   onSave: (trackData: {
     title: string;
     main_artist: string;
-    sub_artist: string[];
-    audio: string | null;
-    duration: string;
+    list_song: string[];
+    album_img: string | null;
   }) => void;
 }
 
@@ -54,71 +53,70 @@ const availableArtists = [
   "Phan Mạnh Quỳnh",
 ];
 
+const availableSongs = [
+  "Chạy ngay đi",
+  "Chúng ta của hiện tại",
+  "Có chắc yêu là đây",
+  "Có hẹn với thanh xuân",
+  "Có tất cả nhưng thiếu anh",
+  "Trời giấu trời mang đi",
+  "Nàng thơ",
+  "Nơi này có anh",
+  "Phải chăng em đã yêu?",
+  "Không một bài hát nào có thể kể hết tâm trạng của em",
+];
+
 const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave }) => {
-  const [trackTitle, setTrackTitle] = React.useState("");
+  const [albumTitle, setAlbumTitle] = React.useState("");
   const [mainArtist, setMainArtist] = React.useState("");
-  const [subArtists, setSubArtists] = React.useState<string[]>([]);
+  const [listSongOfMainArtist, setListSongOfMainArtist] = React.useState<
+    string[]
+  >([]);
   const [openMainArtist, setOpenMainArtist] = React.useState(false);
-  const [openSubArtist, setOpenSubArtist] = React.useState(false);
-  const [audioSrc, setAudioSrc] = useState<string | null>(null);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null); 
+  const [openListSong, setOpenListSong] = React.useState(false);
+  const [albumImg, setAlbumImg] = useState<string | null>(null);
 
-  const handleSubArtistChange = (artist: string) => {
-    setSubArtists((prevArtists) =>
-      prevArtists.includes(artist)
-        ? prevArtists.filter((a) => a !== artist)
-        : [...prevArtists, artist]
+  const [reorderedSong, setReorderSong] = React.useState(availableSongs);
+
+  const handleSongChange = (song: string) => {
+    setListSongOfMainArtist((prevArtists) =>
+      prevArtists.includes(song)
+        ? prevArtists.filter((a) => a !== song)
+        : [...prevArtists, song]
     );
+    setReorderSong((prevSongs) => {
+      // Nếu bài hát đã có trong danh sách, đưa nó lên đầu
+      if (prevSongs.includes(song)) {
+        return [song, ...prevSongs.filter((s) => s !== song)];
+      }
+      return [song, ...prevSongs];
+    });
+    
   };
-
-  
-  const formatDuration = (duration: number) => {
-    const minutes = Math.floor(duration / 60);
-    const seconds = Math.floor(duration % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
-  
 
   const handleSave = () => {
-    const formattedDuration = formatDuration(duration)
     onSave({
-      title: trackTitle,
+      title: albumTitle,
       main_artist: mainArtist,
-      sub_artist: subArtists,
-      audio: audioSrc, 
-      duration: formattedDuration,
+      list_song: listSongOfMainArtist,
+      album_img: albumImg,
     });
-    console.log('Track saved with duration:', formattedDuration);
 
-    setTrackTitle("");
+    setAlbumTitle("");
     setMainArtist("");
-    setSubArtists([]);
-    setAudioSrc(null); 
-    setDuration(0); 
+    setListSongOfMainArtist([]);
+    setAlbumImg(null);
   };
 
-  const handleAudioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleAlbumImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      // Giải phóng URL cũ nếu có
-      if (audioSrc) {
-        URL.revokeObjectURL(audioSrc);
-      }
-
-      const url = URL.createObjectURL(file);
-      setAudioSrc(url);
-
-      // Tạo một audio element để lấy duration
-      const audio = new Audio(url);
-      audio.onloadedmetadata = () => {
-        setDuration(audio.duration); 
-      };
+      setAlbumImg(URL.createObjectURL(file));
     }
   };
 
-  
   return (
+  <div className="">
     <Sheet>
       <SheetTrigger asChild>
         <button className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover">
@@ -126,12 +124,12 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave }) => {
           Add New Album
         </button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="max-h-screen overflow-y-auto scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
         <SheetHeader>
           <SheetTitle className="text-primaryColorPink">
             Add New Album
           </SheetTitle>
-          <SheetDescription>Enter details to add a new track.</SheetDescription>
+          <SheetDescription>Enter details to add a new album.</SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4 items-start">
           <div className="grid grid-cols-4 items-center gap-4">
@@ -139,10 +137,10 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave }) => {
               Title
             </Label>
             <Input
-              id="trackTitle"
-              value={trackTitle}
-              onChange={(e) => setTrackTitle(e.target.value)}
-              placeholder="Enter track title"
+              id="albumTitle"
+              value={albumTitle}
+              onChange={(e) => setAlbumTitle(e.target.value)}
+              placeholder="Enter album title"
               className="col-span-3 border-darkBlue"
             />
           </div>
@@ -200,43 +198,54 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave }) => {
             </Popover>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="ablumImg" className="text-left">
+              Album Image
+            </Label>
+            <Input
+              id="ablumImg"
+              type="file"
+              accept="image/*"
+              onChange={handleAlbumImgChange}
+              className="col-span-3 border-darkerBlue"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="subArtists" className="text-left">
-              Sub Artists
+              List songs
             </Label>
             <div className="col-span-3">
-              <Popover open={openSubArtist} onOpenChange={setOpenSubArtist}>
+              <Popover open={openListSong} onOpenChange={setOpenListSong}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
-                    aria-expanded={openSubArtist}
+                    aria-expanded={openListSong}
                     className="w-full justify-between border-darkBlue col-span-3 truncate"
                   >
-                    {subArtists.length > 0
-                      ? subArtists.join(", ")
-                      : "Select sub artists"}
+                    Select songs of main artist
                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0 border-darkBlue">
+                <PopoverContent className="p-0 border-darkBlue">
                   <Command>
                     <CommandInput
-                      placeholder="Search artist..."
+                      placeholder="Search songs..."
                       className="h-9"
                     />
                     <CommandList>
-                      <CommandEmpty>No artist found.</CommandEmpty>
+                      <CommandEmpty>No song found.</CommandEmpty>
                       <ScrollArea className="h-40">
                         <CommandGroup>
-                          {availableArtists.map((artist) => (
+                          {reorderedSong.map((song) => (
                             <CommandItem
-                              key={artist}
-                              onSelect={() => handleSubArtistChange(artist)}
+                              className=""
+                              key={song}
+                              onSelect={() => handleSongChange(song)}
                             >
-                              {artist}
+                              {song}
                               <CheckIcon
                                 className={`ml-auto h-4 w-4 ${
-                                  subArtists.includes(artist)
+                                  listSongOfMainArtist.includes(song)
                                     ? "opacity-100"
                                     : "opacity-0"
                                 }`}
@@ -251,29 +260,25 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave }) => {
               </Popover>
             </div>
           </div>
-
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="audio" className="text-left">
-              Audio
-            </Label>
-            <Input
-              id="audio"
-              type="file"
-              accept="audio/*"
-              onChange={handleAudioChange}
-              className="col-span-3 border-darkBlue"
-            />
-          </div>
-          <div>
-            {audioSrc && (
-              <div className="col-span-4 flex justify-center items-center my-2">
-                <audio controls ref={audioRef} key={audioSrc} className="h-10 w-full">
-                  <source src={audioSrc} type="audio/mpeg" />
-                  Your browser not support audio display.
-                </audio>
-              </div>
-            )}
-            
+            <div className="space-y-2 col-span-4">
+              {listSongOfMainArtist.map((song, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between gap-2 p-2 border rounded-md border-darkBlue bg-gray-800  hover:bg-darkerBlue cursor-pointer"
+                >
+                  <span>{song}</span>
+                  <Cross2Icon 
+                  className="text-primaryColorPink h-6 w-6 flex-shrink-0 cursor-pointer"
+                  onClick={() =>
+                    setListSongOfMainArtist((prevSongs) =>
+                      prevSongs.filter((s) => s !== song)
+                    )
+                  }
+                  ></Cross2Icon>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <SheetFooter>
@@ -283,12 +288,13 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave }) => {
               type="submit"
               className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
             >
-              Save Track
+              Save Album
             </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>
+  </div>
   );
 };
 

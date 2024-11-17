@@ -29,7 +29,12 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import AddGenre from "@/components/admin/addGenre";
 
+interface Genre {
+  genreId: string;
+  name: string;
+}
 interface AddArtistSheetProps {
   onSave: (artistData: {
     name: string;
@@ -37,38 +42,59 @@ interface AddArtistSheetProps {
     avatar: string;
     genre: string[];
   }) => void;
+  genre: Genre[];
 }
 
-const availableGenres = [
-  "Pop",
-  "Rock",
-  "Jazz",
-  "Hip-Hop",
-  "Classical",
-  "Country",
-  "Electronic",
-  "R&B",
-];
-
-const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
+const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
   const [artistName, setArtistName] = React.useState("");
   const [artistBio, setArtistBio] = React.useState("");
-  const [artistAvatar, setArtistAvatar] = React.useState("");
+  const [artistAvatar, setArtistAvatar] = React.useState<File | null>(null);
   const [artistGenre, setArtistGenre] = React.useState<string[]>([]);
   const [openGenre, setOpenGenre] = React.useState(false);
 
-  const handleGenreChange = (genre: string) => {
+  const [reorderedGenre, setGenre] = React.useState<Genre[]>(genre || []);
+  
+  React.useEffect(() => {
+    setGenre(genre.map((item) => ({
+      ...item,
+      selected: artistGenre.includes(item.genreId),
+    })));    
+  }, [genre, artistGenre]);
+
+  const handleGenreChange = (genreId: string) => {
     setArtistGenre((prevGenres) =>
-      prevGenres.includes(genre)
-        ? prevGenres.filter((g) => g !== genre)
-        : [...prevGenres, genre]
+      prevGenres.includes(genreId)
+        ? prevGenres.filter((id) => id !== genreId)
+        : [...prevGenres, genreId]
     );
+
+    const reorderedGenres = genre
+      .filter(
+        (item) => artistGenre.includes(item.genreId) || item.genreId === genreId
+      )
+      .concat(
+        genre.filter(
+          (item) =>
+            !artistGenre.includes(item.genreId) && item.genreId !== genreId
+        )
+      );
+    setGenre(reorderedGenres); 
+  };
+
+  const handleAddGenre = (newGenre: Genre) => {
+    setArtistGenre((prevGenres) => [...prevGenres, newGenre.genreId]);
+
+    setGenre((prev) => {
+      const updatedGenres = [newGenre, ...prev]; 
+      return updatedGenres;
+    });
+    window.location.reload();
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setArtistAvatar(URL.createObjectURL(file));
+      setArtistAvatar(file);
     }
   };
 
@@ -82,7 +108,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
 
     setArtistName("");
     setArtistBio("");
-    setArtistAvatar("");
+    setArtistAvatar(null);
     setArtistGenre([]);
   };
 
@@ -96,18 +122,12 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle className="text-primaryColorPink">
-            Add New Artist
-          </SheetTitle>
-          <SheetDescription>
-            Enter details to add a new artist.
-          </SheetDescription>
+          <SheetTitle className="text-primaryColorPink">Add New Artist</SheetTitle>
+          <SheetDescription>Enter details to add a new artist.</SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4 items-start">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="artistName" className="text-left">
-              Name
-            </Label>
+            <Label htmlFor="artistName" className="text-left">Name</Label>
             <Input
               id="artistName"
               value={artistName}
@@ -117,9 +137,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="artistBio" className="text-left">
-              Bio
-            </Label>
+            <Label htmlFor="artistBio" className="text-left">Bio</Label>
             <textarea
               id="artistBio"
               value={artistBio}
@@ -129,9 +147,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="artistAvatar" className="text-left">
-              Avatar
-            </Label>
+            <Label htmlFor="artistAvatar" className="text-left">Avatar</Label>
             <Input
               id="artistAvatar"
               type="file"
@@ -141,71 +157,42 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="genre" className="text-left">
-              Genre
-            </Label>
-            <div className="col-span-3">
-              {/* <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between border-darkBlue truncate"
-                  >
-                    {artistGenre.length > 0
-                      ? artistGenre.join(", ")
-                      : "Select genres"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent>
-                  <div className="w-full flex flex-col gap-2">
-                    {availableGenres.map((genre) => (
-                      <div key={genre} className="flex items-center">
-                        <Checkbox
-                          checked={artistGenre.includes(genre)}
-                          onCheckedChange={() => handleGenreChange(genre)}
-                          id={`genre-${genre}`}
-                        />
-                        <Label htmlFor={`genre-${genre}`} className="ml-2">
-                          {genre}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover> */}
-               <Popover open={openGenre} onOpenChange={setOpenGenre}>
+            <Label htmlFor="genre" className="text-left">Genre</Label>
+            <div className="col-span-3 flex gap-1">
+              <Popover open={openGenre} onOpenChange={setOpenGenre}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
                     aria-expanded={openGenre}
-                    className="w-62 justify-between border-darkBlue col-span-3 truncate"
+                    className="w-full justify-between border-darkBlue col-span-3 truncate capitalize"
                   >
                     {artistGenre.length > 0
-                      ? artistGenre.join(", ")
-                      : "Select sub artists"}
+                      ? reorderedGenre
+                          .filter((g) => artistGenre.includes(g.genreId))
+                          .map((g) => g.name)
+                          .join(", ")
+                      : "Select genre"}
                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-62 p-0 border-darkBlue">
+                <PopoverContent className="w-full p-0 border-darkBlue">
                   <Command>
-                    <CommandInput
-                      placeholder="Search artist..."
-                      className="h-9"
-                    />
+                    <CommandInput placeholder="Search genre..." className="h-9" />
                     <CommandList>
-                      <CommandEmpty>No artist found.</CommandEmpty>
+                      <CommandEmpty>No genre found.</CommandEmpty>
                       <ScrollArea className="h-40">
-                        <CommandGroup>
-                          {availableGenres.map((genre) => (
+                        <CommandGroup className="capitalize">
+                          <AddGenre onAddGenre={handleAddGenre} />
+                          {reorderedGenre.map((genreItem) => (
                             <CommandItem
-                              key={genre}
-                              onSelect={() => handleGenreChange(genre)}
+                              key={genreItem.genreId}
+                              onSelect={() => handleGenreChange(genreItem.genreId)}
                             >
-                              {genre}
+                              {genreItem.name}
                               <CheckIcon
                                 className={`ml-auto h-4 w-4 ${
-                                  artistGenre.includes(genre)
+                                  artistGenre.includes(genreItem.genreId)
                                     ? "opacity-100"
                                     : "opacity-0"
                                 }`}

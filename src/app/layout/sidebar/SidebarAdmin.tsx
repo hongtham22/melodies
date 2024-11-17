@@ -4,7 +4,6 @@ import { useState } from 'react';
 
 import {
     HomeIcon,
-    GlobeIcon,
     DiscIcon,
     AvatarIcon,
     ExitIcon,
@@ -12,8 +11,8 @@ import {
 } from '@radix-ui/react-icons'
 import { MdQueueMusic } from "react-icons/md";
 import { FaMicrophoneAlt } from "react-icons/fa";
-import { TbPlaylistAdd } from "react-icons/tb";
 import Link from 'next/link';
+
 
 const SidebarAdmin = () => {
     const [activeMenu, setActiveMenu] = useState('');
@@ -46,6 +45,12 @@ const SidebarAdmin = () => {
                     <HomeIcon className='w-[24px] h-[24px] mr-3' />
                     <Link href="/admin">Dashboard</Link>
                 </div>
+                <div className={`flex my-2 cursor-pointer ${getMenuClass('artist')} py-2 items-center`}
+                    onClick={() => handleMenuClick('artist')}
+                >
+                    <FaMicrophoneAlt className='w-[24px] h-[24px] mr-3' />
+                    <Link href="/admin/artists">Artists</Link>
+                </div>
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('track')} py-2 items-center`}
                     onClick={() => handleMenuClick('track')}
                 >
@@ -59,12 +64,7 @@ const SidebarAdmin = () => {
                     <Link href="/admin/albums">Albums</Link>
 
                 </div>
-                <div className={`flex my-2 cursor-pointer ${getMenuClass('artist')} py-2 items-center`}
-                    onClick={() => handleMenuClick('artist')}
-                >
-                    <FaMicrophoneAlt className='w-[24px] h-[24px] mr-3' />
-                    <Link href="/admin/artists">Artists</Link>
-                </div>
+
 
                 <div className={`flex my-2 cursor-pointer ${getMenuClass('user')} py-2 items-center`}
                     onClick={() => handleMenuClick('user')}

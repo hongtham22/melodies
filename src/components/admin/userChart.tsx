@@ -40,7 +40,6 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 function UserChart({ data }: UserChartProps) {
-  // Memoize chartData to prevent re-creation on each render
   const chartData = React.useMemo(() => [
     {
       type: "Regular",
@@ -58,13 +57,11 @@ function UserChart({ data }: UserChartProps) {
     return chartData.reduce((acc, curr) => acc + curr.users, 0);
   }, [chartData]);
 
-  // Calculate the percentage change in users this month vs last month
   const userGrowthPercentage =
     ((data.totalUserThisMonth - data.totalUserLastMonth) /
       data.totalUserLastMonth) *
     100;
 
-  // Fix to ensure userGrowthPercentage is a number before calling toFixed()
   const formattedGrowthPercentage = Number(userGrowthPercentage.toFixed(2));
   const growthLabel = userGrowthPercentage > 0 ? "Increase" : "Decrease";
   const growthColor =
