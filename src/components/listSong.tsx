@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from "@/components/provider/songProvider";
@@ -17,36 +17,7 @@ interface SongListProps {
 
 const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
   const router = useRouter();
-  const { setCurrentSong, isSkip, setIsSkip, valueSkip, showSidebarRight } =
-    useAppContext();
-  const [index, setIndex] = useState<number | null>(null);
-
-  const listSong: Array<{
-    audio: string;
-    poster: string;
-    name: string;
-    artist: string;
-  }> = [];
-
-  useEffect(() => {
-    if (index !== null && index >= 0 && index < listSong.length && isSkip) {
-      if (valueSkip === "back") {
-        setIndex((prevIndex) =>
-          prevIndex !== null && prevIndex > 0 ? prevIndex - 1 : 0
-        );
-      } else {
-        setIndex((prevIndex) =>
-          prevIndex !== null && prevIndex < listSong.length - 1
-            ? prevIndex + 1
-            : listSong.length - 1
-        );
-      }
-    }
-    if (index !== null && index >= 0 && index < listSong.length) {
-      setCurrentSong(listSong[index]);
-    }
-    setIsSkip(false);
-  }, [isSkip]);
+  const { setCurrentSong, showSidebarRight, setWaitingList } = useAppContext();
 
   return (
     <div className="w-full">
@@ -62,13 +33,6 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
           (song, index) => {
             const nameArtist = getMainArtistName(song.artists);
             const poster = getPosterSong(song.album).image;
-            const songData = {
-              audio: song.filePathAudio,
-              poster: poster as string,
-              name: song.title,
-              artist: nameArtist || "Unknown Artist",
-            };
-            listSong.push(songData);
             return (
               <div
                 key={index}
@@ -82,8 +46,10 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
                   height={400}
                   className="mb-2 rounded-md"
                   onClick={() => {
-                    setCurrentSong(songData);
-                    setIndex(index);
+                    setCurrentSong(song);
+                    if (data) {
+                      setWaitingList(data);
+                    }
                   }}
                 />
                 <div className="flex flex-col justify-between">

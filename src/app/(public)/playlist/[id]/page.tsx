@@ -5,12 +5,11 @@ import PlaylistBanner from "@/components/playlistBanner"
 import { IoSearch } from "react-icons/io5";
 import { IoPlayCircleOutline } from "react-icons/io5";
 import { TfiMoreAlt } from "react-icons/tfi";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { fetchApiData } from "@/app/api/appService";
 import LoadingPage from "@/components/loadingPage";
 import { DataPlaylist, DataSong } from "@/types/interfaces";
-import Playlist from '@/assets/img/placeholderPlaylist.png'
-import { formatTime, getMainArtistName, getPoster, getPosterSong } from "@/utils/utils";
+import { formatTime, getMainArtistName, getPosterSong } from "@/utils/utils";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { MdEdit, MdDelete } from "react-icons/md";
 import UpdatePlaylist from "@/components/popup/updatePlaylist";
@@ -19,12 +18,56 @@ import ConfirmDeletePlaylist from "@/components/popup/confirmDeletePlaylist";
 const Page = ({ params }: { params: { id: string } }) => {
     const { accessToken, loading, setLoading } = useAppContext()
     const [playlist, setPlaylist] = useState<DataPlaylist>()
+    const [songsOfPlaylist, setSongOfPlaylist] = useState<DataSong[]>([])
     const [showMenuMore, setShowMenuMore] = useState<boolean>(false)
     const [searchTerm, setSearchTerm] = useState("");
     const [dominantColor, setDominantColor] = useState<string>();
     const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
     const [isUpdate, setIsUpdate] = useState<boolean>(false)
     const [isDelete, setIsDelete] = useState<boolean>(false)
+
+    useEffect(() => {
+        const fetchSong = async () => {
+            setLoading(true);
+            try {
+                const responses = await Promise.all([
+                    fetchApiData(`/api/user/playlist/detail/${params.id}`, "GET", null, accessToken),
+                    fetchApiData(`/api/user/playlist/detail/${params.id}/songs`, "GET", null, accessToken),
+                ]);
+                if (responses[0].success) {
+                    setPlaylist(responses[0].data.playlist)
+                    const imageUrl = responses[0].data.playlist.image;
+                    if (imageUrl) {
+                        try {
+                            const response = await fetch(
+                                `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl as string)}`
+                            );
+                            console.log("API response:", response);
+                            const data = await response.json();
+                            if (response.ok) {
+                                console.log("Dominant color:", data.dominantColor);
+                                setDominantColor(data.dominantColor);
+                            } else {
+                                console.error("Error fetching dominant color:", data.error);
+                            }
+                        } catch (error) {
+                            console.error("Error fetching dominant color:", error);
+                        }
+                    } else {
+                        setDominantColor('#595959');
+                    }
+                }
+                if (responses[1].success) {
+                    setSongOfPlaylist(responses[1].data.songsOfPlaylist)
+                }
+            } catch (error) {
+                console.error("Error fetching songs:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSong();
+    }, [params.id]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,7 +112,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             } else {
                 const results = await fetchApiData(`/api/songs/search`, "GET", null, null, { query: searchTerm, page: 1 });
                 if (results.success) {
-                    setFilteredSongs(results.data.songs)
+                    setFilteredSongs(results.data.songData)
                 }
             }
         }, 500);
@@ -121,17 +164,18 @@ const Page = ({ params }: { params: { id: string } }) => {
                             )
                         }
                     </div>
-                    {/* <table className="max-w-full text-white border-separate border-spacing-y-3 ">
+                    <table className="max-w-full text-white border-separate border-spacing-y-3 ">
                         <thead className="w-full max-h-[32px]">
                             <tr className="text-primaryColorGray text-[0.9rem]">
                                 <th className="w-[4%] pl-4 text-start">#</th>
                                 <th className="w-[4%] pl-4"></th>
-                                <th className="w-[70%] pl-4 text-start">Tiêu đề</th>
-                                <th className="w-[10%] text-textMedium ">Time</th>
+                                <th className="w-[35%] pl-4 text-start">Tiêu đề</th>
+                                <th className="w-[30%] pl-4 text-start">Album</th>
+                                <th className="w-[8%] pl-4 text-start ">Time</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {playlist?.songsOfPlaylist.map((song, index) => (
+                            {songsOfPlaylist?.map((song, index) => (
                                 <tr
                                     key={index}
                                     className="bg-secondColorBg cursor-pointer hover:bg-gray-700"
@@ -141,7 +185,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                     </td>
                                     <td className="py-1">
                                         <Image
-                                            src={getPoster(dataAlbum)}
+                                            src={getPosterSong(song.album).image}
                                             alt="song"
                                             width={50}
                                             height={50}
@@ -156,18 +200,23 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             {getMainArtistName(song.artists)}
                                         </p>
                                     </td>
-                                    <td className="text-center pl-4 rounded-tr-lg rounded-br-lg align-middle">
+                                    <td className="pl-4">
+                                        <p className="text-[0.9rem] font-semibold hover:underline">
+                                            {getPosterSong(song.album).title}
+                                        </p>
+                                    </td>
+                                    <td className="rounded-tr-lg rounded-br-lg text-start">
                                         <div className="flex gap-3 items-center justify-center">
                                             <p className="text-textMedium">{formatTime(song.duration)}</p>
                                             <button className="hover:scale-110">
-                                                <IoIosMore className="w-5 h-5 shadow-[0_4px_60px_rgba(0,0,0,0.3)]" />
+                                                <TfiMoreAlt className="w-4 h-4 shadow-[0_4px_60px_rgba(0,0,0,0.3)]" />
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
-                    </table> */}
+                    </table>
                     <div className="w-full h-[0.125rem] bg-gray-500 my-5">
 
                     </div>
@@ -204,15 +253,15 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                 className="object-cover rounded-md"
                                             />
                                             <div className="ml-3">
-                                                <p className="font-bold text-white">{song.item.title}</p>
+                                                <p className="font-bold text-white">{song.title}</p>
                                                 <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                                                    {getMainArtistName(song.item.artists)}
+                                                    {getMainArtistName(song.artists)}
                                                 </p>
                                             </div>
                                         </td>
                                         <td>
                                             <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                                                {getPosterSong(song.item.album).title}
+                                                {getPosterSong(song.album).title}
                                             </p>
                                         </td>
                                         <td>

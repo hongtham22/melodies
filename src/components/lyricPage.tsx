@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '@/components/provider/songProvider'
+import { getMainArtistName } from '@/utils/utils'
 
 
 const LyricPage = () => {
@@ -16,7 +17,7 @@ const LyricPage = () => {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ title: currentSong?.name, artist: currentSong?.artist }),
+                        body: JSON.stringify({ title: currentSong?.title, artist: getMainArtistName(currentSong?.artists) }),
                     });
                     const data = await response.json();
                     if (response.ok) {

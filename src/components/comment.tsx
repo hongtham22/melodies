@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import artistimg from "@/assets/img/artist.png";
+import UserImage from "@/assets/img/placeholderUser.jpg";
 import Image from 'next/image';
 
 import {
@@ -64,7 +64,7 @@ const Comment: React.FC<CommentProps> = ({ dataUser, time, comment, role }) => {
                 <div className='flex'>
                     <div className='w-[50px] mr-2'>
                         <Image
-                            src={dataUser?.image || artistimg}
+                            src={dataUser?.image || UserImage}
                             width={40}
                             height={40}
                             alt="avatar"

@@ -21,7 +21,7 @@ const AvatarArtist: React.FC<AvatarArtistProps> = ({ id }) => {
             const fetchData = async () => {
                 const result = await fetchApiData(`/api/artist/${id}`, "GET");
                 if (result.success) {
-                    setArtist(result.data.artists)
+                    setArtist(result.data.artist)
                 } else {
                     console.error("Login error:", result.error);
                 }

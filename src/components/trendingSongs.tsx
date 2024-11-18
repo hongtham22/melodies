@@ -4,8 +4,9 @@ import { HeartIcon } from "@radix-ui/react-icons";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
-import { getMainArtistName, getPosterSong } from "@/utils/utils";
+import { formatTime, getMainArtistName, getPosterSong } from "@/utils/utils";
 import { DataSong } from "@/types/interfaces";
+import { useAppContext } from "@/components/provider/songProvider";
 
 interface SongListProps {
   maintitle?: string;
@@ -15,15 +16,7 @@ interface SongListProps {
 
 const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  const formatTime = (duration: number) => {
-    const min = Math.floor(duration / 1000 / 60);
-    const sec = Math.floor((duration / 1000) % 60);
-
-    const formattedSec = sec < 10 ? "0" + sec : sec;
-
-    return min + ":" + formattedSec;
-  };
+  const { setCurrentSong, setWaitingList } = useAppContext();
 
   const options = { year: 'numeric' as 'numeric' | '2-digit', month: 'short' as 'numeric' | '2-digit', day: 'numeric' as 'numeric' | '2-digit' };
 
@@ -48,13 +41,17 @@ const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) =
             {data?.slice(0, 10)?.map((song, index) => {
               const nameArtist = getMainArtistName(song.artists);
               const poster = getPosterSong(song.album).image;
-              console.log(typeof poster);
-
               const nameAlbum = getPosterSong(song.album).title;
               return (
                 <tr
                   key={index}
                   className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
+                  onClick={() => {
+                    setCurrentSong(song);
+                    if (data) {
+                      setWaitingList(data);
+                    }
+                  }}
                 >
                   <td className="pl-4 pr-8 text-h4 rounded-tl-lg rounded-bl-lg">
                     #{index + 1}

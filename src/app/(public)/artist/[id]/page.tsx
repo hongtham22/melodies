@@ -28,8 +28,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                     fetchApiData(`/api/artist/album/${params.id}`, "GET", null, null, { page: 1 }),
                 ]);
                 if (responses[0].success) {
-                    setDataArtist(responses[0].data.artists)
-                    const imageUrl = responses[0].data.artists.avatar
+                    setDataArtist(responses[0].data.artist)
+                    const imageUrl = responses[0].data.artist.avatar
                     try {
                         const response = await fetch(
                             `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`

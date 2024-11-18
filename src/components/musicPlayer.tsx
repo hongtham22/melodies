@@ -38,20 +38,21 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { formatTime } from '@/utils/utils';
+import { formatTime, getMainArtistName, getPosterSong } from '@/utils/utils';
+import WaveSurfer from 'wavesurfer.js';
 
 const MusicPlayer: React.FC = () => {
     const {
         currentSong,
-        setValueSkip,
-        setIsSkip,
         showContentSong,
         setShowContentSong,
         setShowSidebarRight,
-        waitingList,
-        setWaitingList,
+        showWaitingList,
+        setShowWaitingList,
         showLyricPage,
-        setShowLyricPage
+        setShowLyricPage,
+        nextSong,
+        previousSong
     } = useAppContext()
 
     const [isPlaying, setIsPlaying] = useState(false);
@@ -61,16 +62,31 @@ const MusicPlayer: React.FC = () => {
     const [isRepeat, setIsRepeat] = useState(false);
     const [sound, setSound] = useState(100);
     const [isMute, setIsMute] = useState(false)
+    const wavesurferRef = useRef<WaveSurfer | null>(null);
+    const waveformContainerRef = useRef<HTMLDivElement | null>(null);
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
-        if (currentSong?.audio) {
-            audioRef.current = new Audio(currentSong.audio);
+        if (currentSong?.filePathAudio) {
+            audioRef.current = new Audio(currentSong.filePathAudio);
             const audioElement = audioRef.current;
 
+            wavesurferRef.current = WaveSurfer.create({
+                container: waveformContainerRef.current!,
+                waveColor: 'rgba(255, 255, 255, 0.5)',
+                progressColor: 'rgba(255, 0, 0, 0)',
+                height: 25,
+                normalize: true,
+            });
+
+            wavesurferRef.current.load('/audio/NangTho.mp3');
+            // wavesurferRef.current.load('https://audiomelodies.nyc3.cdn.digitaloceanspaces.com/AUDIO/OLD/HoangDung/25/NangTho.m4a');
+
             const handleMetadataLoaded = () => {
-                setEndTime(audioElement.duration);
+                const duration = audioElement.duration;
+                setEndTime(duration)
+
                 audioElement.play()
                     .then(() => {
                         setIsPlaying(true);
@@ -86,8 +102,8 @@ const MusicPlayer: React.FC = () => {
 
             const handleAudioEnded = () => {
                 setIsPlaying(false);
-                setIsSkip(true);
-                setValueSkip('forward')
+                nextSong()
+                setStartTime(0)
             };
 
             audioElement.addEventListener('loadedmetadata', handleMetadataLoaded);
@@ -102,6 +118,7 @@ const MusicPlayer: React.FC = () => {
                     audioRef.current.removeEventListener('loadedmetadata', handleMetadataLoaded);
                     audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
                     audioRef.current.removeEventListener('ended', handleAudioEnded);
+                    wavesurferRef.current?.destroy();
                 }
             };
         }
@@ -197,7 +214,7 @@ const MusicPlayer: React.FC = () => {
             <div className='fixed bottom-0 h-[12%] w-full border-2 bg-[#121212] flex justify-between items-center px-5 z-40' >
                 <div className='flex items-center w-[23%]'>
                     <Image
-                        src={currentSong.poster}
+                        src={getPosterSong(currentSong?.album).image}
                         alt="Song Poster"
                         width={60}
                         height={60}
@@ -206,12 +223,12 @@ const MusicPlayer: React.FC = () => {
                     <div className='ml-3 max-w-[70%]'>
                         <div className='relative max-w-full overflow-hidden cursor-pointer hover:underline'>
                             <p
-                                className={`font-[500] ${currentSong.name.length > 25 ? 'marquee' : ''}`}
+                                className={`font-[500] ${currentSong.title.length > 25 ? 'marquee' : ''}`}
                             >
-                                {currentSong.name}
+                                {currentSong.title}
                             </p>
                         </div>
-                        <p className='text-[0.8rem] text-primaryColorGray font-thin cursor-pointer hover:underline hover:text-white'>{currentSong.artist}</p>
+                        <p className='text-[0.8rem] text-primaryColorGray font-thin cursor-pointer hover:underline hover:text-white'>{getMainArtistName(currentSong.artists)}</p>
                     </div>
                     <div className='ml-3 cursor-pointer text-primaryColorGray transition-transform duration-200 hover:scale-105 hover:text-white'>
                         <GoPlusCircle className='w-[20px] h-[20px]' />
@@ -229,7 +246,7 @@ const MusicPlayer: React.FC = () => {
                         </Tooltip>
                         <BsFillSkipStartFill
                             className='mx-3 w-[25px] h-[25px] hover:text-primaryColorPink'
-                            onClick={() => { setIsSkip(true); setValueSkip('back') }}
+                            onClick={previousSong}
                         />
                         <FaBackward
                             className='mx-3 w-[20px] h-[20px]  hover:text-primaryColorPink'
@@ -252,7 +269,7 @@ const MusicPlayer: React.FC = () => {
                         />
                         <BsSkipEndFill
                             className='mx-3 w-[25px] h-[25px] hover:text-primaryColorPink'
-                            onClick={() => { setIsSkip(true); setValueSkip('forward') }}
+                            onClick={nextSong}
                         />
                         <Tooltip>
                             <TooltipTrigger className='relative'>
@@ -276,8 +293,10 @@ const MusicPlayer: React.FC = () => {
 
                     </div>
                     <div className='flex items-center'>
-                        <p className='mx-2 text-[0.9rem]'>{formatTime(startTime)}</p>
+                        <p className='mx-2 text-[0.9rem]'>{formatTime(startTime * 1000)}</p>
                         <div className='relative group hover:cursor-pointer' onClick={handleClickOnProgress}>
+                            <div className='absolute -top-[270%] left-0 w-full h-full opacity-0 group-hover:opacity-100 -z-10'
+                                ref={waveformContainerRef} id="waveform"></div>
                             <div className='w-[35vw] bg-[#4D4D4D] h-1 rounded-md '></div>
                             <div
                                 className='absolute bg-white top-0 w-full h-1 rounded-md'
@@ -288,21 +307,21 @@ const MusicPlayer: React.FC = () => {
                                 style={{ left: `calc(${progressWidth}%)` }}  // Adjust the position of the circle
                             ></div>
                         </div>
-                        <p className='mx-2 text-[0.9rem]'>{formatTime(endTime)}</p>
+                        <p className='mx-2 text-[0.9rem]'>{formatTime(endTime * 1000)}</p>
                     </div>
                 </div>
                 <div className='flex'>
                     <BsFilePlayFill
                         className={`w-[18px] h-[18px] ml-2 cursor-pointer ${showContentSong ? 'text-primaryColorPink' : 'text-white'}`}
-                        onClick={() => { setShowContentSong(!showContentSong); setShowSidebarRight(showContentSong ? false : true); setWaitingList(false) }}
+                        onClick={() => { setShowContentSong(!showContentSong); setShowSidebarRight(showContentSong ? false : true); setShowWaitingList(false) }}
                     />
                     <MdLyrics
                         className={`w-[18px] h-[18px] ml-2 cursor-pointer ${showLyricPage ? 'text-primaryColorPink' : 'text-white'}`}
                         onClick={() => setShowLyricPage(!showLyricPage)}
                     />
                     <FaListCheck
-                        className={`w-[18px] h-[18px] ml-2 cursor-pointer ${waitingList ? 'text-primaryColorPink' : 'text-white'}`}
-                        onClick={() => { setShowSidebarRight(waitingList ? false : true); setWaitingList(!waitingList); setShowContentSong(false) }}
+                        className={`w-[18px] h-[18px] ml-2 cursor-pointer ${showWaitingList ? 'text-primaryColorPink' : 'text-white'}`}
+                        onClick={() => { setShowSidebarRight(showWaitingList ? false : true); setShowWaitingList(!showWaitingList); setShowContentSong(false) }}
                     />
                     <div className='flex items-center ml-2 cursor-pointer'>
                         {getVolumeIcon()}

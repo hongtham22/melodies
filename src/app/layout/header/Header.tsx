@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAppContext } from '@/app/AppProvider';
 import { useAppContext as useSongContext } from '@/components/provider/songProvider';
 import { useScrollArea } from "@/components/provider/scrollProvider";
+import UserImage from '@/assets/img/placeholderUser.jpg'
 
 import { Link } from 'react-scroll';
 
@@ -33,9 +34,10 @@ const Header = () => {
     useEffect(() => {
         if (accessToken) {
             const fetchData = async () => {
-                const result = await fetchApiData(`/api/user/info`, "GET", null, accessToken ?? null);
+                const result = await fetchApiData(`/api/user`, "GET", null, accessToken ?? null);
                 if (result.success) {
                     setUser(result.data.user)
+                    localStorage.setItem('avatar', result.data.user.image)
                 } else {
                     console.error("Login error:", result.error);
                 }
@@ -134,7 +136,7 @@ const Header = () => {
                     <BellIcon className="w-6 h-6" />
                     <div className="flex gap-2">
                         <Image
-                            src={user?.image || 'https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da'}
+                            src={user?.image || UserImage}
                             alt="avatar"
                             width={40}
                             height={40}

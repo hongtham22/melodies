@@ -1,31 +1,23 @@
 'use client'
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-
-// Define the SongData type to ensure type safety
-interface SongData {
-    audio: string;
-    poster: string;
-    name: string;
-    artist: string;
-}
-
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import { DataSong } from '@/types/interfaces';
 // Create the context
 interface SongContextType {
     showSidebarRight: boolean | null,
     setShowSidebarRight: (show: boolean) => void;
     showContentSong: boolean | null,
     setShowContentSong: (show: boolean) => void;
-    waitingList: boolean | null,
-    setWaitingList: (show: boolean) => void;
-    valueSkip: string;
-    setValueSkip: (value: string) => void
-    isSkip: boolean | null;
-    setIsSkip: (skip: boolean) => void;
-    currentSong: SongData | null;
-    setCurrentSong: (song: SongData) => void;
+    showWaitingList: boolean | null,
+    setShowWaitingList: (show: boolean) => void;
     showLyricPage: boolean | null;
-    setShowLyricPage: (show: boolean) => void
+    setShowLyricPage: (show: boolean) => void;
+    currentSong: DataSong | null;
+    setCurrentSong: (song: DataSong) => void;
+    waitingList: Array<DataSong>;
+    setWaitingList: (songs: Array<DataSong>) => void;
+    nextSong: () => void;
+    previousSong: () => void;
 }
 
 const SongContext = createContext<SongContextType | undefined>(undefined);
@@ -42,29 +34,52 @@ export const useAppContext = () => {
 
 // Create the SongProvider component
 export const SongProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [currentSong, setCurrentSong] = useState<SongData | null>(null);
-    const [valueSkip, setValueSkip] = useState<string>('')
-    const [isSkip, setIsSkip] = useState<boolean | null>(null)
+    const [currentSong, setCurrentSongState] = useState<DataSong | null>(null);
+    const [waitingList, setWaitingListState] = useState<Array<DataSong>>([]);
     const [showSidebarRight, setShowSidebarRight] = useState<boolean | null>(false)
     const [showContentSong, setShowContentSong] = useState<boolean | null>(false)
-    const [waitingList, setWaitingList] = useState<boolean | null>(false)
+    const [showWaitingList, setShowWaitingList] = useState<boolean | null>(false)
     const [showLyricPage, setShowLyricPage] = useState<boolean | null>(false)
 
+    const setCurrentSong = useCallback((song: DataSong) => {
+        setCurrentSongState(song);
+    }, []);
+
+    const setWaitingList = useCallback((songs: Array<DataSong>) => {
+        setWaitingListState(songs);
+    }, []);
+
+    const nextSong = useCallback(() => {
+        if (currentSong && waitingList.length > 0) {
+            const currentIndex = waitingList.findIndex((song) => song.id === currentSong.id);
+            const nextIndex = (currentIndex + 1) % waitingList.length;
+            setCurrentSongState(waitingList[nextIndex]);
+        }
+    }, [currentSong, waitingList]);
+
+    const previousSong = useCallback(() => {
+        if (currentSong && waitingList.length > 0) {
+            const currentIndex = waitingList.findIndex((song) => song.id === currentSong.id);
+            const previousIndex = (currentIndex - 1 + waitingList.length) % waitingList.length;
+            setCurrentSongState(waitingList[previousIndex]);
+        }
+    }, [currentSong, waitingList]);
+
     const value = {
+        showWaitingList,
+        setShowWaitingList,
         showSidebarRight,
         setShowSidebarRight,
         waitingList,
         setWaitingList,
         showContentSong,
         setShowContentSong,
-        valueSkip,
-        setValueSkip,
-        isSkip,
-        setIsSkip,
         currentSong,
         setCurrentSong,
         showLyricPage,
-        setShowLyricPage
+        setShowLyricPage,
+        nextSong,
+        previousSong,
     };
     return (
         <SongContext.Provider value={value}>

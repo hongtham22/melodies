@@ -25,7 +25,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const result = await fetchApiData(`/api/songs/${params.id}`, "GET");
+            const result = await fetchApiData(`/api/song/${params.id}`, "GET");
             if (result.success) {
                 setDataSong(result.data.song)
                 const imageUrl = typeof getPosterSong(result.data.song.album).image === 'string' ? getPosterSong(result.data.song.album).image : ''
@@ -33,7 +33,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 try {
                     const responses = await Promise.all([
                         fetch(`/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl as string)}`),
-                        fetchApiData(`/api/songs/otherByArtist/${getMainArtistId(result.data.song.artists)}`, "GET", null, null, 0),
+                        fetchApiData(`/api/songs/otherByArtist/${getMainArtistId(result.data.song.artists)}`, "GET", null, null, { page: 1 }),
                     ]);
                     const data = await responses[0].json();
                     if (responses[0].ok) {

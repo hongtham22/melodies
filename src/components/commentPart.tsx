@@ -1,8 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import Image from 'next/image';
-
-import artistimg from "@/assets/img/artist.png";
+import UserImage from "@/assets/img/placeholderUser.jpg";
 import {
     IoIosSend,
     IoMdClose
@@ -21,6 +20,7 @@ interface CommentPartProps {
 }
 
 const CommentPart: React.FC<CommentPartProps> = ({ data }) => {
+    const [avatar] = useState(localStorage.getItem('avatar') || UserImage)
     const { replyStatus, setReplyStatus } = useAppContext()
     const [childrenCmt, setChildrenCmt] = useState<CommentInterface[]>([])
     const [showCmtChild, setShowCmtChild] = useState<boolean>(false)
@@ -38,8 +38,7 @@ const CommentPart: React.FC<CommentPartProps> = ({ data }) => {
                 "GET",
                 null,
                 null,
-                null,
-                page
+                { page: page }
             );
 
             if (result.success) {
@@ -113,7 +112,7 @@ const CommentPart: React.FC<CommentPartProps> = ({ data }) => {
                         <div className='w-[100%] mr-2 flex'>
                             <div className='w-[50px] mr-2 flex'>
                                 <Image
-                                    src={artistimg}
+                                    src={avatar && avatar !== "null" ? avatar : UserImage}
                                     alt="avatar"
                                     className="rounded-full w-[40px] h-[40px] mr-3"
                                 />
