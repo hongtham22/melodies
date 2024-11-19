@@ -1,5 +1,6 @@
 "use client";
-
+import Image from "next/image";
+import artistimg from "@/assets/img/placeholderUser.jpg";
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,94 +31,148 @@ import {
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+interface Artist {
+  id: string;
+  name: string;
+  avatar: string;
+}
 interface AddTrackSheetProps {
   onSave: (trackData: {
     title: string;
-    main_artist: string;
-    sub_artist: string[];
-    audio: string | null;
-    duration: string;
+    mainArtistId: string;
+    subArtistIds: string[];
+    audioFile: File;
+    releaseDate: string;
   }) => void;
+  artist: Artist[];
 }
 
-const availableArtists = [
-  "Sơn Tùng MTP",
-  "Đen Vâu",
-  "Karik",
-  "Binz",
-  "Rhymastic",
-  "Wowy",
-  "JustaTee",
-  "Bích Phương",
-  "Min",
-  "AMEE",
-  "Phan Mạnh Quỳnh",
-];
-
-const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
+const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
   const [trackTitle, setTrackTitle] = React.useState("");
   const [mainArtist, setMainArtist] = React.useState("");
   const [subArtists, setSubArtists] = React.useState<string[]>([]);
   const [openMainArtist, setOpenMainArtist] = React.useState(false);
   const [openSubArtist, setOpenSubArtist] = React.useState(false);
   const [audioSrc, setAudioSrc] = useState<string | null>(null);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null); 
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [releaseDate, setReleaseDate] = useState<string>("");
 
-  const handleSubArtistChange = (artist: string) => {
-    setSubArtists((prevArtists) =>
-      prevArtists.includes(artist)
-        ? prevArtists.filter((a) => a !== artist)
-        : [...prevArtists, artist]
+  const [listArtist, setListArtist] = React.useState<Artist[]>(artist || []);
+  const originalOrder = React.useRef<Artist[]>(artist || []);
+
+  React.useEffect(() => {
+    setListArtist((prevList) =>
+      prevList.map((item) => ({
+        ...item,
+        selected: mainArtist === item.id,
+      }))
     );
+    if (!mainArtist) {
+      setSubArtists([]);
+    }
+  }, [mainArtist]);
+
+  const handleMainArtistSelect = (selectedArtist: Artist) => {
+    if (mainArtist === selectedArtist.id) {
+      setMainArtist("");
+      setListArtist((prevList) =>
+        prevList.map((artist) =>
+          artist.id === selectedArtist.id
+            ? { ...artist, selected: false }
+            : artist
+        )
+      );
+    } else {
+      setMainArtist(selectedArtist.id);
+      setListArtist((prevList) => [
+        { ...selectedArtist, selected: true },
+        ...prevList.filter((artist) => artist.id !== selectedArtist.id),
+      ]);
+    }
   };
 
-  
-  const formatDuration = (duration: number) => {
-    const minutes = Math.floor(duration / 60);
-    const seconds = Math.floor(duration % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  // const handleSubArtistChange = (artist: Artist) => {
+  //   if (artist.id === mainArtist) return;
+
+  //   setSubArtists((prevArtists) =>
+  //     prevArtists.includes(artist.id)
+  //       ? prevArtists.filter((id) => id !== artist.id)
+  //       : [...prevArtists, artist.id]
+  //   );
+  // };
+  const handleSubArtistChange = (artist: Artist) => {
+    if (artist.id === mainArtist) return;
+
+    setSubArtists((prevArtists) => {
+      const isAlreadySelected = prevArtists.includes(artist.id);
+
+      if (isAlreadySelected) {
+        // Bỏ chọn -> trả lại vị trí cũ
+        setListArtist((prevList) => {
+          const updatedList = prevList.filter((item) => item.id !== artist.id);
+          const originalArtist = originalOrder.current.find(
+            (item) => item.id === artist.id
+          );
+          if (originalArtist) {
+            const index = originalOrder.current.indexOf(originalArtist);
+            updatedList.splice(index, 0, originalArtist);
+          }
+          return updatedList;
+        });
+        return prevArtists.filter((id) => id !== artist.id);
+      } else {
+        setListArtist((prevList) => [
+          artist,
+          ...prevList.filter((item) => item.id !== artist.id),
+        ]);
+        return [...prevArtists, artist.id];
+      }
+    });
   };
-  
 
   const handleSave = () => {
-    const formattedDuration = formatDuration(duration)
-    onSave({
-      title: trackTitle,
-      main_artist: mainArtist,
-      sub_artist: subArtists,
-      audio: audioSrc, 
-      duration: formattedDuration,
-    });
-    console.log('Track saved with duration:', formattedDuration);
+    if (audioFile) {
+      onSave({
+        title: trackTitle,
+        mainArtistId: mainArtist,
+        subArtistIds: subArtists,
+        releaseDate: releaseDate,
+        audioFile: audioFile,
+      });
+    } else {
+      console.error("Audio file is required.");
+    }
+    console.log("Track saved with release_date:", releaseDate);
 
     setTrackTitle("");
     setMainArtist("");
     setSubArtists([]);
-    setAudioSrc(null); 
-    setDuration(0); 
+    setAudioFile(null);
+    setReleaseDate("");
   };
 
   const handleAudioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Giải phóng URL cũ nếu có
+      const maxSize = 30 * 1024 * 1024;
+      if (file.size > maxSize) {
+        event.target.value = "";
+        setAudioSrc(null);
+        alert("File size should not exceed 30MB");
+        return;
+      }
+      setAudioFile(file);
+
       if (audioSrc) {
-        URL.revokeObjectURL(audioSrc);
+        URL.revokeObjectURL(audioSrc); 
       }
 
       const url = URL.createObjectURL(file);
       setAudioSrc(url);
-
-      // Tạo một audio element để lấy duration
-      const audio = new Audio(url);
-      audio.onloadedmetadata = () => {
-        setDuration(audio.duration); 
-      };
     }
   };
 
-  
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -158,7 +213,9 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
                   aria-expanded={openMainArtist}
                   className="w-full justify-between border-darkBlue col-span-3 truncate"
                 >
-                  {mainArtist || "Select main artist"}
+                  {mainArtist
+                    ? listArtist.find((a) => a.id === mainArtist)?.name
+                    : "Select main artist"}
                   <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -172,20 +229,23 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
                     <CommandEmpty>No artist found.</CommandEmpty>
                     <ScrollArea className="h-40">
                       <CommandGroup>
-                        {availableArtists.map((artist) => (
+                        {listArtist.map((artist) => (
                           <CommandItem
-                            key={artist}
-                            onSelect={() => {
-                              setMainArtist(
-                                artist === mainArtist ? "" : artist
-                              );
-                              setOpenMainArtist(false);
-                            }}
+                            key={artist.id}
+                            onSelect={() => handleMainArtistSelect(artist)}
                           >
-                            {artist}
+                            <Image
+                              src={artist.avatar || artistimg}
+                              alt={artist.name}
+                              width={50}
+                              height={50}
+                              className="rounded-lg w-8 h-8 mr-2"
+                            />
+
+                            {artist.name}
                             <CheckIcon
                               className={`ml-auto h-4 w-4 ${
-                                artist === mainArtist
+                                artist.id === mainArtist
                                   ? "opacity-100"
                                   : "opacity-0"
                               }`}
@@ -199,6 +259,25 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
               </PopoverContent>
             </Popover>
           </div>
+
+          {/* Release Date */}
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="releaseDate" className="text-left">
+              Release Date
+            </label>
+            <div className="col-span-3">
+              <input
+                id="releaseDate"
+                type="date"
+                className="calendar-icon w-full border-primaryColorBlue border p-2 rounded-md bg-slate-950 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primaryColorBlue"
+                onChange={(e) => setReleaseDate(e.target.value)}
+                max={new Date().toISOString().split("T")[0]}
+              />
+            </div>
+          </div>
+
+          {/* Sub Artist */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="subArtists" className="text-left">
               Sub Artists
@@ -211,9 +290,17 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
                     role="combobox"
                     aria-expanded={openSubArtist}
                     className="w-full justify-between border-darkBlue col-span-3 truncate"
+                    disabled={!mainArtist}
                   >
                     {subArtists.length > 0
-                      ? subArtists.join(", ")
+                      ? subArtists
+                          .map(
+                            (id) =>
+                              listArtist.find((artist) => artist.id === id)
+                                ?.name
+                          )
+                          .filter(Boolean)
+                          .join(", ")
                       : "Select sub artists"}
                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -228,21 +315,30 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
                       <CommandEmpty>No artist found.</CommandEmpty>
                       <ScrollArea className="h-40">
                         <CommandGroup>
-                          {availableArtists.map((artist) => (
-                            <CommandItem
-                              key={artist}
-                              onSelect={() => handleSubArtistChange(artist)}
-                            >
-                              {artist}
-                              <CheckIcon
-                                className={`ml-auto h-4 w-4 ${
-                                  subArtists.includes(artist)
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                }`}
-                              />
-                            </CommandItem>
-                          ))}
+                          {listArtist
+                            .filter((artist) => artist.id !== mainArtist) // Loại trừ mainArtist
+                            .map((artist) => (
+                              <CommandItem
+                                key={artist.id}
+                                onSelect={() => handleSubArtistChange(artist)}
+                              >
+                                <Image
+                                  src={artist.avatar || artistimg}
+                                  alt={artist.name}
+                                  width={50}
+                                  height={50}
+                                  className="rounded-lg w-8 h-8 mr-2"
+                                />
+                                {artist.name}
+                                <CheckIcon
+                                  className={`ml-auto h-4 w-4 ${
+                                    subArtists.includes(artist.id)
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  }`}
+                                />
+                              </CommandItem>
+                            ))}
                         </CommandGroup>
                       </ScrollArea>
                     </CommandList>
@@ -267,15 +363,18 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave }) => {
           <div>
             {audioSrc && (
               <div className="col-span-4 flex justify-center items-center my-2">
-                <audio controls ref={audioRef} key={audioSrc} className="h-10 w-full">
+                <audio
+                  controls
+                  ref={audioRef}
+                  key={audioSrc}
+                  className="h-10 w-full"
+                >
                   <source src={audioSrc} type="audio/mpeg" />
                   Your browser not support audio display.
                 </audio>
               </div>
             )}
-            
           </div>
-         
         </div>
         <SheetFooter>
           <SheetClose asChild>

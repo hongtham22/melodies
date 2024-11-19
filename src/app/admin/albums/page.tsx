@@ -3,50 +3,98 @@ import AddAlbumSheet from "@/components/admin/addAlbumSheet";
 import ListAlbumsAdmin from "@/components/admin/listAlbumsAdmin";
 import React from "react";
 import { MdDeleteOutline } from "react-icons/md";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from "@/app/AppProvider";
 import { PaginationWithLinks } from "@/components/paginationWithLinks";
 import { useSearchParams } from "next/navigation";
 import LoadingPage from "@/components/loadingPage";
+import { useToast } from "@/hooks/use-toast"
+
 
 function Page() {
-  const handleAddAlbum = (trackData: {
-    title: string;
-    main_artist: string;
-    sub_artist: string[];
-    audio: string;
-  }) => {
-    console.log("New track added:", trackData);
-  };
   const { loading, setLoading } = useAppContext();
   const [listAlbumsAdminData, setListAlbumsAdminData] = useState([]);
   const searchParams = useSearchParams();
   const page = parseInt(searchParams?.get("page") || "1", 10);
   const [totalPage, setTotalPage] = useState(1);
-  useEffect(() => {
-    const fetchAlbumsAdmin = async () => {
+  const [listArtistsData, setListArtistsData] = useState([]);
+  const { toast } = useToast()
+
+  const fetchAlbumsAdmin = useCallback(
+    async (currentPage: number) => {
       setLoading(true);
       try {
         const responses = await Promise.all([
           fetchApiData("/api/admin/allAlbum", "GET", null, null, {
-            page: page,
+            page: currentPage,
           }),
+          fetchApiData("/api/admin/allArtistName", "GET", null, null),
         ]);
         if (responses[0].success) {
           setListAlbumsAdminData(responses[0].data.data);
           setTotalPage(responses[0].data.totalPage);
-
-          console.log("List albums:", responses[0].data.data);
+        }
+        if (responses[1].success) {
+          setListArtistsData(responses[1].data.artists);
         }
       } catch (error) {
-        console.error("Error fetching songs:", error);
+        console.error("Error fetching albums:", error);
       } finally {
         setLoading(false);
       }
+    }, [setLoading]
+  );
+  
+  useEffect(() => {
+    fetchAlbumsAdmin(page);
+  }, [fetchAlbumsAdmin, page]); 
+
+  const handleAddAlbum = async (albumData: {
+    title: string;
+    mainArtistId: string;
+    type: string;
+    songIds: string[];
+    albumCover: File;
+    releaseDate: string;
+  }) => {
+    const { title, mainArtistId, type, songIds, albumCover, releaseDate } =
+      albumData;
+    const data = {
+      title,
+      mainArtistId,
+      type,
+      songIds: songIds.map((id) => ({ songId: id })),
+      releaseDate,
     };
-    fetchAlbumsAdmin();
-  }, [setLoading, page]);
+    console.log("New track added:", albumData);
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(data));
+    formData.append("albumCover", albumCover);
+
+    try {
+      const response = await fetchApiData(
+        "/api/admin/create/album",
+        "POST",
+        formData
+      );
+
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: `Album "${title}" added successfully.`,
+          variant: "success",
+        });
+        fetchAlbumsAdmin(page);
+      } else {
+        alert("Error: " + response.error);
+      }
+    } catch (error) {
+      console.error("Error adding album:", error);
+      alert("An error occurred while sending the data.");
+    }
+  };
+
   if (loading) return <LoadingPage />;
 
   return (
@@ -60,7 +108,7 @@ function Page() {
               Delete Albums
             </button>
 
-            <AddAlbumSheet onSave={handleAddAlbum} />
+            <AddAlbumSheet onSave={handleAddAlbum} artist={listArtistsData} />
           </div>
         </div>
       </div>

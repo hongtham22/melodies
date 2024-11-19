@@ -94,7 +94,15 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setArtistAvatar(file);
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        e.target.value = "";
+        alert("File size should not exceed 10MB");
+        return;
+      }
+      else{
+        setArtistAvatar(file);
+      }
     }
   };
 
