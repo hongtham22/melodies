@@ -1,17 +1,18 @@
 'use client'
 import { useEffect, useState } from "react";
 import { fetchApiData } from "@/app/api/appService";
+import { fetchApiData as fetchApiDataRecommend } from "@/app/api/appServiceAI";
 import { useAppContext } from "@/app/AppProvider";
 
 import Banner from "@/components/banner";
 import PopularArtists from "@/components/popularArtists";
 import SongList from "@/components/listSong";
 import TrendingSongs from "@/components/trendingSongs";
-import MoodPlaylist from "@/components/moodPlaylist";
 import LoadingPage from "@/components/loadingPage";
 
 export default function Home() {
-  const { loading, setLoading } = useAppContext();
+  const { loading, setLoading, accessToken } = useAppContext();
+  const [recommend, setRecentCommend] = useState()
   const [weekSong, setWeekSong] = useState()
   const [newReleaseSong, setNewReleaseSong] = useState()
   const [trendSong, setTrendSong] = useState()
@@ -24,7 +25,7 @@ export default function Home() {
           fetchApiData("/api/songs/weeklytopsongs", "GET", null, null, { page: 1 }),
           fetchApiData("/api/songs/newRaleaseSong", "GET", null, null, { page: 1 }),
           fetchApiData("/api/songs/trending", "GET", null, null, { page: 1 }),
-          fetchApiData("/api/artist/popular", "GET", null, null, { page: 1 })
+          fetchApiData("/api/artist/popular", "GET", null, null, { page: 1 }),
         ]);
         if (responses[0].success) setWeekSong(responses[0].data.weeklyTopSongs);
         if (responses[1].success) setNewReleaseSong(responses[1].data.newReleaseSongs);
@@ -38,6 +39,18 @@ export default function Home() {
     };
     fetchSong();
   }, []);
+
+  useEffect(() => {
+    if (accessToken) {
+      const fetchRecommendations = async () => {
+        const recommendResponse = await fetchApiDataRecommend("/recommend", "GET", null, accessToken, { page: 1 });
+        if (recommendResponse.success) {
+          setRecentCommend(recommendResponse.data.songs);
+        }
+      };
+      fetchRecommendations();
+    }
+  }, [accessToken]);
 
   if (loading) return <LoadingPage />
   return (
@@ -55,12 +68,13 @@ export default function Home() {
       <div className="">
         <PopularArtists maintitle="Popular" subtitle="Artists" data={popularArtist} />
       </div>
-      <div className="mt-4">
-        <SongList maintitle="Top" subtitle="Albums" />
-      </div>
-      <div className="mt-4">
-        <MoodPlaylist />
-      </div>
+      {
+        accessToken && recommend && (
+          <div className="">
+            <SongList maintitle="Recommend" subtitle="Songs" data={recommend} />
+          </div>
+        )
+      }
     </div>
   );
 }

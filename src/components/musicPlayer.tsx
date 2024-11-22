@@ -52,12 +52,14 @@ const MusicPlayer: React.FC = () => {
         showLyricPage,
         setShowLyricPage,
         nextSong,
-        previousSong
+        previousSong,
+        startTime,
+        setStartTime,
     } = useAppContext()
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [endTime, setEndTime] = useState<number>(0);
-    const [startTime, setStartTime] = useState<number>(0);
+    // const [startTime, setStartTime] = useState<number>(0);
     const [progressWidth, setProgressWidth] = useState(0);
     const [isRepeat, setIsRepeat] = useState(false);
     const [sound, setSound] = useState(100);
@@ -87,7 +89,7 @@ const MusicPlayer: React.FC = () => {
                 const duration = audioElement.duration;
                 setEndTime(duration)
 
-                audioElement.play()
+                audioElement?.play()
                     .then(() => {
                         setIsPlaying(true);
                     })
@@ -99,7 +101,6 @@ const MusicPlayer: React.FC = () => {
             const handleTimeUpdate = () => {
                 setStartTime(audioElement.currentTime);
             };
-
             const handleAudioEnded = () => {
                 setIsPlaying(false);
                 nextSong()
@@ -123,6 +124,25 @@ const MusicPlayer: React.FC = () => {
             };
         }
     }, [currentSong]);
+
+    useEffect(() => {
+        const handleLyricClick = (event: CustomEvent) => {
+            if (audioRef.current) {
+                const newTime = event.detail.startTime; // Lấy thời gian từ sự kiện
+                audioRef.current.currentTime = newTime;
+                setStartTime(newTime);
+                audioRef.current.play();
+                setIsPlaying(true);
+            }
+        };
+
+        document.addEventListener('lyricClick', handleLyricClick as EventListener);
+
+        return () => {
+            document.removeEventListener('lyricClick', handleLyricClick as EventListener);
+        };
+    }, []);
+
 
     useEffect(() => {
         const progress = (startTime / endTime) * 100;

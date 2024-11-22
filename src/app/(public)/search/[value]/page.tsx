@@ -7,22 +7,20 @@ import AlbumList from "@/components/albumList";
 import SongList from "@/components/listSong";
 import LoadingPage from "@/components/loadingPage";
 import PopularArtists from "@/components/popularArtists";
+import UserImage from '@/assets/img/placeholderUser.jpg'
+import SongImage from '@/assets/img/placeholderSong.jpg'
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaCirclePlay } from "react-icons/fa6";
-import { getPoster, getMainArtistName } from '@/utils/utils'
+import { getMainArtistName, getPosterSong } from '@/utils/utils'
 import { DataSong, Artist } from "@/types/interfaces";
-
-interface TopResults {
-  artist?: Artist;
-  songs?: Array<DataSong>
-}
 
 const SearchPage = ({ params }: { params: { value: string } }) => {
   const router = useRouter();
   const { loading, setLoading } = useAppContext();
   const [notFound, setNotFound] = useState(false);
-  const [topResults, setTopResults] = useState<TopResults>({})
+  const [topResults, setTopResults] = useState<Artist>()
+  const [songTopResults, setSongTopResults] = useState()
   const [artists, setArtists] = useState([])
   const [songs, setSongs] = useState([])
   const [song, setSong] = useState<DataSong>()
@@ -36,14 +34,15 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-      const result = await fetchApiData(`/api/user/search?query=${params.value}`, "GET");
+      const result = await fetchApiData(`/api/songs/search`, "GET", null, null, { query: params.value });
       if (result.success) {
         console.log('ok');
         setTopResults(result.data.topResult)
-        setArtists(result.data.artists)
-        setSongs(result.data.songs)
-        setSong(result.data.songs[0])
-        setAlbums(result.data.albums)
+        setSongTopResults(result.data.songTopResult)
+        setArtists(result.data.artistData)
+        setSongs(result.data.songData)
+        setSong(result.data.songData[0])
+        setAlbums(result.data.albumData)
       } else {
         console.error("Login error:", result.error);
         setNotFound(true)
@@ -54,22 +53,12 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
   }, [params.value])
 
   const isEmptyResults =
-    Object.keys(topResults).length === 0 &&
+    Object.keys(topResults || {}).length === 0 &&
     !artists.length &&
     !songs.length &&
     !albums.length;
 
-  const isEmptyTopResults = Object.keys(topResults).length === 0
-
-  const [poster, setPoster] = useState("https://i.scdn.co/image/ab67616d00001e025a6bc1ecf16bbac5734f23da");
-
-  useEffect(() => {
-    if (song) {
-      setPoster(getPoster(song.album));
-    }
-  }, [song]);
-
-
+  const isEmptyTopResults = topResults ? Object.keys(topResults).length === 0 : true;
   function formatDuration(totalMilliseconds: number) {
     const totalSeconds = Math.floor(totalMilliseconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
@@ -115,7 +104,7 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                   {isEmptyTopResults ? (
                     <div className="relative bg-[#121212]  pt-4 pb-6 px-4 rounded-xl hover:bg-[#2F2F2F] cursor-pointer group">
                       <Image
-                        src={poster}
+                        src={song?.album ? getPosterSong(song.album).image : SongImage}
                         alt="Song Poster"
                         width={110}
                         height={110}
@@ -137,11 +126,11 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                   ) : (
                     <div
                       className="relative bg-[#121212]  pt-4 pb-6 px-4 rounded-xl hover:bg-[#2F2F2F] cursor-pointer group"
-                      onClick={() => router.push(`/artist/${topResults?.artist?.id}`)}
+                      onClick={() => router.push(`/artist/${topResults?.id}`)}
                     >
                       <div className="w-[110px] h-[110px] overflow-hidden rounded-full mb-3">
                         <Image
-                          src={topResults?.artist?.avatar || "https://via.placeholder.com/110"}
+                          src={topResults?.avatar || UserImage}
                           alt="Song Poster"
                           width={110}
                           height={110}
@@ -150,7 +139,7 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                         />
                       </div>
                       <p className="w-[70%] text-3xl font-bold line-clamp-2 group-hover:underline">
-                        {topResults?.artist?.name}
+                        {topResults?.name}
                       </p>
                       <p className="text-primaryColorGray mt-1">Nghệ sĩ</p>
                     </div>
@@ -160,8 +149,8 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                 <div className="w-[60%]">
                   <p className="font-bold text-[1.5rem] mb-2">Bài hát</p>
                   <div className="flex flex-col gap-1 w-full">
-                    {(isEmptyTopResults ? songs : topResults?.songs)?.slice(0, 4).map((song: DataSong, index) => {
-                      const poster = getPoster(song.album)
+                    {(isEmptyTopResults ? songs : songTopResults)?.slice(0, 4).map((song: DataSong, index) => {
+                      const poster = getPosterSong(song.album)
                       return (
                         <div
                           key={index}
@@ -169,7 +158,7 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                         >
                           <div className="relative group flex">
                             <Image
-                              src={poster}
+                              src={poster.image}
                               alt="Song Poster"
                               width={45}
                               height={45}

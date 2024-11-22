@@ -14,8 +14,11 @@ import { RiPlayListAddLine } from "react-icons/ri";
 import { MdEdit, MdDelete } from "react-icons/md";
 import UpdatePlaylist from "@/components/popup/updatePlaylist";
 import ConfirmDeletePlaylist from "@/components/popup/confirmDeletePlaylist";
+import { useToast } from "@/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 const Page = ({ params }: { params: { id: string } }) => {
+    const { toast } = useToast()
     const { accessToken, loading, setLoading } = useAppContext()
     const [playlist, setPlaylist] = useState<DataPlaylist>()
     const [songsOfPlaylist, setSongOfPlaylist] = useState<DataSong[]>([])
@@ -126,6 +129,25 @@ const Page = ({ params }: { params: { id: string } }) => {
         const term = e.target.value;
         setSearchTerm(term);
     };
+
+    const handleAddSong = async (idSong: string) => {
+        const payload = {
+            playlistId: params.id,
+            songId: idSong
+        }
+
+        const result = await fetchApiData(`/api/user/playlist/addSong`, "POST", JSON.stringify(payload), accessToken);
+        if (result.success) {
+            setSongOfPlaylist((prev) => [result.data.newSong, ...prev])
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: result.error,
+                action: <ToastAction altText="Try again">Try again</ToastAction>,
+            });
+        }
+    }
 
     if (loading) return <LoadingPage />
     return (
@@ -265,7 +287,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             </p>
                                         </td>
                                         <td>
-                                            <button className="px-4 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-black hover:bg-white transition-all duration-300">Add</button>
+                                            <button
+                                                className="px-4 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-black hover:bg-white transition-all duration-300"
+                                                onClick={() => handleAddSong(song.id)}
+                                            >Add</button>
                                         </td>
                                     </tr>
                                 ))

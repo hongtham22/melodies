@@ -12,6 +12,7 @@ import Footer from "@/app/layout/footer/Footer";
 import ScrollButton from "@/app/layout/scrollButton/ScrollButton";
 import LyricPage from "@/components/lyricPage"
 import { useAppContext } from "@/app/AppProvider";
+import { useAppContext as useSongContext } from "@/components/provider/songProvider";
 import PlaylistMenu from "@/components/playlistMenu";
 import Link from "next/link";
 
@@ -19,6 +20,7 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { search, showPlaylistMenu } = useAppContext()
+  const { showLyricPage } = useSongContext()
   const router = useRouter();
   const [previousPage, setPreviousPage] = useState<string | null>(null);
 
@@ -56,8 +58,13 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({
       <ScrollContent>
         <main className="ml-[16.66vw] border-l-2 border-primaryColorPink flex flex-col items-center relative">
           <Header />
-          {children}
-          <LyricPage />
+          {
+            showLyricPage ? (
+              <LyricPage />
+            ) : (
+              children
+            )
+          }
           <ToastProvider />
           <Footer />
         </main>

@@ -20,7 +20,7 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'audiomelodies.nyc3.digitaloceanspaces.com',
+                hostname: 'audiomelodies.nyc3.cdn.digitaloceanspaces.com',
                 pathname: '/**',
 
             }
