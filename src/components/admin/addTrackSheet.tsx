@@ -190,7 +190,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
         </SheetHeader>
         <div className="grid gap-4 py-4 items-start">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="trackTitle" className="text-left">
+            <Label htmlFor="trackTitle" className="text-left text-textMedium">
               Title
             </Label>
             <Input
@@ -202,7 +202,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="mainArtist" className="text-left">
+            <Label htmlFor="mainArtist" className="text-left text-textMedium">
               Main Artist
             </Label>
             <Popover open={openMainArtist} onOpenChange={setOpenMainArtist}>
@@ -263,7 +263,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
           {/* Release Date */}
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="releaseDate" className="text-left">
+            <label htmlFor="releaseDate" className="text-left text-textMedium">
               Release Date
             </label>
             <div className="col-span-3">
@@ -279,7 +279,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
 
           {/* Sub Artist */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="subArtists" className="text-left">
+            <Label htmlFor="subArtists" className="text-left text-textMedium">
               Sub Artists
             </Label>
             <div className="col-span-3">
@@ -349,7 +349,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="audio" className="text-left">
+            <Label htmlFor="audio" className="text-left text-textMedium">
               Audio
             </Label>
             <Input

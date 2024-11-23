@@ -4,6 +4,7 @@ import songimg from "@/assets/img/placeholderPlaylist.png";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import AlbumDetailSheet from "@/components/admin/albumDetailSheet";
 
 export interface Album {
   albumId: string;
@@ -43,7 +44,11 @@ function ListAlbumsAdmin({
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [isHeaderChecked, setIsHeaderChecked] = useState(false);
   const itemsPerPage = 10;
+  const [openAlbumId, setOpenAlbumId] = useState<string | null>(null);
 
+  const handleRowClick = (albumId: string) => {
+    setOpenAlbumId(albumId); // Cập nhật ID của artist
+  };
   const handleHeaderCheckboxChange = () => {
     if (isHeaderChecked) {
       setSelectedItems([]);
@@ -128,6 +133,7 @@ function ListAlbumsAdmin({
               <tr
                 key={album.albumId}
                 className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
+                onClick={() => handleRowClick(album.albumId)}
               >
                 <td className="pl-2 text-h4 rounded-tl-lg rounded-bl-lg text-center">
                   <Checkbox
@@ -150,7 +156,7 @@ function ListAlbumsAdmin({
                       alt="song"
                       width={50}
                       height={50}
-                      className="rounded-lg"
+                      className="rounded-lg h-12 w-12"
                     />
                     <div className="flex items-center">
                       <h3 className="text-h4 mb-1 hover:underline line-clamp-1 text-lightPink">
@@ -192,6 +198,13 @@ function ListAlbumsAdmin({
             ))}
         </tbody>
       </table>
+
+      {openAlbumId && (
+        <AlbumDetailSheet
+        albumId={openAlbumId}
+        onClose={() => setOpenAlbumId(null)}
+        />
+      )}
     </div>
   );
 }

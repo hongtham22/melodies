@@ -16,7 +16,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { role } = useAppContext();
   return (
     <div className="">
-      {
+       { 
         role && role === 'Admin' ? (
           <div>
             <SidebarAdmin />
@@ -37,8 +37,8 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         ) : (
           <NotFound />
-        )
-      }
+        ) 
+       }
     </div>
   );
 };

@@ -212,6 +212,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
             </SheetDescription>
           </SheetHeader>
           <div className="grid gap-4 py-4 items-start">
+            {/* title */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="trackTitle" className="text-left">
                 Title
@@ -314,7 +315,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
                 type="file"
                 accept="image/*"
                 onChange={handleAlbumImgChange}
-                className="col-span-3 border-darkerBlue"
+                className="col-span-3 border-darkBlue"
               />
             </div>
             {/* Release Date */}
@@ -340,7 +341,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
               <Label htmlFor="subArtists" className="text-left">
                 List songs
               </Label>
-              <div className="col-span-3">
+              <div className="col-span-3 border-darkBlue">
                 <Popover open={openListSong} onOpenChange={setOpenListSong}>
                   <PopoverTrigger asChild>
                     <Button
