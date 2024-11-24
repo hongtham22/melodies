@@ -43,9 +43,10 @@ interface AddArtistSheetProps {
     genre: string[];
   }) => void;
   genre: Genre[];
+  fetchGenres: () => Promise<void>;
 }
 
-const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
+const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre, fetchGenres }) => {
   const [artistName, setArtistName] = React.useState("");
   const [artistBio, setArtistBio] = React.useState("");
   const [artistAvatar, setArtistAvatar] = React.useState<File | null>(null);
@@ -60,6 +61,16 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
       selected: artistGenre.includes(item.genreId),
     })));    
   }, [genre, artistGenre]);
+
+  const handleAddGenre = async (newGenre: Genre) => {
+    setArtistGenre((prevGenres) => [...prevGenres, newGenre.genreId]);
+
+    setGenre((prev) => {
+      const updatedGenres = [newGenre, ...prev]; 
+      return updatedGenres;
+    });
+    await fetchGenres();
+  };
 
   const handleGenreChange = (genreId: string) => {
     setArtistGenre((prevGenres) =>
@@ -81,20 +92,20 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
     setGenre(reorderedGenres); 
   };
 
-  const handleAddGenre = (newGenre: Genre) => {
-    setArtistGenre((prevGenres) => [...prevGenres, newGenre.genreId]);
 
-    setGenre((prev) => {
-      const updatedGenres = [newGenre, ...prev]; 
-      return updatedGenres;
-    });
-    window.location.reload();
-  };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setArtistAvatar(file);
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        e.target.value = "";
+        alert("File size should not exceed 10MB");
+        return;
+      }
+      else{
+        setArtistAvatar(file);
+      }
     }
   };
 
@@ -126,6 +137,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
           <SheetDescription>Enter details to add a new artist.</SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4 items-start">
+          {/* Aritst  */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="artistName" className="text-left">Name</Label>
             <Input
@@ -136,6 +148,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
               className="col-span-3 border-darkerBlue"
             />
           </div>
+          {/* Bio */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="artistBio" className="text-left">Bio</Label>
             <textarea
@@ -146,6 +159,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
               className="col-span-3 border rounded p-2 border-darkBlue bg-primaryColorBg resize-none"
             />
           </div>
+          {/* Avatar */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="artistAvatar" className="text-left">Avatar</Label>
             <Input
@@ -156,6 +170,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre }) => {
               className="col-span-3 border-darkerBlue"
             />
           </div>
+          {/* Genre */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="genre" className="text-left">Genre</Label>
             <div className="col-span-3 flex gap-1">

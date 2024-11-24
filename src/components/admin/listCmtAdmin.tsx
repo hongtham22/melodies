@@ -1,5 +1,7 @@
 import React from 'react';
 import Image from "next/image";
+import userImg from "@/assets/img/placeholderUser.jpg";
+
 
 interface Comment {
   id: string;
@@ -36,7 +38,7 @@ function ListCmtAdmin({ data }: ListCmtAdminProps) {
         return (
           <div key={id} className="flex gap-3 w-full justify-between">
             <Image
-              src={image}
+              src={image || userImg}
               alt={`${name}'s Poster`}
               width={52}
               height={52}

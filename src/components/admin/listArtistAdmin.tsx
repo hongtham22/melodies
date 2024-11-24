@@ -5,6 +5,7 @@ import { CaretSortIcon} from "@radix-ui/react-icons";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import ArtistDetailSheet from "@/components/admin/artistDetailSheet";
 interface Artist {
   id: string;
   name: string;
@@ -23,6 +24,7 @@ function ListArtistAdmin({ data, page }: {data: ListArtistAdminProps; page: numb
       const [selectedItems, setSelectedItems] = useState<number[]>([]);
       const [isHeaderChecked, setIsHeaderChecked] = useState(false);
       const itemsPerPage = 10;
+      const [openArtistId, setOpenArtistId] = useState<string | null>(null);
 
       const handleHeaderCheckboxChange = () => {
         if (isHeaderChecked) {
@@ -39,6 +41,9 @@ function ListArtistAdmin({ data, page }: {data: ListArtistAdminProps; page: numb
             ? prev.filter((item) => item !== index)
             : [...prev, index]
         );
+      };
+      const handleRowClick = (artistId: string) => {
+        setOpenArtistId(artistId); // Cập nhật ID của artist
       };
   return (
     <div className="w-[90%] flex flex-col justify-center items-center rounded-md border-primaryColorBg mb-2">
@@ -90,6 +95,7 @@ function ListArtistAdmin({ data, page }: {data: ListArtistAdminProps; page: numb
             <tr
             key={artist.id}
             className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
+            onClick={() => handleRowClick(artist.id)}
           >
             <td className="pl-2 text-h4 rounded-tl-lg rounded-bl-lg text-center">
               <Checkbox
@@ -121,10 +127,17 @@ function ListArtistAdmin({ data, page }: {data: ListArtistAdminProps; page: numb
             <td className="text-textMedium pl-2 text-center rounded-tr-lg rounded-br-lg">
               <div className="line-clamp-1">{artist.totalFollow}</div>
             </td>
-          </tr>
+          </tr>  
           ))}
         </tbody>
       </table>
+
+      {openArtistId && (
+        <ArtistDetailSheet
+          artistId={openArtistId}
+          onClose={() => setOpenArtistId(null)} // Đóng Sheet khi xong
+        />
+      )}
   </div>
   )
 }

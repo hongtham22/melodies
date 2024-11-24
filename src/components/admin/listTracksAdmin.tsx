@@ -1,8 +1,7 @@
 "use client";
 import Image from "next/image";
-import songimg from "@/assets/img/songs.png";
 import { CaretSortIcon } from "@radix-ui/react-icons";
-
+import songimg from "@/assets/img/placeholderSong.jpg";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
@@ -18,6 +17,7 @@ interface AlbumImage {
 interface Album {
   albumImages: AlbumImage[];
   title: string;
+  albumType: string;
 }
 
 interface Track {
@@ -34,7 +34,7 @@ interface Track {
   album: Album[];
 }
 
-function ListTracksAdmin({ data, page }: { data: Track[]; page: number; }) {
+function ListTracksAdmin({ data, page }: { data: Track[]; page: number }) {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [isHeaderChecked, setIsHeaderChecked] = useState(false);
   const itemsPerPage = 10;
@@ -42,21 +42,23 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number; }) {
   function capitalizeWords(str: string): string {
     return str
       .toLowerCase()
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   }
-  
+
   function formatDuration(duration: number): string {
     const minutes = Math.floor(duration / 60000);
-    const seconds = Math.floor((duration % 60000) / 1000).toString().padStart(2, '0');
+    const seconds = Math.floor((duration % 60000) / 1000)
+      .toString()
+      .padStart(2, "0");
     return `${minutes}:${seconds}`;
   }
-  
-  const options: Intl.DateTimeFormatOptions = { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   };
   const handleHeaderCheckboxChange = () => {
     if (isHeaderChecked) {
@@ -165,12 +167,14 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number; }) {
                     />
                   </td>
                   <td className="pl-1 text-h4 text-center">
-                    <p className="line-clamp-1">{(page - 1) * itemsPerPage + index + 1}</p>
+                    <p className="line-clamp-1">
+                      {(page - 1) * itemsPerPage + index + 1}
+                    </p>
                   </td>
                   <td className="pl-2 line-clamp-1">
                     <div className="w-full flex gap-2">
                       <Image
-                        src={track.album[0].albumImages[0].image || songimg}
+                        src={track.album[0]?.albumImages[0]?.image || songimg}
                         alt="song"
                         width={50}
                         height={50}
@@ -189,7 +193,11 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number; }) {
                     </div>
                   </td>
                   <td className="text-textMedium pl-6 text-center">
-                    <div className="line-clamp-1">{capitalizeWords(track.album[0].title)}</div>
+                    <div className="line-clamp-1">
+                      {track.album[0]?.title
+                        ? capitalizeWords(track.album[0].title)
+                        : "No album"}
+                    </div>
                   </td>
                   <td className="text-textMedium pl-2 text-center">
                     <div className="line-clamp-1">
@@ -198,12 +206,18 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number; }) {
                   </td>
                   <td className="text-textMedium pl-2 text-center">
                     <div className="line-clamp-1">
-                      {new Date(track?.createdAt).toLocaleDateString('en-US', options)}
+                      {new Date(track?.createdAt).toLocaleDateString(
+                        "en-US",
+                        options
+                      )}
                     </div>
                   </td>
                   <td className="text-textMedium pl-2 text-center">
                     <div className="truncate">
-                      {new Date(track?.releaseDate).toLocaleDateString('en-US', options)}
+                      {new Date(track?.releaseDate).toLocaleDateString(
+                        "en-US",
+                        options
+                      )}
                     </div>
                   </td>
                   <td className="text-textMedium text-center pl-2">
@@ -225,7 +239,6 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number; }) {
 
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-      
     </div>
   );
 }

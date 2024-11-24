@@ -80,7 +80,7 @@ function HeaderAdmin() {
             />
             <div className="flex  flex-col">
                 <p className="text-textSmall">Welcome</p>
-                <p className="text-textMedium line-clamp-1">Adminnnnnnnnnnnnn</p>
+                <p className="text-textMedium line-clamp-1">Admin</p>
             </div>
           </div>
         </div>

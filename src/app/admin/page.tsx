@@ -11,6 +11,7 @@ import ListCmtAdmin from "@/components/admin/listCmtAdmin";
 import ListRecentUserAdmin from "@/components/admin/listRecentUserAdmin";
 import OverallAdmin from "@/components/admin/overallAdmin";
 import LoadingPage from "@/components/loadingPage";
+import songimg from "@/assets/img/placeholderSong.jpg";
 
 interface Artist {
   id: string;
@@ -18,14 +19,15 @@ interface Artist {
   avatar: string;
   main: boolean;
 }
+
 interface AlbumImage {
   image: string;
 }
+
 interface Album {
   albumImages: AlbumImage[];
   title: string;
 }
-
 
 interface TodayBestSong {
   id: string;
@@ -40,7 +42,6 @@ interface TodayBestSong {
 }
 
 const Page = () => {
-
   const [overallAdminData, setOverallAdminData] = useState({
     totalSongs: 0,
     totalArtists: 0,
@@ -55,18 +56,20 @@ const Page = () => {
   const [userGrowthData, setUserGrowthData] = useState([]);
   const [totalPlayAndCmtYearData, setTotalPlayAndCmtYearData] = useState([]);
   const [recentUserData, setRecentUserData] = useState([]);
+
   useEffect(() => {
     const fetchAdminDashboard = async () => {
       setLoading(true);
       try {
         const responses = await Promise.all([
           fetchApiData("/api/admin/total", "GET", null, null),
-          fetchApiData("/api/admin/recentComment", "GET", null, null, {page: 1}),
+          fetchApiData("/api/admin/recentComment", "GET", null, null, { page: 1 }),
           fetchApiData("/api/admin/todayBestSong", "GET", null, null),
           fetchApiData("/api/admin/userGrowth", "GET", null, null),
           fetchApiData("/api/admin/totalPlayAndCmtYear", "GET", null, null),
-          fetchApiData("/api/admin/recentUser", "GET", null, null,  {page: 1}),
+          fetchApiData("/api/admin/recentUser", "GET", null, null, { page: 1 }),
         ]);
+
         if (responses[0].success) {
           setOverallAdminData(responses[0].data.data);
         }
@@ -91,6 +94,7 @@ const Page = () => {
         setLoading(false);
       }
     };
+
     fetchAdminDashboard();
   }, [setLoading]);
 
@@ -99,18 +103,17 @@ const Page = () => {
   return (
     <div className="p-8 my-20 w-full space-y-6">
       <OverallAdmin data={overallAdminData} />
-      {/* chart */}
       <div className="flex gap-7">
-        <div className="flex w-2/3  bg-secondColorBg rounded-xl">
+        <div className="flex w-2/3 bg-secondColorBg rounded-xl">
           <SongsChart data={totalPlayAndCmtYearData} />
         </div>
-        <div className=" w-1/3 flex  flex-col gap-7">
+        <div className="w-1/3 flex flex-col gap-7">
           {todayBestSongData && (
             <div className="bg-secondColorBg shadow-sm shadow-primaryColorBlue rounded-lg p-3">
               <p className="text-h3 text-primaryColorPink">Today Best Song</p>
               <div className="flex gap-3 w-full mt-2">
                 <Image
-                  src={todayBestSongData.album[0].albumImages[0].image || "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8"}
+                  src={todayBestSongData.album[0]?.albumImages[0]?.image ?? songimg}
                   alt="Today Best Song Poster"
                   width={60}
                   height={60}
@@ -139,9 +142,7 @@ const Page = () => {
       </div>
 
       <div className="flex gap-7">
-        {/* Recent comment */}
         <ListCmtAdmin data={recentCommentData} />
-        {/* Recent users */}
         <ListRecentUserAdmin data={recentUserData} />
       </div>
     </div>

@@ -1,5 +1,7 @@
 import React from 'react'
 import Image from "next/image";
+import artistimg from "@/assets/img/placeholderUser.jpg";
+
 
 interface User {
   id: string;
@@ -34,12 +36,12 @@ function ListRecentUserAdmin({ data }: ListRecentUserAdminProps) {
     <div className=" w-1/3 bg-secondColorBg rounded-xl flex flex-col gap-4 p-3 shadow-sm shadow-primaryColorBlue">
     <p className="text-h3 text-primaryColorPink">Recent Users</p>
     {data.map((user) => {
-      const { id, name, email, image, createdAt } = user;
+      const { id, username, email, image, createdAt } = user;
       return (
         <div key={id} className="flex gap-1 w-full">
           <Image
             // src={image}
-            src={image || "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8"}
+            src={image || artistimg}
             alt="user Poster"
             width={48}
             height={48}
@@ -48,7 +50,7 @@ function ListRecentUserAdmin({ data }: ListRecentUserAdminProps) {
           />
           <div className="ml-3 w-full">
             <div className="flex justify-between">
-              <p className="font-bold line-clamp-1">{name || "Unknown User"}</p>
+              <p className="font-bold line-clamp-1">{username || "Unknown User"}</p>
               <p className="text-textMedium text-gray-400 line-clamp-1">
                 {formatTime(createdAt)|| 'Unknow'}
               </p>
@@ -65,71 +67,3 @@ function ListRecentUserAdmin({ data }: ListRecentUserAdminProps) {
 }
 
 export default ListRecentUserAdmin
-
-
-
- // const listUser = [
-    //     {
-    //       poster:
-    //         "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-    //       name: "Keshi",
-    //       gmail: "example@gmail.com",
-    //       time: "12 hours",
-    //     },
-    //     {
-    //       poster:
-    //         "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-    //       name: "Keshi",
-    //       gmail: "example@gmail.com",
-    //       time: "12 hours",
-    //     },
-    //     {
-    //       poster:
-    //         "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-    //       name: "Keshi",
-    //       gmail: "example@gmail.com",
-    //       time: "12 hours",
-    //     },
-    //     {
-    //       poster:
-    //         "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-    //       name: "Keshi",
-    //       gmail: "example@gmail.com",
-    //       time: "12 hours",
-    //     },
-    //     {
-    //       poster:
-    //         "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-    //       name: "Keshi",
-    //       gmail: "example@gmail.com",
-    //       time: "12 hours",
-    //     },
-    //     {
-    //       poster:
-    //         "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-    //       name: "Keshi",
-    //       gmail: "example@gmail.com",
-    //       time: "12 hours",
-    //     },
-    //     {
-    //       poster:
-    //         "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-    //       name: "Keshi",
-    //       gmail: "example@gmail.com",
-    //       time: "12 hours",
-    //     },
-    //     {
-    //       poster:
-    //         "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-    //       name: "Keshi",
-    //       gmail: "example@gmail.com",
-    //       time: "12 hours",
-    //     },
-    //     {
-    //       poster:
-    //         "https://i.scdn.co/image/ab676161000051742fc3ef8a80c35243e5e899b8",
-    //       name: "Keshi",
-    //       gmail: "example@gmail.com",
-    //       time: "12 hours",
-    //     },
-    //   ];

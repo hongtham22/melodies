@@ -1,11 +1,23 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 import tailwindScrollbar from 'tailwind-scrollbar'
+import plugin from "tailwindcss/plugin"; 
 
 const config: Config = {
   plugins: [
     tailwindcssAnimate,
     tailwindScrollbar,
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        '.calendar-icon': {
+          '&::-webkit-calendar-picker-indicator': {
+            filter: 'invert(1)', // Đảo ngược màu icon (trắng trên nền tối)
+            opacity: '1', // Đảm bảo icon luôn hiển thị
+            cursor: 'pointer',
+          },
+        },
+      });
+    }),
   ],
   darkMode: ["class"],
   content: [

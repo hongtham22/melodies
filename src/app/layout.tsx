@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { SongProvider } from "@/components/provider/songProvider";
 import { ScrollProvider } from "@/components/provider/scrollProvider";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
 import { AppProvider } from "@/app/AppProvider";
 
 const geistSans = localFont({
@@ -41,7 +41,6 @@ export default function RootLayout({
             </SongProvider>
           </ScrollProvider>
         </AppProvider>
-
       </body>
     </html>
   );
