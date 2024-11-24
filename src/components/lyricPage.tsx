@@ -109,7 +109,7 @@ const LyricPage = () => {
     if (loading) return <LoadingPage />
     return (
         <div
-            className="absolute top-0 left-0 w-full pb-28"
+            className="absolute top-0 left-0 w-full min-h-screen pb-28"
             style={{ backgroundColor: dominantColor }}
         >
             <div className='w-full h-24 bg-black'>

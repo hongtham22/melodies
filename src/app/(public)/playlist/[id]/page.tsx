@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/app/AppProvider";
+import { useAppContext as useSongContext } from "@/components/provider/songProvider";
 import PlaylistBanner from "@/components/playlistBanner"
 import { IoSearch } from "react-icons/io5";
 import { IoPlayCircleOutline } from "react-icons/io5";
@@ -20,6 +21,7 @@ import { ToastAction } from "@/components/ui/toast"
 const Page = ({ params }: { params: { id: string } }) => {
     const { toast } = useToast()
     const { accessToken, loading, setLoading } = useAppContext()
+    const { addListToWaitingList, setCurrentSong, setWaitingList } = useSongContext();
     const [playlist, setPlaylist] = useState<DataPlaylist>()
     const [songsOfPlaylist, setSongOfPlaylist] = useState<DataSong[]>([])
     const [showMenuMore, setShowMenuMore] = useState<boolean>(false)
@@ -167,18 +169,18 @@ const Page = ({ params }: { params: { id: string } }) => {
                         </button>
                         {
                             showMenuMore && (
-                                <div className="absolute top-14 left-20 bg-[#1F1F1F]">
+                                <div className="absolute top-14 left-20 bg-[#1F1F1F] p-2 rounded-md">
                                     <ul className="">
                                         <li
-                                            className="flex gap-3 px-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300"
-
+                                            className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md"
+                                            onClick={() => addListToWaitingList(songsOfPlaylist)}
                                         ><RiPlayListAddLine /> Add to waiting list</li>
                                         <li
-                                            className="flex gap-3 px-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300"
+                                            className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md "
                                             onClick={() => { setIsUpdate(true); setShowMenuMore(false) }}
                                         ><MdEdit /> Edit detail playlist</li>
                                         <li
-                                            className="flex gap-3 px-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300"
+                                            className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md"
                                             onClick={() => { setIsDelete(true); setShowMenuMore(false) }}
                                         ><MdDelete /> Delete playlist</li>
                                     </ul>
@@ -201,6 +203,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 <tr
                                     key={index}
                                     className="bg-secondColorBg cursor-pointer hover:bg-gray-700"
+                                    onClick={() => { setCurrentSong(song); setWaitingList(songsOfPlaylist); }}
                                 >
                                     <td className="pl-4 pr-8 text-h4 rounded-tl-lg rounded-bl-lg">
                                         #{index + 1}

@@ -20,6 +20,7 @@ interface SongContextType {
     previousSong: () => void;
     startTime: number;
     setStartTime: React.Dispatch<React.SetStateAction<number>>;
+    addListToWaitingList: (songs: Array<DataSong>) => void;
 }
 
 const SongContext = createContext<SongContextType | undefined>(undefined);
@@ -68,6 +69,13 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     }, [currentSong, waitingList]);
 
+    const addToWaitingList = useCallback((song: DataSong) => {
+        setWaitingListState((prevList) => [...prevList, song]);
+    }, []);
+    const addListToWaitingList = useCallback((songs: Array<DataSong>) => {
+        setWaitingListState((prevList) => [...prevList, ...songs]);
+    }, []);
+
     const value = {
         showWaitingList,
         setShowWaitingList,
@@ -83,6 +91,8 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setShowLyricPage,
         nextSong,
         previousSong,
+        addToWaitingList,
+        addListToWaitingList,
         startTime,
         setStartTime,
     };
