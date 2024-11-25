@@ -31,14 +31,14 @@ const ArtistBanner: React.FC<BannerProps> = ({ data, color }) => {
             />
 
             <div
-                className={`absolute inset-0 z-5 bg-contain transform bg-right bg-no-repeat background-with-blur`}
+                className={`absolute inset-0 bg-contain transform bg-right bg-no-repeat background-with-blur`}
                 style={{
                     '--background-image': `url(${data?.avatar})`,
                     // backgroundPosition: `center calc(100% - 200px)`
                 } as React.CSSProperties}
             />
             <div
-                className="absolute inset-0 z-15"
+                className="absolute inset-0"
                 style={{
                     background: `linear-gradient(to right, #000000 40%, ${darkerColor} 98%)`,
                     opacity: 0.8, // Điều chỉnh độ mờ của lớp phủ nếu cần

@@ -69,7 +69,8 @@ const LyricPage = () => {
         if (currentSong) {
             const fetchLyrics = async () => {
                 try {
-                    const response = await fetch('/lyric/NangThoLyric.json');
+                    // const response = await fetch('/lyric/NangThoLyric.json');
+                    const response = await fetch('https://audiomelodies.nyc3.cdn.digitaloceanspaces.com/PBL6/LYRIC/ha.json');
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }

@@ -24,7 +24,7 @@ const Sidebar = () => {
     useAppContext();
   const [showRequireLogin, setShowRequireLogin] = useState(false);
   const [showRequireLoginForListenTogether, setShowRequireLoginForListenTogether] =
-  useState(false);
+    useState(false);
 
   const handleShowPlaylist = () => {
     if (accessToken) {

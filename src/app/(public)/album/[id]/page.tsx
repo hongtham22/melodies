@@ -23,12 +23,12 @@ const Page = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const result = await fetchApiData(`/api/album/more/${params.id}`, "GET");
+      const result = await fetchApiData(`/api/album/${params.id}`, "GET");
       if (result.success) {
-        setDataAlbum(result.data.albumWithSong)
-        const imageUrl = typeof getPoster(result.data.albumWithSong) === "string"
-          ? getPoster(result.data.albumWithSong)
-          : `${process.env.NEXT_PUBLIC_FE}${(getPoster(result.data.albumWithSong) as StaticImageData).src}`;
+        setDataAlbum(result.data.album)
+        const imageUrl = typeof getPoster(result.data.album) === "string"
+          ? getPoster(result.data.album)
+          : `${process.env.NEXT_PUBLIC_FE}${(getPoster(result.data.album) as StaticImageData).src}`;
         console.log(imageUrl);
 
         try {
