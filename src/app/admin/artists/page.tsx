@@ -18,6 +18,7 @@ function Page() {
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsAdminData, setListArtistsAdminData] = useState([]);
   const [genreList, setGenreList] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
  
   const fetchArtists = useCallback(async (page: number) => {
@@ -89,6 +90,56 @@ function Page() {
     }
   };
 
+  const handleDeleteArtist = async () => {
+    if (selectedItems.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one artist to delete.",
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    try {
+      const requestBody = JSON.stringify({ artistIds: selectedItems });
+  
+      const response = await fetchApiData(
+        "/api/admin/delete/artist",
+        "PATCH",
+        requestBody, 
+        null, 
+        null 
+      );
+  
+      if (response.success) {
+        fetchArtists(page);
+  
+        toast({
+          title: "Success",
+          description: "Artist deleted successfully.",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: response.error || "Failed to delete artist.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting artist:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while deleting artist.",
+        variant: "destructive",
+      });
+    } finally {
+      setSelectedItems([]);
+    }
+  
+    console.log("Deleting artists:", { artistIds: selectedItems });
+  };
+
   if (loading) return <LoadingPage />;
 
   return (
@@ -108,7 +159,8 @@ function Page() {
             />
           </div>
           <div className="flex gap-4">
-            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue">
+            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
+            onClick={handleDeleteArtist}>
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
               Delete Artist
             </button>
@@ -117,7 +169,7 @@ function Page() {
           </div>
         </div>
       </div>
-      <ListArtistAdmin data={listArtistsAdminData} page={page} />
+      <ListArtistAdmin data={listArtistsAdminData} page={page} onSelectedItemsChange={setSelectedItems}/>
       <PaginationWithLinks page={page} totalPage={totalPage} />
     </div>
   );
