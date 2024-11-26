@@ -11,7 +11,6 @@ import NotFound from "@/app/not-found";
 import AlbumList from "@/components/albumList";
 import { Artist } from "@/types/interfaces";
 import { IoPlayCircleOutline } from "react-icons/io5";
-import tinycolor from "tinycolor2";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { loading, setLoading } = useAppContext();

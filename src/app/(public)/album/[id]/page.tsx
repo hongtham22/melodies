@@ -2,6 +2,7 @@
 import Image, { StaticImageData } from "next/image";
 import React, { useState, useEffect } from "react";
 import { useAppContext } from "@/app/AppProvider";
+import { useAppContext as useSongContext } from "@/components/provider/songProvider";
 import { fetchApiData } from "@/app/api/appService";
 import { HeartIcon, HeartFilledIcon } from "@radix-ui/react-icons";
 import { IoPlayCircleOutline } from "react-icons/io5";
@@ -12,13 +13,35 @@ import LoadingPage from "@/components/loadingPage";
 import NotFound from "@/app/not-found";
 import { DataAlbum } from "@/types/interfaces";
 import { formatTime, getMainArtistName, getPoster } from "@/utils/utils";
+import { useScrollArea } from "@/components/provider/scrollProvider";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { loading, setLoading } = useAppContext();
+  const { scrollAreaRef } = useScrollArea();
+  const { showSidebarRight } = useSongContext()
   const [dataAlbum, setDataAlbum] = useState<DataAlbum>()
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [dominantColor, setDominantColor] = useState<string>();
   const [notFound, setNotFound] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollAreaRef?.current) {
+        const scrollTop = scrollAreaRef.current.scrollTop;
+        console.log("scrollTop", scrollTop);
+        setIsScrolled(scrollTop > 180);
+      }
+    };
+    if (scrollAreaRef?.current) {
+      scrollAreaRef.current.addEventListener("scroll", handleScroll);
+      return () => {
+        if (scrollAreaRef.current) {
+          scrollAreaRef.current.removeEventListener("scroll", handleScroll);
+        }
+      };
+    }
+  }, [scrollAreaRef]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,6 +134,19 @@ const Page = ({ params }: { params: { id: string } }) => {
               </div>
             </div>
           </div>
+        </div>
+        <div
+          className={`flex items-center gap-2 fixed top-24 pl-8 font-bold text-2xl py-4 transition-transform duration-300
+                        ${isScrolled ? "translate-y-0" : "-translate-y-full opacity-0"} ${showSidebarRight ? 'w-[61%]' : 'w-[81%]'}`}
+          style={{
+            backgroundColor: isScrolled ? "#1F1F1F" : "transparent",
+          }}
+        >
+          <IoPlayCircleOutline
+            className="w-12 h-12 text-white cursor-pointer"
+          // onClick={() => { if (dataSongArtist) { setCurrentSong(dataSongArtist[0]); setWaitingList(dataSongArtist); } }}
+          />
+          {dataAlbum?.title}
         </div>
 
         {/* Song lists */}
