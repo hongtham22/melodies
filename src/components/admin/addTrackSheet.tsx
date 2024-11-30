@@ -43,6 +43,7 @@ interface AddTrackSheetProps {
     subArtistIds: string[];
     audioFile: File;
     releaseDate: string;
+    lyricFile: File | null;
   }) => void;
   artist: Artist[];
 }
@@ -57,7 +58,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [releaseDate, setReleaseDate] = useState<string>("");
-
+  const [lyricFile, setLyricFile] = useState<File | null>(null);
   const [listArtist, setListArtist] = React.useState<Artist[]>(artist || []);
   const originalOrder = React.useRef<Artist[]>(artist || []);
 
@@ -92,15 +93,6 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
     }
   };
 
-  // const handleSubArtistChange = (artist: Artist) => {
-  //   if (artist.id === mainArtist) return;
-
-  //   setSubArtists((prevArtists) =>
-  //     prevArtists.includes(artist.id)
-  //       ? prevArtists.filter((id) => id !== artist.id)
-  //       : [...prevArtists, artist.id]
-  //   );
-  // };
   const handleSubArtistChange = (artist: Artist) => {
     if (artist.id === mainArtist) return;
 
@@ -139,6 +131,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
         subArtistIds: subArtists,
         releaseDate: releaseDate,
         audioFile: audioFile,
+        lyricFile: lyricFile,
       });
     } else {
       console.error("Audio file is required.");
@@ -150,6 +143,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
     setSubArtists([]);
     setAudioFile(null);
     setReleaseDate("");
+    setLyricFile(null);
   };
 
   const handleAudioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,11 +159,29 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
       setAudioFile(file);
 
       if (audioSrc) {
-        URL.revokeObjectURL(audioSrc); 
+        URL.revokeObjectURL(audioSrc);
       }
 
       const url = URL.createObjectURL(file);
       setAudioSrc(url);
+    }
+  };
+
+  const handleLyricChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const maxSize = 10 * 1024 * 1024; 
+      if (file.size > maxSize) {
+        event.target.value = "";
+        alert("File size should not exceed 1MB");
+        return;
+      }
+      if (file.type !== "application/json") {
+        event.target.value = "";
+        alert("Only JSON files are allowed");
+        return;
+      }
+      setLyricFile(file);
     }
   };
 
@@ -198,7 +210,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
               value={trackTitle}
               onChange={(e) => setTrackTitle(e.target.value)}
               placeholder="Enter track title"
-              className="col-span-3 border-darkBlue"
+              className="col-span-3 border-darkBlue" required
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -224,6 +236,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
                   <CommandInput
                     placeholder="Search artist..."
                     className="h-9"
+                    required
                   />
                   <CommandList>
                     <CommandEmpty>No artist found.</CommandEmpty>
@@ -273,6 +286,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
                 className="calendar-icon w-full border-primaryColorBlue border p-2 rounded-md bg-slate-950 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primaryColorBlue"
                 onChange={(e) => setReleaseDate(e.target.value)}
                 max={new Date().toISOString().split("T")[0]}
+                required
               />
             </div>
           </div>
@@ -358,6 +372,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
               accept="audio/*"
               onChange={handleAudioChange}
               className="col-span-3 border-darkBlue"
+              required
             />
           </div>
           <div>
@@ -375,6 +390,29 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
               </div>
             )}
           </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="lyric" className="text-left text-textMedium">
+          Lyric File
+        </Label>
+        <Input
+          id="lyric"
+          type="file"
+          accept="application/json"
+          onChange={handleLyricChange}
+          className="col-span-3 border-darkBlue"
+        />
+      </div>
+      {/* <div>
+        {lyricFile && (
+          <div className="col-span-4 flex justify-center items-center my-2">
+            <p className="text-sm text-success">
+              {lyricFile.name} has been uploaded successfully.
+            </p>
+          </div>
+        )}
+      </div> */}
+
         </div>
         <SheetFooter>
           <SheetClose asChild>

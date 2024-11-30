@@ -19,17 +19,20 @@ function Page() {
   const page = parseInt(searchParams?.get("page") || "1", 10);
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsData, setListArtistsData] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
+  const { accessToken } = useAppContext()
+
 
   const fetchAlbumsAdmin = useCallback(
     async (currentPage: number) => {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/admin/allAlbum", "GET", null, null, {
+          fetchApiData("/api/admin/allAlbum", "GET", null, accessToken, {
             page: currentPage,
           }),
-          fetchApiData("/api/admin/allArtistName", "GET", null, null),
+          fetchApiData("/api/admin/allArtistName", "GET", null, accessToken),
         ]);
         if (responses[0].success) {
           setListAlbumsAdminData(responses[0].data.data);
@@ -76,7 +79,8 @@ function Page() {
       const response = await fetchApiData(
         "/api/admin/create/album",
         "POST",
-        formData
+        formData,
+        accessToken
       );
 
       if (response.success) {
@@ -95,6 +99,58 @@ function Page() {
     }
   };
 
+  const handleDeleteAlbums = async () => {
+    if (selectedItems.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one album to delete.",
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    try {
+      const requestBody = JSON.stringify({ albumIds: selectedItems });
+  
+      const response = await fetchApiData(
+        "/api/admin/delete/album",
+        "DELETE",
+        requestBody, 
+        accessToken, 
+        null 
+      );
+  
+      if (response.success) {
+        fetchAlbumsAdmin(page);
+  
+        toast({
+          title: "Success",
+          description: "Albums deleted successfully.",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: response.error || "Failed to delete albums.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting albums:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while deleting albums.",
+        variant: "destructive",
+      });
+    } finally {
+      setSelectedItems([]);
+    }
+  
+    console.log("Deleting albums:", { albumIds: selectedItems });
+  };
+  
+  
+
   if (loading) return <LoadingPage />;
 
   return (
@@ -103,7 +159,8 @@ function Page() {
         <div className="w-full flex items-center justify-between px-3">
           <h1 className="text-h2 text-primaryColorPink">List Albums</h1>
           <div className="flex gap-4">
-            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue">
+            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
+            onClick={handleDeleteAlbums}>
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
               Delete Albums
             </button>
@@ -112,7 +169,7 @@ function Page() {
           </div>
         </div>
       </div>
-      <ListAlbumsAdmin data={listAlbumsAdminData} page={page} />
+      <ListAlbumsAdmin data={listAlbumsAdminData} page={page} onSelectedItemsChange={setSelectedItems} />
       <PaginationWithLinks page={page} totalPage={totalPage} />
     </div>
   );

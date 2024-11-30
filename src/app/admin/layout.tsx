@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MusicPlayer from "@/components/musicPlayer";
 import ScrollContent from "@/components/scrollContent";
 import SongIntroduce from "@/components/songIntroduce";
@@ -14,6 +14,14 @@ import NotFound from "@/app/not-found";
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { role } = useAppContext();
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true); 
+  }, []);
+
+  if (!isClient) {
+    return null; 
+  }
   return (
     <div className="">
        { 

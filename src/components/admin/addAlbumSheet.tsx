@@ -46,6 +46,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
 import artistimg from "@/assets/img/placeholderUser.jpg";
 import { fetchApiData } from "@/app/api/appService";
+import { useAppContext } from "@/app/AppProvider";
 
 interface Artist {
   id: string;
@@ -83,6 +84,8 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
   >([]);
   const [releaseDate, setReleaseDate] = useState<string>("");
   const [typeAlbum, setTypeAlbum] = useState<string>("");
+  const { accessToken } = useAppContext()
+
 
   React.useEffect(() => {
     setListArtist((prevList) =>
@@ -121,7 +124,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
           `/api/artist/song/${selectedArtist.id}`,
           "GET",
           null,
-          null
+          accessToken
         );
         if (response.success) {
           setListSongOfMainArtist(response.data.songs);

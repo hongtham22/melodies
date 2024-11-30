@@ -19,13 +19,15 @@ function Page() {
   const page = parseInt(searchParams?.get("page") || "1", 10);
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsData, setListArtistsData] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const { accessToken } = useAppContext()
 
   const fetchTrackAdmin = useCallback(
     async (page: number) => {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/songs", "GET", null, null, { page: page }),
+          fetchApiData("/api/songs", "GET", null, accessToken, { page: page }),
         ]);
         if (responses[0].success) {
           setListTracksData(responses[0].data.song);
@@ -47,7 +49,7 @@ function Page() {
         "/api/admin/allArtistName",
         "GET",
         null,
-        null
+        accessToken
       );
 
       if (artistsResponse.success) {
@@ -72,8 +74,9 @@ function Page() {
     subArtistIds: string[];
     audioFile: File;
     releaseDate: string;
+    lyricFile: File;
   }) => {
-    const { title, mainArtistId, subArtistIds, audioFile, releaseDate } =
+    const { title, mainArtistId, subArtistIds, audioFile, releaseDate, lyricFile } =
       trackData;
     const data = {
       title,
@@ -84,12 +87,14 @@ function Page() {
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
     formData.append("audioFile", audioFile);
+    formData.append("lyricFile", lyricFile);
 
     try {
       const response = await fetchApiData(
         '/api/admin/create/song',
         "POST",
-        formData
+        formData,
+        accessToken
       );
 
       if (response.success) {
@@ -109,6 +114,58 @@ function Page() {
     console.log("New track added:", trackData);
   };
 
+  const handleDeleteTracks = async () => {
+    if (selectedItems.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one track to delete.",
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    try {
+      const requestBody = JSON.stringify({ songIds: selectedItems });
+  
+      const response = await fetchApiData(
+        "/api/admin/delete/song",
+        "DELETE",
+        requestBody, 
+        accessToken, 
+        null 
+      );
+  
+      if (response.success) {
+        fetchTrackAdmin(page);
+  
+        toast({
+          title: "Success",
+          description: "Tracks deleted successfully.",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: response.error || "Failed to delete tracks.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting albums:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while deleting tracks.",
+        variant: "destructive",
+      });
+    } finally {
+      setSelectedItems([]);
+    }
+  
+    console.log("Deleting tracks:", { songIds: selectedItems });
+  };
+  
+  
+
   if (loading) return <LoadingPage />;
 
   return (
@@ -117,7 +174,8 @@ function Page() {
         <div className="w-full flex items-center justify-between px-3">
           <h1 className="text-h2 text-primaryColorPink">List Tracks</h1>
           <div className="flex gap-4">
-            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue">
+            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
+            onClick={handleDeleteTracks}>
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
               Delete Track
             </button>
@@ -125,7 +183,7 @@ function Page() {
           </div>
         </div>
       </div>
-      <ListTracksAdmin data={listTracksData} page={page} />
+      <ListTracksAdmin data={listTracksData} page={page} onSelectedItemsChange={setSelectedItems} />
       <PaginationWithLinks page={page} totalPage={totalPage} />
     </div>
   );

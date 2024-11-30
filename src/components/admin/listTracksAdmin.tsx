@@ -4,7 +4,8 @@ import { CaretSortIcon } from "@radix-ui/react-icons";
 import songimg from "@/assets/img/placeholderSong.jpg";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import TrackDetailSheet from "@/components/admin/trackDetailSheet";
 
 interface Artist {
   name: string;
@@ -34,10 +35,21 @@ interface Track {
   album: Album[];
 }
 
-function ListTracksAdmin({ data, page }: { data: Track[]; page: number }) {
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+function ListTracksAdmin({
+  data,
+  page,
+  onSelectedItemsChange,
+  
+}: {
+  data: Track[];
+  page: number;
+  onSelectedItemsChange: (selectedItems: string[]) => void;
+  
+}) {
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isHeaderChecked, setIsHeaderChecked] = useState(false);
   const itemsPerPage = 10;
+  const [openTrackId, setOpenTrackId] = useState<string | null>(null);
 
   function capitalizeWords(str: string): string {
     return str
@@ -64,20 +76,25 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number }) {
     if (isHeaderChecked) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(
-        Array.from({ length: data.length }, (_, index) => index)
-      );
+      setSelectedItems(data.map((track) => track.id));
     }
     setIsHeaderChecked(!isHeaderChecked);
   };
 
-  const handleItemCheckboxChange = (index: number) => {
+  const handleItemCheckboxChange = (id: string) => {
     setSelectedItems((prev) =>
-      prev.includes(index)
-        ? prev.filter((item) => item !== index)
-        : [...prev, index]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
+
+  useEffect(() => {
+    onSelectedItemsChange(selectedItems);
+  }, [selectedItems, onSelectedItemsChange]);
+
+  const handleRowClick = (trackId: string) => {
+    setOpenTrackId(trackId); 
+  };
+
   return (
     <div className="w-full flex flex-col justify-center items-center">
       <ScrollArea className="w-[1150px] whitespace-nowrap rounded-md border-primaryColorBg mb-2">
@@ -158,11 +175,13 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number }) {
                 <tr
                   key={track.id}
                   className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
+                  onClick={() => handleRowClick(track.id)}
                 >
                   <td className="pl-2 text-h4 rounded-tl-lg rounded-bl-lg text-center">
                     <Checkbox
-                      checked={selectedItems.includes(index)}
-                      onCheckedChange={() => handleItemCheckboxChange(index)}
+                      checked={selectedItems.includes(track.id)}
+                      onCheckedChange={() => handleItemCheckboxChange(track.id)}
+                      onClick={(e) => e.stopPropagation()}
                       className="line-clamp-1"
                     />
                   </td>
@@ -236,6 +255,13 @@ function ListTracksAdmin({ data, page }: { data: Track[]; page: number }) {
               ))}
           </tbody>
         </table>
+
+        {openTrackId && (
+          <TrackDetailSheet
+            trackId={openTrackId}
+            onClose={() => setOpenTrackId(null)}
+          />
+        )}
 
         <ScrollBar orientation="horizontal" />
       </ScrollArea>

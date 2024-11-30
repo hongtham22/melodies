@@ -18,12 +18,15 @@ function Page() {
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsAdminData, setListArtistsAdminData] = useState([]);
   const [genreList, setGenreList] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
+  const { accessToken } = useAppContext()
+
  
   const fetchArtists = useCallback(async (page: number) => {
     setLoading(true);
     try {
-      const artistsResponse = await fetchApiData("/api/artist/allArtist", "GET", null, null, {
+      const artistsResponse = await fetchApiData("/api/artist/allArtist", "GET", null, accessToken, {
         page: page,
       });
 
@@ -42,7 +45,7 @@ function Page() {
   const fetchGenres = useCallback(async () => {
     setLoading(true);
     try {
-      const genresResponse = await fetchApiData("/api/admin/allGenre", "GET", null, null);
+      const genresResponse = await fetchApiData("/api/admin/allGenre", "GET", null, accessToken);
 
       if (genresResponse.success) {
         setGenreList(genresResponse.data.genres);
@@ -71,7 +74,7 @@ function Page() {
     formData.append("data", JSON.stringify(data));
     formData.append("avatar", avatar);
     try {
-      const response = await fetchApiData('/api/admin/create/artist', 'POST', formData);
+      const response = await fetchApiData('/api/admin/create/artist', 'POST', formData, accessToken, null);
   
       if (response.success) {
         toast({
@@ -87,6 +90,56 @@ function Page() {
       console.error('Error adding artist:', error);
       alert('An error occurred while sending the data.');
     }
+  };
+
+  const handleDeleteArtist = async () => {
+    if (selectedItems.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one artist to delete.",
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    try {
+      const requestBody = JSON.stringify({ artistIds: selectedItems });
+  
+      const response = await fetchApiData(
+        "/api/admin/delete/artist",
+        "PATCH",
+        requestBody, 
+        accessToken, 
+        null 
+      );
+  
+      if (response.success) {
+        fetchArtists(page);
+  
+        toast({
+          title: "Success",
+          description: "Artist deleted successfully.",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: response.error || "Failed to delete artist.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting artist:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while deleting artist.",
+        variant: "destructive",
+      });
+    } finally {
+      setSelectedItems([]);
+    }
+  
+    console.log("Deleting artists:", { artistIds: selectedItems });
   };
 
   if (loading) return <LoadingPage />;
@@ -108,7 +161,8 @@ function Page() {
             />
           </div>
           <div className="flex gap-4">
-            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue">
+            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
+            onClick={handleDeleteArtist}>
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
               Delete Artist
             </button>
@@ -117,7 +171,7 @@ function Page() {
           </div>
         </div>
       </div>
-      <ListArtistAdmin data={listArtistsAdminData} page={page} />
+      <ListArtistAdmin data={listArtistsAdminData} page={page} onSelectedItemsChange={setSelectedItems}/>
       <PaginationWithLinks page={page} totalPage={totalPage} />
     </div>
   );

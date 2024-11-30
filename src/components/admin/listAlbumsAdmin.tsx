@@ -3,7 +3,7 @@ import Image from "next/image";
 import songimg from "@/assets/img/placeholderPlaylist.png";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AlbumDetailSheet from "@/components/admin/albumDetailSheet";
 
 export interface Album {
@@ -37,34 +37,43 @@ interface ListAlbumsAdminProps {
 function ListAlbumsAdmin({
   data,
   page,
+  onSelectedItemsChange
 }: {
   data: ListAlbumsAdminProps;
   page: number;
+  onSelectedItemsChange: (selectedItems: string[]) => void;
 }) {
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isHeaderChecked, setIsHeaderChecked] = useState(false);
   const itemsPerPage = 10;
   const [openAlbumId, setOpenAlbumId] = useState<string | null>(null);
 
   const handleRowClick = (albumId: string) => {
-    setOpenAlbumId(albumId); // Cập nhật ID của artist
+    console.log("albumId", albumId);
+    setOpenAlbumId(albumId); 
   };
   const handleHeaderCheckboxChange = () => {
     if (isHeaderChecked) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(Array.from({ length: 10 }, (_, index) => index));
+      // setSelectedItems(Array.from({ length: 10 }, (_, index) => index));
+      setSelectedItems(data.map((album) => album.albumId));
     }
     setIsHeaderChecked(!isHeaderChecked);
   };
 
-  const handleItemCheckboxChange = (index: number) => {
+  const handleItemCheckboxChange = (albumId: string) => {
     setSelectedItems((prev) =>
-      prev.includes(index)
-        ? prev.filter((item) => item !== index)
-        : [...prev, index]
+      prev.includes(albumId)
+        ? prev.filter((id) => id !== albumId)
+        : [...prev, albumId]
     );
   };
+
+  useEffect(() => {
+    onSelectedItemsChange(selectedItems);
+  }, [selectedItems, onSelectedItemsChange]);
+
 
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
@@ -137,8 +146,9 @@ function ListAlbumsAdmin({
               >
                 <td className="pl-2 text-h4 rounded-tl-lg rounded-bl-lg text-center">
                   <Checkbox
-                    checked={selectedItems.includes(index)}
-                    onCheckedChange={() => handleItemCheckboxChange(index)}
+                    checked={selectedItems.includes(album.albumId)}
+                    onCheckedChange={() => handleItemCheckboxChange(album.albumId)}
+                    onClick={(e) => e.stopPropagation()}
                   />
                 </td>
                 <td className="pl-1 text-h4 text-center">
@@ -192,7 +202,7 @@ function ListAlbumsAdmin({
                   </div>
                 </td>
                 <td className="text-textMedium text-center pl-2 rounded-tr-lg rounded-br-lg">
-                  <div className="line-clamp-1">{album.albumType}</div>
+                  <div className="line-clamp-1 capitalize">{album.albumType}</div>
                 </td>
               </tr>
             ))}
