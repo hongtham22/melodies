@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAppContext } from "@/app/AppProvider";
 import Image from "next/image";
 import { fetchApiData } from "@/app/api/appService";
@@ -16,6 +17,7 @@ import { DataSong } from "@/types/interfaces";
 import { getMainArtistId, getMainArtistName, getPosterSong } from "@/utils/utils";
 
 const Page = ({ params }: { params: { id: string } }) => {
+    const router = useRouter()
     const { loading, setLoading } = useAppContext();
     const [notFound, setNotFound] = useState(false);
     const [dominantColor, setDominantColor] = useState<string>();
@@ -33,7 +35,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 try {
                     const responses = await Promise.all([
                         fetch(`/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl as string)}`),
-                        fetchApiData(`/api/songs/otherByArtist/${getMainArtistId(result.data.song.artists)}`, "GET", null, null, { page: 1 }),
+                        fetchApiData(`/api/songs/otherByArtist/${result.data.song.artists ? getMainArtistId(result.data.song.artists) : ''}`, "GET", null, null, { page: 1 }),
                     ]);
                     const data = await responses[0].json();
                     if (responses[0].ok) {
@@ -99,7 +101,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                             <h3>Song</h3>
                             <h1 className="mt-2 text-5xl font-bold">{dataSong?.title}</h1>
                             <div className="mt-3 flex items-center space-x-2 text-h4 font-semibold">
-                                <p>{dataSong?.artists ? getMainArtistName(dataSong.artists) : "Unknown Artist"}</p>
+                                <p
+                                    className="cursor-pointer hover:underline"
+                                    onClick={() => dataSong?.artists && router.push(`/artist/${getMainArtistId(dataSong.artists)}`)}
+                                >{dataSong?.artists ? getMainArtistName(dataSong.artists) : "Unknown Artist"}</p>
                                 <span className="text-gray-300">•</span>
                                 <p className="">{dataSong?.album ? getPosterSong(dataSong.album).title : "Unknown Album"}</p>
                                 <span className="text-gray-300">•</span>

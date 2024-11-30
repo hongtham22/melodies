@@ -18,6 +18,7 @@ import CommentPart from '@/components/commentPart';
 import Image from 'next/image';
 import { Comment } from '@/types/interfaces';
 import '@/components/scss/commentSection.scss'
+import CommentPartNew from '@/components/commentPartNew';
 
 interface CommentSectionProps {
     id: string
@@ -37,6 +38,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
     const [contentCmt, setContentComment] = useState<string>('')
     const [errorPost, setErrorPost] = useState<boolean>(false)
     const [messageError, setMessageError] = useState<string>('')
+    const [newCmt, setNewCmt] = useState<{ data: Comment; cmtChild: Comment[] }[]>([])
+
     const handleClickSort = () => {
         setIsClickSort(!isClickSort)
     }
@@ -48,7 +51,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
 
     const fetchComments = async () => {
         setLoading(true);
-        const response = await fetchApiData(`/api/songs/comment/${id}`, 'GET', null, null, { page: page })
+        const response = await fetchApiData(`/api/songs/comment/${id}`, 'GET', null, accessToken, { page: page })
         if (response.success) {
             const data = await response.data;
             setComments(prevComments => [...prevComments, ...data.comments]);
@@ -62,7 +65,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
     useEffect(() => {
         setComments([])
         setPage(1)
-        fetchComments(); // Fetch dữ liệu trang đầu tiên
+        fetchComments();
     }, [id]);
 
     const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
@@ -83,7 +86,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
         const response = await fetchApiDataAI(`/actions/comment`, 'POST', JSON.stringify(payload), accessToken)
         if (response.success) {
             if (response.data.status === 'success') {
-                setComments((prev) => [response.data.comment, ...prev])
+                setNewCmt((prev) => [{ data: response.data.comment, cmtChild: [] }, ...prev])
                 setTotalCmt((prev) => prev + 1)
             } else {
                 setMessageError(response.data.message)
@@ -147,10 +150,17 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
             </div>
             <hr className='py-2' />
             <div className="min-h-[120px] max-h-[600px] overflow-auto pr-4 scrollbar-thin scrollbar-thumb-transparent/30 scrollbar-track-transparent" onScroll={handleScroll}>
+                {newCmt?.map((comment, index) => (
+                    <div key={index}>
+                        <CommentProvider>
+                            <CommentPartNew data={comment.data} cmtChild={comment.cmtChild} songId={id} setTotalCmt={setTotalCmt} />
+                        </CommentProvider>
+                    </div>
+                ))}
                 {comments?.map((comment, index) => (
                     <div key={index}>
                         <CommentProvider>
-                            <CommentPart data={comment} />
+                            <CommentPart data={comment} songId={id} setTotalCmt={setTotalCmt} />
                         </CommentProvider>
                     </div>
                 ))}

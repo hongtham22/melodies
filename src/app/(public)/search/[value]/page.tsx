@@ -1,6 +1,7 @@
 "use client";
 import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from "@/app/AppProvider";
+import { useAppContext as useSongContext } from "@/components/provider/songProvider";
 import { useRouter } from 'next/navigation';
 import NotFound from "@/app/not-found";
 import AlbumList from "@/components/albumList";
@@ -18,6 +19,7 @@ import { DataSong, Artist } from "@/types/interfaces";
 const SearchPage = ({ params }: { params: { value: string } }) => {
   const router = useRouter();
   const { loading, setLoading } = useAppContext();
+  const { setCurrentSong } = useSongContext()
   const [notFound, setNotFound] = useState(false);
   const [topResults, setTopResults] = useState<Artist>()
   const [songTopResults, setSongTopResults] = useState()
@@ -155,6 +157,7 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                         <div
                           key={index}
                           className="flex justify-between items-center cursor-pointer hover:bg-[#2F2F2F] py-2 px-3 rounded-md"
+                          onClick={() => setCurrentSong(song)}
                         >
                           <div className="relative group flex">
                             <Image
@@ -166,8 +169,13 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                               className="object-cover rounded-md"
                             />
                             <div className="ml-3">
-                              <p className="font-bold">{song?.title}</p>
-                              <p className="font-thin text-primaryColorGray text-[0.9rem]">
+                              <p
+                                className="font-bold hover:underline"
+                                onClick={() => router.push(`/song/${song.id}`)}
+                              >{song?.title}</p>
+                              <p
+                                className="font-thin text-primaryColorGray text-[0.9rem]"
+                              >
                                 {song?.artists ? getMainArtistName(song.artists) : ''}
                               </p>
                             </div>

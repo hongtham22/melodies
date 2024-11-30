@@ -42,7 +42,7 @@ const PopularArtists: React.FC<PeopleListProps> = ({
           <div
             key={artist.id || index}
             className="flex flex-col gap-6 justify-center items-center group cursor-pointer"
-            onClick={() => router.push(`artist/${artist.id}`)}
+            onClick={() => router.push(`/artist/${artist.id}`)}
           >
             <div style={{ width: avatarSize, height: avatarSize }}>
               <Image

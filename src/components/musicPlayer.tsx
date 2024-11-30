@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/tooltip"
 import { formatTime, getMainArtistName, getPosterSong } from '@/utils/utils';
 import WaveSurfer from 'wavesurfer.js';
+import { decrypt } from '@/app/decode';
 
 const MusicPlayer: React.FC = () => {
     const {
@@ -71,7 +72,7 @@ const MusicPlayer: React.FC = () => {
 
     useEffect(() => {
         if (currentSong?.filePathAudio) {
-            audioRef.current = new Audio(currentSong.filePathAudio);
+            audioRef.current = new Audio(decrypt(currentSong.filePathAudio));
             const audioElement = audioRef.current;
 
             wavesurferRef.current = WaveSurfer.create({
