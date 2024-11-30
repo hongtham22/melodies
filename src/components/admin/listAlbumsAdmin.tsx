@@ -49,7 +49,8 @@ function ListAlbumsAdmin({
   const [openAlbumId, setOpenAlbumId] = useState<string | null>(null);
 
   const handleRowClick = (albumId: string) => {
-    setOpenAlbumId(albumId); // Cập nhật ID của artist
+    console.log("albumId", albumId);
+    setOpenAlbumId(albumId); 
   };
   const handleHeaderCheckboxChange = () => {
     if (isHeaderChecked) {
@@ -201,7 +202,7 @@ function ListAlbumsAdmin({
                   </div>
                 </td>
                 <td className="text-textMedium text-center pl-2 rounded-tr-lg rounded-br-lg">
-                  <div className="line-clamp-1">{album.albumType}</div>
+                  <div className="line-clamp-1 capitalize">{album.albumType}</div>
                 </td>
               </tr>
             ))}

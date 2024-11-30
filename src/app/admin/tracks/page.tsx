@@ -74,8 +74,9 @@ function Page() {
     subArtistIds: string[];
     audioFile: File;
     releaseDate: string;
+    lyricFile: File;
   }) => {
-    const { title, mainArtistId, subArtistIds, audioFile, releaseDate } =
+    const { title, mainArtistId, subArtistIds, audioFile, releaseDate, lyricFile } =
       trackData;
     const data = {
       title,
@@ -86,6 +87,7 @@ function Page() {
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
     formData.append("audioFile", audioFile);
+    formData.append("lyricFile", lyricFile);
 
     try {
       const response = await fetchApiData(
@@ -180,7 +182,7 @@ function Page() {
           </div>
         </div>
       </div>
-      <ListTracksAdmin data={listTracksData} page={page} onSelectedItemsChange={setSelectedItems}/>
+      <ListTracksAdmin data={listTracksData} page={page} onSelectedItemsChange={setSelectedItems} />
       <PaginationWithLinks page={page} totalPage={totalPage} />
     </div>
   );

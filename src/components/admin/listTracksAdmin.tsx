@@ -5,6 +5,7 @@ import songimg from "@/assets/img/placeholderSong.jpg";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
+import TrackDetailSheet from "@/components/admin/trackDetailSheet";
 
 interface Artist {
   name: string;
@@ -34,10 +35,21 @@ interface Track {
   album: Album[];
 }
 
-function ListTracksAdmin({ data, page, onSelectedItemsChange }: { data: Track[]; page: number;   onSelectedItemsChange: (selectedItems: string[]) => void; }) {
+function ListTracksAdmin({
+  data,
+  page,
+  onSelectedItemsChange,
+  
+}: {
+  data: Track[];
+  page: number;
+  onSelectedItemsChange: (selectedItems: string[]) => void;
+  
+}) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isHeaderChecked, setIsHeaderChecked] = useState(false);
   const itemsPerPage = 10;
+  const [openTrackId, setOpenTrackId] = useState<string | null>(null);
 
   function capitalizeWords(str: string): string {
     return str
@@ -64,24 +76,24 @@ function ListTracksAdmin({ data, page, onSelectedItemsChange }: { data: Track[];
     if (isHeaderChecked) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(
-        data.map((track) => track.id)
-      );
+      setSelectedItems(data.map((track) => track.id));
     }
     setIsHeaderChecked(!isHeaderChecked);
   };
 
   const handleItemCheckboxChange = (id: string) => {
     setSelectedItems((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
   useEffect(() => {
     onSelectedItemsChange(selectedItems);
   }, [selectedItems, onSelectedItemsChange]);
+
+  const handleRowClick = (trackId: string) => {
+    setOpenTrackId(trackId); // Cập nhật ID của artist
+  };
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
@@ -163,6 +175,7 @@ function ListTracksAdmin({ data, page, onSelectedItemsChange }: { data: Track[];
                 <tr
                   key={track.id}
                   className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
+                  onClick={() => handleRowClick(track.id)}
                 >
                   <td className="pl-2 text-h4 rounded-tl-lg rounded-bl-lg text-center">
                     <Checkbox
@@ -242,6 +255,13 @@ function ListTracksAdmin({ data, page, onSelectedItemsChange }: { data: Track[];
               ))}
           </tbody>
         </table>
+
+        {openTrackId && (
+          <TrackDetailSheet
+            trackId={openTrackId}
+            onClose={() => setOpenTrackId(null)}
+          />
+        )}
 
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
