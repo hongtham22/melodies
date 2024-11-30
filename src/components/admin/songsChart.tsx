@@ -11,7 +11,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-// Chart configuration
 const chartConfig = {
   play: {
     label: "Play",

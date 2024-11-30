@@ -56,18 +56,20 @@ const Page = () => {
   const [userGrowthData, setUserGrowthData] = useState([]);
   const [totalPlayAndCmtYearData, setTotalPlayAndCmtYearData] = useState([]);
   const [recentUserData, setRecentUserData] = useState([]);
+  const { accessToken } = useAppContext()
+
 
   useEffect(() => {
     const fetchAdminDashboard = async () => {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/admin/total", "GET", null, null),
-          fetchApiData("/api/admin/recentComment", "GET", null, null, { page: 1 }),
-          fetchApiData("/api/admin/todayBestSong", "GET", null, null),
-          fetchApiData("/api/admin/userGrowth", "GET", null, null),
-          fetchApiData("/api/admin/totalPlayAndCmtYear", "GET", null, null),
-          fetchApiData("/api/admin/recentUser", "GET", null, null, { page: 1 }),
+          fetchApiData("/api/admin/total", "GET",null, accessToken, null),
+          fetchApiData("/api/admin/recentComment", "GET", null, accessToken, { page: 1 }),
+          fetchApiData("/api/admin/todayBestSong", "GET", null, accessToken),
+          fetchApiData("/api/admin/userGrowth", "GET", null, accessToken),
+          fetchApiData("/api/admin/totalPlayAndCmtYear", "GET", null, accessToken),
+          fetchApiData("/api/admin/recentUser", "GET", null, accessToken, { page: 1 }),
         ]);
 
         if (responses[0].success) {

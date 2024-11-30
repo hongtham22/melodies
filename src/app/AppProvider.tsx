@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import { io, Socket } from 'socket.io-client';
 interface AppContextType {
     showPlaylistMenu: boolean,
     setShowPlaylistMenu: (show: boolean) => void
@@ -13,6 +14,7 @@ interface AppContextType {
     setRole: (role: string) => void;
     accessToken: string | null,
     setAccessToken: (token: string) => void
+    socket: Socket | null;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -47,6 +49,8 @@ export const AppProvider: React.FC<{
             return typeof window !== "undefined" ? Cookies.get('accessToken') || "" : initialAccessToken;
         });
 
+        const [socket, setSocket] = useState<Socket | null>(null);
+
         useEffect(() => {
             if (accessToken && role) {
                 Cookies.set('role', role, { expires: 7 }); // Expire in 7 days
@@ -56,6 +60,26 @@ export const AppProvider: React.FC<{
                 Cookies.remove('role');
             }
         }, [accessToken, role]);
+
+        useEffect(() => {
+            if (accessToken) {
+              const newSocket = io("https://1vtglwl3-20099.asse.devtunnels.ms", {
+                auth: { token: accessToken },
+              });
+        
+              newSocket.on("connect", () => {
+                console.log("Socket connected:", newSocket.id);
+              });
+        
+              setSocket(newSocket);
+        
+              // Cleanup on Unmount or Token Change
+              return () => {
+                newSocket.disconnect();
+                setSocket(null);
+              };
+            }
+          }, [accessToken]);
 
         const value = {
             showPlaylistMenu,
@@ -68,6 +92,7 @@ export const AppProvider: React.FC<{
             setRole,
             accessToken,
             setAccessToken,
+            socket,
         };
         return (
             <AppContext.Provider value={value}>

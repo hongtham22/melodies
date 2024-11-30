@@ -7,6 +7,7 @@ import { CommandItem } from "@/components/ui/command";
 import { PlusIcon, CheckIcon } from "@radix-ui/react-icons";
 import { fetchApiData } from "@/app/api/appService";
 import { useToast } from "@/hooks/use-toast"
+import { useAppContext } from "@/app/AppProvider";
 
 interface AddGenreProps {
   onAddGenre: (newGenre: { genreId: string; name: string }) => void;
@@ -16,6 +17,7 @@ const AddGenre: React.FC<AddGenreProps> = ({ onAddGenre }) => {
     const [isAdding, setIsAdding] = useState(false);
     const [genreName, setGenreName] = useState("");
     const { toast } = useToast();
+    const { accessToken } = useAppContext()
   
     const handleAddGenre = async () => {
       if (!genreName.trim()) {
@@ -31,7 +33,8 @@ const AddGenre: React.FC<AddGenreProps> = ({ onAddGenre }) => {
         const response = await fetchApiData(
           "/api/admin/create/genre",
           "POST",
-          JSON.stringify({ name: genreName })
+          JSON.stringify({ name: genreName }),
+          accessToken
         );
   
         if (response.success) {

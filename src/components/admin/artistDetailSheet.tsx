@@ -76,6 +76,8 @@ const ArtistDetailSheet: React.FC<
   const [openGenre, setOpenGenre] = useState(false);
   const { loading, setLoading } = useAppContext();
   const { toast } = useToast();
+  const { accessToken } = useAppContext()
+
 
 
   const fetchGenres = useCallback(async () => {
@@ -84,7 +86,7 @@ const ArtistDetailSheet: React.FC<
         "/api/admin/allGenre",
         "GET",
         null,
-        null
+        accessToken
       );
       if (genresResponse.success) {
         setGenreList(genresResponse.data.genres);
@@ -102,7 +104,7 @@ const ArtistDetailSheet: React.FC<
           `/api/artist/${artistId}`,
           "GET",
           null,
-          null
+          accessToken
         );
         if (!response.success) {
           throw new Error("Failed to fetch artist details.");
@@ -185,7 +187,7 @@ const ArtistDetailSheet: React.FC<
       "PATCH",
       formData,
       null,
-      null
+      accessToken
     );
 
     if (response.success) {

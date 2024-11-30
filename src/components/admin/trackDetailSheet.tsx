@@ -34,6 +34,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { fetchApiData } from "@/app/api/appService";
 import { useArtistContext } from "@/components/provider/artistProvider";
 import { useToast } from "@/hooks/use-toast";
+import { useAppContext } from "@/app/AppProvider";
 
 interface SimplifiedArtist {
   id: string;
@@ -90,6 +91,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
   const [lyric, setLyric] = useState<string>("");
   const [lyricFile, setLyricFile] = useState<File | null>(null);
   const { toast } = useToast();
+  const { accessToken } = useAppContext();
 
   //   const { listArtists } = useArtistContext();
   const { listArtists }: { listArtists: SimplifiedArtist[] } =
@@ -102,12 +104,12 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
           `/api/song/${trackId}`,
           "GET",
           null,
-          null
+          accessToken
         );
         if (!response.success) {
           throw new Error("Failed to fetch track details.");
         }
-        const trackData = response.data.song; 
+        const trackData = response.data.song;
         setTrackDetail(trackData);
         setTrackTitle(trackData.title);
         setAudioSrc(trackData.filePathAudio);
@@ -215,7 +217,8 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
     releaseDate: string;
     lyricFile: File | null;
   }) => {
-    const { title, mainArtist, subArtist, audioFile, releaseDate, lyricFile } = trackData;
+    const { title, mainArtist, subArtist, audioFile, releaseDate, lyricFile } =
+      trackData;
 
     const data = {
       title,
@@ -232,7 +235,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
     if (audioFile) {
       formData.append("audioFile", audioFile);
     }
-  
+
     if (lyricFile) {
       formData.append("lyricFile", lyricFile);
     }
@@ -243,7 +246,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
         "PATCH",
         formData,
         null,
-        null
+        accessToken
       );
 
       if (response.success) {
@@ -280,7 +283,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
   const handleLyricChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const maxSize = 10 * 1024 * 1024; 
+      const maxSize = 10 * 1024 * 1024;
       if (file.size > maxSize) {
         event.target.value = "";
         alert("File size should not exceed 1MB");
@@ -294,7 +297,6 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
       setLyricFile(file);
     }
   };
-
 
   return (
     <Sheet open={!!trackId} onOpenChange={onClose}>
@@ -510,12 +512,11 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
               />
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="audio" className="text-left text-textMedium">
-                Link Lyric
-              </Label>
-
-              {lyric && (
+            {lyric && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="audio" className="text-left text-textMedium">
+                  Link Lyric
+                </Label>
                 <div className="col-span-3 flex justify-center items-center my-2">
                   <button
                     onClick={() =>
@@ -526,21 +527,21 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
                     Open Lyric
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
-        <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="lyric" className="text-left text-textMedium">
-         Edit Lyric
-        </Label>
-        <Input
-          id="lyric"
-          type="file"
-          accept="application/json"
-          onChange={handleLyricChange}
-          className="col-span-3 border-darkBlue"
-        />
-      </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="lyric" className="text-left text-textMedium">
+                Edit Lyric
+              </Label>
+              <Input
+                id="lyric"
+                type="file"
+                accept="application/json"
+                onChange={handleLyricChange}
+                className="col-span-3 border-darkBlue"
+              />
+            </div>
 
             {/* <div className="grid grid-cols-4 items-center gap-4">
               <Label>Plays count</Label>

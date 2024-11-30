@@ -92,7 +92,7 @@ function ListTracksAdmin({
   }, [selectedItems, onSelectedItemsChange]);
 
   const handleRowClick = (trackId: string) => {
-    setOpenTrackId(trackId); // Cập nhật ID của artist
+    setOpenTrackId(trackId); 
   };
 
   return (

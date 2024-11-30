@@ -60,6 +60,8 @@ function Page() {
     if (result.success) {
       setAccessToken(result.data.accessToken);
       setRole(result.data.role);
+
+      
     } else {
       console.error("Login error:", result.error);
       toast({

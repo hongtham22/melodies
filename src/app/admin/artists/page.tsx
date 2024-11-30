@@ -20,11 +20,13 @@ function Page() {
   const [genreList, setGenreList] = useState([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
+  const { accessToken } = useAppContext()
+
  
   const fetchArtists = useCallback(async (page: number) => {
     setLoading(true);
     try {
-      const artistsResponse = await fetchApiData("/api/artist/allArtist", "GET", null, null, {
+      const artistsResponse = await fetchApiData("/api/artist/allArtist", "GET", null, accessToken, {
         page: page,
       });
 
@@ -43,7 +45,7 @@ function Page() {
   const fetchGenres = useCallback(async () => {
     setLoading(true);
     try {
-      const genresResponse = await fetchApiData("/api/admin/allGenre", "GET", null, null);
+      const genresResponse = await fetchApiData("/api/admin/allGenre", "GET", null, accessToken);
 
       if (genresResponse.success) {
         setGenreList(genresResponse.data.genres);
@@ -72,7 +74,7 @@ function Page() {
     formData.append("data", JSON.stringify(data));
     formData.append("avatar", avatar);
     try {
-      const response = await fetchApiData('/api/admin/create/artist', 'POST', formData);
+      const response = await fetchApiData('/api/admin/create/artist', 'POST', formData, accessToken, null);
   
       if (response.success) {
         toast({
@@ -107,7 +109,7 @@ function Page() {
         "/api/admin/delete/artist",
         "PATCH",
         requestBody, 
-        null, 
+        accessToken, 
         null 
       );
   

@@ -20,14 +20,14 @@ function Page() {
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsData, setListArtistsData] = useState([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-
+  const { accessToken } = useAppContext()
 
   const fetchTrackAdmin = useCallback(
     async (page: number) => {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/songs", "GET", null, null, { page: page }),
+          fetchApiData("/api/songs", "GET", null, accessToken, { page: page }),
         ]);
         if (responses[0].success) {
           setListTracksData(responses[0].data.song);
@@ -49,7 +49,7 @@ function Page() {
         "/api/admin/allArtistName",
         "GET",
         null,
-        null
+        accessToken
       );
 
       if (artistsResponse.success) {
@@ -93,7 +93,8 @@ function Page() {
       const response = await fetchApiData(
         '/api/admin/create/song',
         "POST",
-        formData
+        formData,
+        accessToken
       );
 
       if (response.success) {
@@ -130,7 +131,7 @@ function Page() {
         "/api/admin/delete/song",
         "DELETE",
         requestBody, 
-        null, 
+        accessToken, 
         null 
       );
   

@@ -48,6 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAppContext } from "@/app/AppProvider";
 
 interface Album {
   albumId: string;
@@ -94,6 +95,7 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
   const [openListSong, setOpenListSong] = React.useState(false);
   const [typeAlbum, setTypeAlbum] = useState<string>("");
   const { toast } = useToast();
+  const { accessToken } = useAppContext()
 
 
   useEffect(() => {
@@ -103,7 +105,7 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
           `/api/album/${albumId}`,
           "GET",
           null,
-          null
+          accessToken
         );
         if (!response.success) {
           throw new Error("Failed to fetch album details.");
@@ -147,7 +149,7 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
         `/api/artist/song/${artistId}`,
         "GET",
         null,
-        null
+        accessToken
       );
       if (response.success) {
         setListSongOfMainArtist(response.data.songs);
@@ -233,7 +235,7 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
         "PATCH",
         formData,
         null,
-        null
+        accessToken
       );
   
       if (response.success) {

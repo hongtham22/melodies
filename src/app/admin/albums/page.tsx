@@ -21,16 +21,18 @@ function Page() {
   const [listArtistsData, setListArtistsData] = useState([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
+  const { accessToken } = useAppContext()
+
 
   const fetchAlbumsAdmin = useCallback(
     async (currentPage: number) => {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/admin/allAlbum", "GET", null, null, {
+          fetchApiData("/api/admin/allAlbum", "GET", null, accessToken, {
             page: currentPage,
           }),
-          fetchApiData("/api/admin/allArtistName", "GET", null, null),
+          fetchApiData("/api/admin/allArtistName", "GET", null, accessToken),
         ]);
         if (responses[0].success) {
           setListAlbumsAdminData(responses[0].data.data);
@@ -77,7 +79,8 @@ function Page() {
       const response = await fetchApiData(
         "/api/admin/create/album",
         "POST",
-        formData
+        formData,
+        accessToken
       );
 
       if (response.success) {
@@ -113,7 +116,7 @@ function Page() {
         "/api/admin/delete/album",
         "DELETE",
         requestBody, 
-        null, 
+        accessToken, 
         null 
       );
   

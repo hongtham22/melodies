@@ -52,7 +52,7 @@ function ListArtistAdmin({
   }, [selectedItems, onSelectedItemsChange]);
 
   const handleRowClick = (artistId: string) => {
-    setOpenArtistId(artistId); // Cập nhật ID của artist
+    setOpenArtistId(artistId); 
   };
   return (
     <div className="w-[90%] flex flex-col justify-center items-center rounded-md border-primaryColorBg mb-2">
@@ -147,7 +147,7 @@ function ListArtistAdmin({
       {openArtistId && (
         <ArtistDetailSheet
           artistId={openArtistId}
-          onClose={() => setOpenArtistId(null)} // Đóng Sheet khi xong
+          onClose={() => setOpenArtistId(null)} 
         />
       )}
     </div>

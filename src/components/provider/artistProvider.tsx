@@ -1,6 +1,7 @@
 'use client';
 
 import { fetchApiData } from '@/app/api/appService';
+import { useAppContext } from '@/app/AppProvider';
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 interface Artist {
@@ -28,6 +29,7 @@ export const useArtistContext = () => {
 // ArtistProvider
 export const ArtistProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [listArtists, setListArtists] = useState<Artist[]>([]);
+  const { accessToken } = useAppContext();
 
   useEffect(() => {
     // Giả sử bạn fetch dữ liệu từ API
@@ -37,7 +39,7 @@ export const ArtistProvider: React.FC<{ children: ReactNode }> = ({ children }) 
           "/api/admin/allArtistName",
           "GET",
           null,
-          null
+          accessToken
         );
         if(response.success) {
             setListArtists(response.data.artists);
