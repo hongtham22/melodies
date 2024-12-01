@@ -63,14 +63,17 @@ export const AppProvider: React.FC<{
 
         useEffect(() => {
             if (accessToken) {
-              const newSocket = io("https://1vtglwl3-20099.asse.devtunnels.ms", {
-                auth: { token: accessToken },
+              const newSocket = io("http://localhost:20099", {
+                auth: { accessToken: accessToken },
               });
-        
-              newSocket.on("connect", () => {
-                console.log("Socket connected:", newSocket.id);
+
+              newSocket.on("errorToken", ({ code, message }) => {
+                console.log("Error accesstoken code: ", code);
+                console.log("Error accesstoken message: ", message);
+                alert(message);
+                newSocket.disconnect();
               });
-        
+
               setSocket(newSocket);
         
               // Cleanup on Unmount or Token Change
