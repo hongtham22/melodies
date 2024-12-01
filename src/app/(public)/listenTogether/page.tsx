@@ -8,7 +8,10 @@ import { useAppContext } from "@/app/AppProvider";
 import LoadingPage from "@/components/loadingPage";
 import { fetchApiData } from "@/app/api/appService";
 import { DataSong } from "@/types/interfaces";
-
+import { decrypt } from "@/app/decode";
+import Image from "next/image";
+import { getMainArtistName, getPosterSong } from "@/utils/utils";
+import { IoSearch } from "react-icons/io5";
 
 // let socket: Socket | null = null;
 
@@ -22,7 +25,9 @@ function Page() {
   const [permit, setPermit] = useState(true);
 
   const [message, setMessage] = useState<string>("");
-  const [chatMessages, setChatMessages] = useState<{ user: string; message: string }[]>([]);
+  const [chatMessages, setChatMessages] = useState<
+    { user: string; message: string }[]
+  >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
 
@@ -35,20 +40,26 @@ function Page() {
   // const accessToken = "hihi"
   useEffect(() => {
     const handler = setTimeout(async () => {
-        if (searchTerm === "") {
-            setFilteredSongs([]);
-        } else {
-            const results = await fetchApiData(`/api/songs/search`, "GET", null, null, { query: searchTerm, page: 1 });
-            if (results.success) {
-                setFilteredSongs(results.data.songData)
-            }
+      if (searchTerm === "") {
+        setFilteredSongs([]);
+      } else {
+        const results = await fetchApiData(
+          `/api/songs/search`,
+          "GET",
+          null,
+          null,
+          { query: searchTerm, page: 1 }
+        );
+        if (results.success) {
+          setFilteredSongs(results.data.songData);
         }
+      }
     }, 500);
 
     return () => {
-        clearTimeout(handler);
+      clearTimeout(handler);
     };
-}, [searchTerm]);
+  }, [searchTerm]);
 
   useEffect(() => {
     // Khởi tạo socket
@@ -97,7 +108,7 @@ function Page() {
       console.log("Message:", data);
       setChatMessages((prevMessages) => [
         ...prevMessages,
-        { user: data.user.username, message: data.message }, 
+        { user: data.user.username, message: data.message },
       ]);
     });
 
@@ -147,12 +158,18 @@ function Page() {
       accessToken: accessToken,
       message: message,
     });
-   };
+  };
+
+  
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+};
 
   return (
     <div className="w-full my-20 m-6 p-8 flex flex-col gap-4">
-      <div className="flex ">
-        <div className="flex w-1/3 gap-2 items-center justify-start">
+      <div className="flex mb-5 gap-6 items-center">
+        <div className="">
           <button
             onClick={handleCreateRoom}
             className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
@@ -161,7 +178,7 @@ function Page() {
             Create a room
           </button>
         </div>
-        <div className="flex w-1/3 gap-2 items-center justify-start">
+        <div className="flex w-1/4 gap-2 items-center">
           <Input
             className="border-white"
             placeholder="enter room"
@@ -178,53 +195,109 @@ function Page() {
       </div>
 
       <div className="w-full flex justify-between gap-4">
-      <div className="w-1/3 flex flex-col gap-4">
-        <h1 className="text-primaryColorPink">List Music</h1>
-        <div className="w-full">
-          <audio
-            ref={audioRef}
-            controls
-            onPause={permit ? handlePause : undefined}
-            onPlay={permit ? handlePlay : undefined}
-            onTimeUpdate={permit ? handleTimeUpdate : undefined}
-            className={!permit ? "pointer-events-none opacity-50" : ""}
-          >
-            <source
-              src="https://audiomelodies.nyc3.digitaloceanspaces.com/AUDIO/OLD/HoangThuyLinh/VIETNAMESECONCERTTHEALBUM/BanhTroiNuocVietnameseConcertEdition.m4a"
-              type="audio/mpeg"
-            />
-            Your browser does not support the audio element.
-          </audio>
-        </div>
-        <div className="w-full h-[400px] bg-slate-200 text-black flex flex-col gap-4 p-4">
-          <div className="w-full flex gap-4">
-            <Input placeholder="enter message" className="text-black"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            ></Input>
-            <button
-              onClick={handleSentMessage}
-              className="h-[45px] p-2 text-textMedium bg-primaryColorPink rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+        <div className="w-1/3 flex flex-col gap-4">
+          <h1 className="text-primaryColorPink">List Music</h1>
+          <div className="w-full">
+            <audio
+              ref={audioRef}
+              controls
+              onPause={permit ? handlePause : undefined}
+              onPlay={permit ? handlePlay : undefined}
+              onTimeUpdate={permit ? handleTimeUpdate : undefined}
+              className={!permit ? "pointer-events-none opacity-50" : ""}
             >
-              Sent
-            </button>
-
+              <source
+                // src="https://audiomelodies.nyc3.digitaloceanspaces.com/AUDIO/OLD/HoangThuyLinh/VIETNAMESECONCERTTHEALBUM/BanhTroiNuocVietnameseConcertEdition.m4a"
+                src={decrypt(
+                  "U2FsdGVkX1/SJM4yu3157rno3f0JC1AY1vLJhSn4tNlnszs7Bqn4vhiNmZCi4Th79Rsa1Wa2RDqkcGru94ff1DZjvWXG8Vdr8TBRTBduMkUD1AAmjI9fCl3B2pzPsd/0jMpNItmuu4dn3qSCss33pDZrt4UQ6M5BGVOSbP28s8MpL9L69b4Y8mt4sj3xLYIe"
+                )}
+                type="audio/mpeg"
+              />
+              Your browser does not support the audio element.
+            </audio>
           </div>
-          
-          <div className="w-full border border-primaryColorBlue">
-            {chatMessages.map((msg, index) => (
-              <div key={index}>
-                <p>{msg.user}</p>
-                <h3>{msg.message}</h3>
-              </div>
-            ))}
+          <div className="w-full h-[400px] bg-slate-200 text-black flex flex-col gap-4 p-4">
+            <div className="w-full flex gap-4">
+              <Input
+                placeholder="enter message"
+                className="text-black"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              ></Input>
+              <button
+                onClick={handleSentMessage}
+                className="h-[45px] p-2 text-textMedium bg-primaryColorPink rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+              >
+                Sent
+              </button>
+            </div>
+
+            <div className="w-full border border-primaryColorBlue">
+              {chatMessages.map((msg, index) => (
+                <div key={index}>
+                  <p>{msg.user}</p>
+                  <h3>{msg.message}</h3>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-
-      </div>
-      <div className="w-1/3 h-[800px] bg-gray-200">
-
-      </div>
+        <div className="w-1/4 h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
+          <div>
+            <p className="font-bold text-ml mb-3">
+              Let&apos;s find content for your playlist
+            </p>
+            <div className="flex items-center bg-[#2C2C2C] w-[35%] p-2 gap-2 rounded-md">
+              <IoSearch className="text-[1.2rem]" />
+              <input
+                type="text"
+                placeholder="Find songs"
+                className="focus:outline-none placeholder:text-[0.9rem] placeholder:text-primaryColorGray text-primaryColorGray text-[0.9rem] bg-transparent w-full"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
+          </div>
+          <table className="max-w-full text-white border-separate border-spacing-y-3 ">
+            <thead className="w-full max-h-[32px]">
+              <tr>
+                <th className="w-[75%] pl-4"></th>
+                <th className="w-[25%] pl-4"></th>
+              </tr>
+            </thead>
+            <tbody className="mt-4">
+              {filteredSongs.length > 0 &&
+                filteredSongs.map((song, index) => (
+                  <tr key={index}>
+                    <td className="relative group flex pr-2">
+                      <Image
+                        src={getPosterSong(song.album).image}
+                        alt="Song Poster"
+                        width={48}
+                        height={48}
+                        quality={100}
+                        className="object-cover rounded-md w-10 h-10"
+                      />
+                      <div className="ml-3">
+                        <p className="font-bold text-white">{song.title}</p>
+                        <p className="font-thin text-primaryColorGray text-[0.9rem]">
+                          {getMainArtistName(song.artists)}
+                        </p>
+                      </div>
+                    </td>
+                    <td>
+                      <button
+                        className="px-4 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-black hover:bg-white transition-all duration-300"
+                        // onClick={() => handleAddSong(song.id)}
+                      >
+                        Add
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

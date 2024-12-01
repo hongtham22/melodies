@@ -64,8 +64,14 @@ export const AppProvider: React.FC<{
         useEffect(() => {
             if (accessToken) {
               const newSocket = io("https://1vtglwl3-20099.asse.devtunnels.ms", {
-                auth: { token: accessToken },
+                auth: { accessToken: accessToken },
               });
+
+            //   const socket = io('http://your-socket-server.com', {
+            //     auth: {
+            //         accessToken: yourAccessToken, // Gửi accessToken
+            //     },
+            // });
         
               newSocket.on("connect", () => {
                 console.log("Socket connected:", newSocket.id);
