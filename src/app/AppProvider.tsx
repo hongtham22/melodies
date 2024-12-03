@@ -73,9 +73,20 @@ export const AppProvider: React.FC<{
             //     },
             // });
         
-              newSocket.on("connect", () => {
-                console.log("Socket connected:", newSocket.id);
+            //   newSocket.on("connect", () => {
+            //     console.log("Socket connected:", newSocket.id);
+            //   });
+            newSocket.on("errorToken", ({ code, message }) => {
+                console.log("Error accesstoken code: ", code);
+                console.log("Error accesstoken message: ", message);
+                alert(message);
+                newSocket.disconnect();
               });
+              
+
+              newSocket.on('paymentStatus', (data) =>{
+                console.log("payment", data);
+              })
         
               setSocket(newSocket);
         
