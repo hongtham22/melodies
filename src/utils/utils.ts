@@ -14,6 +14,11 @@ export const getMainArtistId = (artists: Artist[]): string | undefined => {
     return mainArtist?.id;
 };
 
+export const getSubArtists = (artists: Artist[]): string[] => {
+    const subArtists = artists.filter(artist => artist?.ArtistSong.main !== true);
+    return subArtists.map(artist => artist.name).filter(Boolean);
+};
+
 export const getPosterSong = (albums: Array<DataAlbum>, albumType?: string) => {
     if (albums?.length) {
         const filteredAlbums = albumType

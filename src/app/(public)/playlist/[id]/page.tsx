@@ -75,42 +75,6 @@ const Page = ({ params }: { params: { id: string } }) => {
     }, [params.id]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true)
-            const result = await fetchApiData(`/api/user/playlist/detail/${params.id}`, "GET", null, accessToken);
-            if (result.success) {
-                setPlaylist(result.data.playlist)
-                const imageUrl = result.data.playlist.image;
-                if (imageUrl) {
-                    try {
-                        const response = await fetch(
-                            `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl as string)}`
-                        );
-                        console.log("API response:", response);
-                        const data = await response.json();
-                        if (response.ok) {
-                            console.log("Dominant color:", data.dominantColor);
-                            setDominantColor(data.dominantColor);
-                        } else {
-                            console.error("Error fetching dominant color:", data.error);
-                        }
-                    } catch (error) {
-                        console.error("Error fetching dominant color:", error);
-                    }
-                } else {
-                    setDominantColor('#595959');
-                }
-
-            } else {
-                console.error("Login error:", result.error);
-                // setNotFound(true)
-            }
-            setLoading(false);
-        };
-        fetchData();
-    }, [params.id]);
-
-    useEffect(() => {
         const handler = setTimeout(async () => {
             if (searchTerm === "") {
                 setFilteredSongs([]);

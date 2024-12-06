@@ -58,7 +58,7 @@ const PlaylistMenu = () => {
         );
         if (result.success && result.data?.newPlaylist) {
             setListPlayer(prevList => [result.data?.newPlaylist, ...(prevList || [])])
-            router.push(`/playlist/${result.data.newPlaylist.id}`)
+            router.push(`/playlist/${result.data.newPlaylist.playlistId}`)
         } else {
 
         }

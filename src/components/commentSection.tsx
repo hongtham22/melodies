@@ -26,7 +26,7 @@ interface CommentSectionProps {
 
 const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
     const { accessToken } = useAppContext()
-    const [avatar] = useState(localStorage.getItem('avatar') || UserImage)
+    const [avatar] = useState(typeof window !== 'undefined' ? localStorage.getItem('avatar') || UserImage : UserImage)
     const sorts = ['Newest', 'Oldest']
     const [valueSort, setValueSort] = useState('Newest')
     const [isClickSort, setIsClickSort] = useState(false)

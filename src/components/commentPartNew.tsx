@@ -24,7 +24,7 @@ interface CommentPartProps {
 }
 
 const CommentPartNew: React.FC<CommentPartProps> = ({ data, songId, cmtChild, setTotalCmt }) => {
-    const [avatar] = useState(localStorage.getItem('avatar') || UserImage)
+    const [avatar] = useState(typeof window !== 'undefined' ? localStorage.getItem('avatar') || UserImage : UserImage)
     const { accessToken } = useAppContext()
     const { replyStatus, setReplyStatus } = useCommentContext()
     const [showCmtChild, setShowCmtChild] = useState<boolean>(false)

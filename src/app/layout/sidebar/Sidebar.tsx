@@ -12,6 +12,7 @@ import {
   HeartIcon,
   ListBulletIcon,
 } from "@radix-ui/react-icons";
+import { CgProfile } from "react-icons/cg";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -241,6 +242,17 @@ const Sidebar = () => {
       </div>
       <div id="general-section" className="mb-5">
         <p className="text-primaryColorPink/60 text-[0.8rem]">General</p>
+        <div
+          className={`flex my-2 cursor-pointer ${getMenuClass(
+            "Profile"
+          )} py-2 items-center `}
+          onClick={() => handleMenuClick("Profile")}
+        >
+          <CgProfile className="w-[24px] h-[24px] mr-3" />
+          <Link href="/profile">Profile</Link>
+
+          {/* <p>Setting</p> */}
+        </div>
         <div
           className={`flex my-2 cursor-pointer ${getMenuClass(
             "Setting"
