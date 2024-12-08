@@ -12,7 +12,7 @@ import AlbumList from "@/components/albumList";
 import LoadingPage from "@/components/loadingPage";
 import NotFound from "@/app/not-found";
 import { DataAlbum } from "@/types/interfaces";
-import { formatTime, getMainArtistName, getPoster } from "@/utils/utils";
+import { formatTime, getMainArtistInfo, getPoster } from "@/utils/utils";
 import { useScrollArea } from "@/components/provider/scrollProvider";
 
 const Page = ({ params }: { params: { id: string } }) => {
@@ -189,7 +189,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                       {song.title}
                     </h3>
                     <p className="text-textSmall hover:underline">
-                      {getMainArtistName(song.artists)}
+                      {getMainArtistInfo(song.artists)?.name}
                     </p>
                   </td>
                   <td className="text-center pl-4 rounded-tr-lg rounded-br-lg align-middle">

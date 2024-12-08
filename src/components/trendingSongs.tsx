@@ -4,9 +4,10 @@ import { HeartIcon } from "@radix-ui/react-icons";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
-import { formatTime, getMainArtistName, getPosterSong } from "@/utils/utils";
+import { formatTime, getAllArtistsInfo, getPosterSong } from "@/utils/utils";
 import { DataSong } from "@/types/interfaces";
 import { useAppContext } from "@/components/provider/songProvider";
+import { useRouter } from "next/navigation";
 
 interface SongListProps {
   maintitle?: string;
@@ -17,6 +18,7 @@ interface SongListProps {
 const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { setCurrentSong, setWaitingList } = useAppContext();
+  const router = useRouter()
 
   const options = { year: 'numeric' as 'numeric' | '2-digit', month: 'short' as 'numeric' | '2-digit', day: 'numeric' as 'numeric' | '2-digit' };
 
@@ -39,7 +41,6 @@ const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) =
           </thead>
           <tbody className="">
             {data?.slice(0, 10)?.map((song, index) => {
-              const nameArtist = getMainArtistName(song.artists);
               const poster = getPosterSong(song.album).image;
               const nameAlbum = getPosterSong(song.album).title;
               return (
@@ -69,16 +70,27 @@ const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) =
                     <h3 className="text-h4 mb-1 line-clamp-2 hover:underline">
                       {song.title}
                     </h3>
-                    <p className="text-textSmall line-clamp-1 hover:underline">
-                      {nameArtist}
-                    </p>
+                    <div className="flex flex-wrap text-[0.9rem]">
+                      {song?.artists ? (
+                        getAllArtistsInfo(song.artists).map((artist, index, array) => (
+                          <span key={artist.id} className="flex items-center">
+                            <span
+                              className="cursor-pointer hover:underline"
+                              onClick={() => router.push(`/artist/${artist.id}`)}
+                            >
+                              {artist.name}
+                            </span>
+                            {index < array.length - 1 && <span>,&nbsp;</span>}
+                          </span>
+                        ))
+                      ) : (
+                        <p>Unknown Artist</p>
+                      )}
+                    </div>
                   </td>
                   <td className="text-textMedium pl-4 text-center">
                     {new Date(song?.releaseDate).toLocaleDateString('en-US', options)}
                   </td>
-                  {/* <td className="text-textMedium pl-4 line-clamp-2 text-center align-middle">
-                    {nameAlbum}
-                  </td> */}
                   <td className="text-textMedium pl-4 line-clamp-2 text-center align-middle table-cell">
                     {nameAlbum}
                   </td>

@@ -1,5 +1,5 @@
 .marquee {
-    display: inline-block;
+    display: flex;
     animation: marquee 8s linear infinite;
     text-wrap: nowrap;
 }

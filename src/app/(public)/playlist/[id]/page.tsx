@@ -10,7 +10,7 @@ import Image from "next/image";
 import { fetchApiData } from "@/app/api/appService";
 import LoadingPage from "@/components/loadingPage";
 import { DataPlaylist, DataSong } from "@/types/interfaces";
-import { formatTime, getMainArtistName, getPosterSong } from "@/utils/utils";
+import { formatTime, getMainArtistInfo, getPosterSong } from "@/utils/utils";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { MdEdit, MdDelete } from "react-icons/md";
 import UpdatePlaylist from "@/components/popup/updatePlaylist";
@@ -186,7 +186,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             {song.title}
                                         </h3>
                                         <p className="text-textSmall hover:underline">
-                                            {getMainArtistName(song.artists)}
+                                            {getMainArtistInfo(song.artists)?.name}
                                         </p>
                                     </td>
                                     <td className="pl-4">
@@ -244,7 +244,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             <div className="ml-3">
                                                 <p className="font-bold text-white">{song.title}</p>
                                                 <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                                                    {getMainArtistName(song.artists)}
+                                                    {getMainArtistInfo(song.artists)?.name}
                                                 </p>
                                             </div>
                                         </td>

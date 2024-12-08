@@ -6,7 +6,7 @@ import { useAppContext } from "@/components/provider/songProvider";
 import { useRouter } from 'next/navigation';
 import PropTypes from "prop-types";
 import { DataSong } from "@/types/interfaces";
-import { getMainArtistId, getMainArtistName, getPosterSong } from "@/utils/utils";
+import { getAllArtistsInfo, getPosterSong } from "@/utils/utils";
 
 interface SongListProps {
   maintitle?: string;
@@ -31,7 +31,6 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
       >
         {(showSidebarRight ? data?.slice(0, 4) : data?.slice(0, 5))?.map(
           (song, index) => {
-            const nameArtist = getMainArtistName(song.artists);
             const poster = getPosterSong(song.album).image;
             return (
               <div
@@ -59,12 +58,24 @@ const SongList: React.FC<SongListProps> = ({ maintitle, subtitle, data }) => {
                   >
                     {song.title}
                   </p>
-                  <p
-                    className="text-[0.8rem] font-thin mb-1 line-clamp-1 cursor-pointer hover:underline"
-                    onClick={() => router.push(`/artist/${getMainArtistId(song.artists)}`)}
-                  >
-                    {nameArtist}
-                  </p>
+                  <div className="flex flex-wrap text-[0.9rem]">
+                    {song?.artists ? (
+                      getAllArtistsInfo(song.artists).map((artist, index, array) => (
+                        <span key={artist.id} className="flex items-center">
+                          <span
+                            className="cursor-pointer hover:underline"
+                            onClick={() => router.push(`/artist/${artist.id}`)}
+                          >
+                            {artist.name}
+                          </span>
+                          {index < array.length - 1 && <span>,&nbsp;</span>}
+                        </span>
+                      ))
+                    ) : (
+                      <p>Unknown Artist</p>
+                    )}
+                  </div>
+
                 </div>
               </div>
             );

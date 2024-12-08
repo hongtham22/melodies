@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation';
 import { useAppContext as useSongContext } from '@/components/provider/songProvider';
 import Image from 'next/image';
 import './scss/musicPlayer.scss'
@@ -39,11 +40,11 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { formatTime, getMainArtistName, getPosterSong } from '@/utils/utils';
+import { formatTime, getAllArtistsInfo, getPosterSong } from '@/utils/utils';
 import WaveSurfer from 'wavesurfer.js';
 import { decrypt } from '@/app/decode';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { fetchApiData } from '@/app/api/appService';
 import { useAppContext } from '@/app/AppProvider';
@@ -53,6 +54,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const MusicPlayer: React.FC = () => {
     const { accessToken } = useAppContext()
+    const router = useRouter()
     const {
         currentSong,
         showContentSong,
@@ -326,7 +328,28 @@ const MusicPlayer: React.FC = () => {
                                 {currentSong.title}
                             </p>
                         </div>
-                        <p className='text-[0.8rem] text-primaryColorGray font-thin cursor-pointer hover:underline hover:text-white'>{getMainArtistName(currentSong.artists)}</p>
+                        <div className="relative max-w-full overflow-hidden">
+                            <div
+                                className={`flex whitespace-nowrap items-center text-[0.8rem] text-primaryColorGray font-thin ${getAllArtistsInfo(currentSong.artists).length > 3 ? 'marquee' : ''
+                                    }`}
+                            >
+                                {currentSong?.artists ? (
+                                    getAllArtistsInfo(currentSong.artists).map((artist, index, array) => (
+                                        <span key={artist.id} className="flex items-center">
+                                            <span
+                                                className="cursor-pointer hover:underline"
+                                                onClick={() => router.push(`/artist/${artist.id}`)}
+                                            >
+                                                {artist.name}
+                                            </span>
+                                            {index < array.length - 1 && <span>,&nbsp;</span>}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <p>Unknown Artist</p>
+                                )}
+                            </div>
+                        </div>
                     </div>
                     <div
                         className='relative ml-5 cursor-pointer text-primaryColorGray transition-transform duration-200 hover:scale-105 hover:text-white'

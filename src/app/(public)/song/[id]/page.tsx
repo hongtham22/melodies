@@ -14,7 +14,7 @@ import AvatarArtist from "@/components/avatarArtist";
 import SongList from "@/components/listSong";
 import PopularArtists from "@/components/popularArtists";
 import { DataSong } from "@/types/interfaces";
-import { getMainArtistId, getMainArtistName, getPosterSong } from "@/utils/utils";
+import { getAllArtistsInfo, getMainArtistInfo, getPosterSong } from "@/utils/utils";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter()
@@ -31,22 +31,33 @@ const Page = ({ params }: { params: { id: string } }) => {
             if (result.success) {
                 setDataSong(result.data.song)
                 const imageUrl = typeof getPosterSong(result.data.song.album).image === 'string' ? getPosterSong(result.data.song.album).image : ''
-                setMainArtist(getMainArtistName(result.data.song.artists))
+                setMainArtist(getMainArtistInfo(result.data.song.artists)?.name)
                 try {
                     const responses = await Promise.all([
-                        fetch(`/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl as string)}`),
-                        fetchApiData(`/api/songs/otherByArtist/${result.data.song.artists ? getMainArtistId(result.data.song.artists) : ''}`, "GET", null, null, { page: 1 }),
+                        fetchApiData(`/api/songs/otherByArtist/${result.data.song.artists ? getMainArtistInfo(result.data.song.artists)?.id : ''}`, "GET", null, null, { page: 1 }),
                     ]);
-                    const data = await responses[0].json();
-                    if (responses[0].ok) {
-                        console.log("Dominant color:", data.dominantColor);
-                        setDominantColor(data.dominantColor);
-                    } else {
-                        console.error("Error fetching dominant color:", data.error);
-                    }
-                    if (responses[1].success) setAnotherSong(responses[1].data.songs);
+                    if (responses[0].success) setAnotherSong(responses[0].data.songs);
                 } catch (error) {
                     console.error("Error fetching dominant color:", error);
+                }
+                if (imageUrl) {
+                    try {
+                        const response = await fetch(
+                            `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl as string)}`
+                        );
+                        console.log("API response:", response);
+                        const data = await response.json();
+                        if (response.ok) {
+                            console.log("Dominant color:", data.dominantColor);
+                            setDominantColor(data.dominantColor);
+                        } else {
+                            console.error("Error fetching dominant color:", data.error);
+                        }
+                    } catch (error) {
+                        console.error("Error fetching dominant color:", error);
+                    }
+                } else {
+                    setDominantColor('#595959');
                 }
             } else {
                 console.error("Login error:", result.error);
@@ -101,10 +112,24 @@ const Page = ({ params }: { params: { id: string } }) => {
                             <h3>Song</h3>
                             <h1 className="mt-2 text-5xl font-bold">{dataSong?.title}</h1>
                             <div className="mt-3 flex items-center space-x-2 text-h4 font-semibold">
-                                <p
-                                    className="cursor-pointer hover:underline"
-                                    onClick={() => dataSong?.artists && router.push(`/artist/${getMainArtistId(dataSong.artists)}`)}
-                                >{dataSong?.artists ? getMainArtistName(dataSong.artists) : "Unknown Artist"}</p>
+                                <div className="flex">
+                                    {dataSong?.artists ? (
+                                        getAllArtistsInfo(dataSong.artists).map((artist, index, array) => (
+                                            <span key={artist.id} className="flex items-center">
+                                                <span
+                                                    className="cursor-pointer hover:underline"
+                                                    onClick={() => router.push(`/artist/${artist.id}`)}
+                                                >
+                                                    {artist.name}
+                                                </span>
+                                                {index < array.length - 1 && <span>,&nbsp;</span>}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <p>Unknown Artist</p>
+                                    )}
+                                </div>
+
                                 <span className="text-gray-300">•</span>
                                 <p className="">{dataSong?.album ? getPosterSong(dataSong.album).title : "Unknown Album"}</p>
                                 <span className="text-gray-300">•</span>
@@ -127,7 +152,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     </div>
                 </div>
                 <div className="flex pl-5 pr-16 gap-16">
-                    <AvatarArtist id={dataSong?.artists ? getMainArtistId(dataSong.artists) : undefined} />
+                    <AvatarArtist id={dataSong?.artists ? getMainArtistInfo(dataSong.artists)?.id : undefined} />
                     <CommentSection id={params?.id} />
                 </div>
                 <div className="mx-5 mt-8">

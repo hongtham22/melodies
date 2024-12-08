@@ -8,7 +8,7 @@ import React from "react";
 import "@/components/scss/waitingList.scss";
 
 import { IoIosClose } from "react-icons/io";
-import { getMainArtistName, getPosterSong } from "@/utils/utils";
+import { getMainArtistInfo, getPosterSong } from "@/utils/utils";
 
 const WaitingList: React.FC = () => {
   const { showWaitingList, setShowWaitingList, setShowSidebarRight, currentSong, waitingList, setCurrentSong } = useAppContext();
@@ -56,7 +56,7 @@ const WaitingList: React.FC = () => {
               <div className="ml-3">
                 <p className="font-bold text-primaryColorPink line-clamp-1" title={currentSong?.title}>{currentSong?.title}</p>
                 <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                  {currentSong?.artists ? getMainArtistName(currentSong.artists) : ''}
+                  {currentSong?.artists ? getMainArtistInfo(currentSong.artists)?.name : ''}
                 </p>
               </div>
             </div>
@@ -84,7 +84,7 @@ const WaitingList: React.FC = () => {
                   <div className="ml-3 w-[60%]">
                     <p className={`font-bold line-clamp-1 text-[0.95rem] ${isCurrentPlaying ? "text-primaryColorPink" : ""}`}>{song.title}</p>
                     <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                      {getMainArtistName(song.artists)}
+                      {getMainArtistInfo(song.artists)?.name}
                     </p>
                   </div>
                   {

@@ -13,7 +13,7 @@ import SongImage from '@/assets/img/placeholderSong.jpg'
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaCirclePlay } from "react-icons/fa6";
-import { getMainArtistName, getPosterSong } from '@/utils/utils'
+import { getAllArtistsInfo, getMainArtistInfo, getPosterSong } from '@/utils/utils'
 import { DataSong, Artist } from "@/types/interfaces";
 
 const SearchPage = ({ params }: { params: { value: string } }) => {
@@ -119,7 +119,7 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                       <div className="flex items-center gap-2 text-[0.95rem]">
                         <p className="text-primaryColorGray">Bài hát</p>
                         <div className="h-[6px] w-[6px] bg-primaryColorGray rounded-full"></div>
-                        <p>{song?.artists ? getMainArtistName(song.artists) : ''}</p>
+                        <p>{song?.artists ? getMainArtistInfo(song.artists)?.name : ''}</p>
                       </div>
                       <div className="absolute right-3 bottom-7 opacity-0 group-hover:text-primaryColorPink group-hover:opacity-100">
                         <FaCirclePlay className="mx-3 w-[45px] h-[45px]" />
@@ -173,11 +173,23 @@ const SearchPage = ({ params }: { params: { value: string } }) => {
                                 className="font-bold hover:underline"
                                 onClick={() => router.push(`/song/${song.id}`)}
                               >{song?.title}</p>
-                              <p
-                                className="font-thin text-primaryColorGray text-[0.9rem]"
-                              >
-                                {song?.artists ? getMainArtistName(song.artists) : ''}
-                              </p>
+                              <div className="flex flex-wrap text-[0.9rem]">
+                                {song?.artists ? (
+                                  getAllArtistsInfo(song.artists).map((artist, index, array) => (
+                                    <span key={artist.id} className="flex items-center">
+                                      <span
+                                        className="cursor-pointer hover:underline"
+                                        onClick={() => router.push(`/artist/${artist.id}`)}
+                                      >
+                                        {artist.name}
+                                      </span>
+                                      {index < array.length - 1 && <span>,&nbsp;</span>}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <p>Unknown Artist</p>
+                                )}
+                              </div>
                             </div>
                           </div>
                           <div>

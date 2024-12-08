@@ -78,10 +78,9 @@ function SongPlayedBanner({ id }: { id: string }) {
               )}`
             ),
             fetchApiData(
-              `/api/songs/otherByArtist/${
-                result.data.song.artists
-                  ? getMainArtistId(result.data.song.artists)
-                  : ""
+              `/api/songs/otherByArtist/${result.data.song.artists
+                ? getMainArtistId(result.data.song.artists)
+                : ""
               }`,
               "GET",
               null,
@@ -110,23 +109,23 @@ function SongPlayedBanner({ id }: { id: string }) {
     fetchData();
   }, [id]);
 
-useEffect(() => {
+  useEffect(() => {
     if (audioRef.current) {
       const audioElement = audioRef.current;
-  
+
       const updateDuration = () => {
         console.log("Audio duration:", audioElement.duration);
         setEndTime(audioElement.duration || 0);
       };
-  
+
       audioElement.addEventListener("loadedmetadata", updateDuration);
-  
+
       return () => {
         audioElement.removeEventListener("loadedmetadata", updateDuration);
       };
     }
   }, []);
-  
+
 
   useEffect(() => {
     if (audioRef.current) {
@@ -295,7 +294,7 @@ useEffect(() => {
                   <div className="flex items-center space-x-2 text-textMedium ">
                     <p
                       className="cursor-pointer hover:underline"
-                      // onClick={() => dataSong?.artists && router.push(`/artist/${getMainArtistId(dataSong.artists)}`)}
+                    // onClick={() => dataSong?.artists && router.push(`/artist/${getMainArtistId(dataSong.artists)}`)}
                     >
                       {dataSong?.artists
                         ? getMainArtistName(dataSong.artists)
@@ -346,9 +345,8 @@ useEffect(() => {
                     <Tooltip>
                       <TooltipTrigger className="relative">
                         <FaRepeat
-                          className={`mx-3 w-[20px] h-[20px] hover:text-primaryColorPink ${
-                            isRepeat ? "text-primaryColorPink" : "text-white"
-                          }`}
+                          className={`mx-3 w-[20px] h-[20px] hover:text-primaryColorPink ${isRepeat ? "text-primaryColorPink" : "text-white"
+                            }`}
                           onClick={handleRepeat}
                         />
                         {isRepeat && (
