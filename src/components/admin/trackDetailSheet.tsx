@@ -149,7 +149,6 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
   }, [trackId]);
 
   console.log("releaseDate", releaseDate);
-  // Hàm xử lý khi chọn Main Artist
   const handleMainArtistSelect = (artist: SimplifiedArtist) => {
     setMainArtist(artist.id);
     setOpenMainArtist(false);
@@ -158,10 +157,8 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
   const handleSubArtistSelect = (artist: SimplifiedArtist) => {
     setSubArtists((prev) => {
       if (prev.includes(artist.id)) {
-        // Nếu nghệ sĩ đã được chọn, bỏ chọn
         return prev.filter((id) => id !== artist.id);
       } else {
-        // Nếu chưa được chọn, thêm vào danh sách
         return [...prev, artist.id];
       }
     });
@@ -181,7 +178,8 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
     .map((id) => listArtists.find((artist) => artist.id === id))
     .filter(Boolean);
   const remainingArtists = listArtists.filter(
-    (artist) => !subArtists.includes(artist.id)
+    (artist) => !subArtists.includes(artist.id) && artist.id !== mainArtist
+    // (artist) => !subArtists.includes(artist.id)
   );
 
   const displayArtists = [...orderedSubArtists, ...remainingArtists];
@@ -245,8 +243,8 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
         `/api/admin/update/song/${trackId}`,
         "PATCH",
         formData,
+        accessToken,
         null,
-        accessToken
       );
 
       if (response.success) {
@@ -433,7 +431,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
                     {subArtists.length > 0
                       ? orderedSubArtists
                           .map((artist) => artist?.name)
-                          .join(", ") // Kiểm tra artist có tồn tại
+                          .join(", ") 
                       : "This track has no sub artists"}
                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>

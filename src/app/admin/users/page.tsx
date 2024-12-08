@@ -27,14 +27,16 @@ function Page() {
     totalUserPremium: 0,
     totalUserFree: 0,
   });
+  const { accessToken } = useAppContext()
+
 
   useEffect(() => {
     const fetchUserAdmin = async () => {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/admin/allUser", "GET", null, null, { page: page }),
-          fetchApiData("/api/admin/userGrowth", "GET", null, null),
+          fetchApiData("/api/admin/allUser", "GET", null, accessToken, { page: page }),
+          fetchApiData("/api/admin/userGrowth", "GET", null, accessToken),
         ]);
         if (responses[0].success) {
           setListUsersData(responses[0].data.users);

@@ -186,8 +186,8 @@ const ArtistDetailSheet: React.FC<
       `/api/admin/update/artist/${artistId}`,
       "PATCH",
       formData,
+      accessToken,
       null,
-      accessToken
     );
 
     if (response.success) {

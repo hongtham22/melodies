@@ -10,6 +10,7 @@ import { useSearchParams } from "next/navigation";
 import LoadingPage from "@/components/loadingPage";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/hooks/use-toast"
+import Genre from "@/components/genre";
 
 function Page() {
   const { loading, setLoading } = useAppContext();
@@ -107,7 +108,7 @@ function Page() {
   
       const response = await fetchApiData(
         "/api/admin/delete/artist",
-        "PATCH",
+        "DELETE",
         requestBody, 
         accessToken, 
         null 
@@ -161,6 +162,7 @@ function Page() {
             />
           </div>
           <div className="flex gap-4">
+            <Genre />
             <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
             onClick={handleDeleteArtist}>
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
