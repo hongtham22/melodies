@@ -6,7 +6,7 @@ import posterImg from "@/assets/img/placeholderSong.jpg";
 import { fetchApiData } from "@/app/api/appService";
 import { DataSong } from "@/types/interfaces";
 import { getMainArtistId } from "@/utils/utils";
-import "./scss/musicPlayer.scss";
+import "@/components/scss/musicPlayer.scss";
 
 import {
   FaCirclePlay,
@@ -56,74 +56,9 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
   const [currentSongId, setCurrentSongId] = useState(id);
 
   const currentIndex = playlist.findIndex((songId) => songId === currentSongId);
-  // useEffect(() => {
-  //   console.log("currentSongId:", currentSongId);
-  //   console.log("playlist:", playlist);
-  //   const fetchData = async () => {
-  //     setLoading(true);
-  //     const result = await fetchApiData(
-  //       `/api/song/${id}`,
-  //       "GET",
-  //       null,
-  //       accessToken
-  //     );
-  //     if (result.success) {
-  //       setDataSong(result.data.song);
-  //       const imageUrl =
-  //         typeof getPosterSong(result.data.song.album).image === "string"
-  //           ? getPosterSong(result.data.song.album).image
-  //           : "";
-  //       try {
-  //         const responses = await Promise.all([
-  //           fetch(
-  //             `/api/get-dominant-color?imageUrl=${encodeURIComponent(
-  //               imageUrl as string
-  //             )}`
-  //           ),
-  //         ]);
-  //         const data = await responses[0].json();
-  //         if (responses[0].ok) {
-  //           console.log("Dominant color:", data.dominantColor);
-  //           setDominantColor(data.dominantColor);
-  //         } else {
-  //           console.error("Error fetching dominant color:", data.error);
-  //         }
-  //       } catch (error) {
-  //         console.error("Error fetching dominant color:", error);
-  //       }
-  //     } else {
-  //       console.error("Login error:", result.error);
-  //       setNotFound(true);
-  //     }
-  //     setLoading(false);
-  //   };
-
-  //   fetchData();
-  // }, [accessToken, id, setLoading]);
-
-
-   // useEffect(() => {
-  //   if (dataSong) {
-  //     const audioUrl = dataSong.filePathAudio
-  //       ? decrypt(dataSong.filePathAudio)
-  //       : "https://audiomelodies.nyc3.cdn.digitaloceanspaces.com/PBL6/AUDIO/OLD/Chillies/VaTheLaHet/VaTheLaHet.m4a";
-  
-  //     console.log("audioRef.current.src", audioUrl);
-  
-  //     if (audioRef.current) {
-  //       if (audioRef.current.src !== audioUrl) {
-  //         audioRef.current.src = audioUrl;
-  //         audioRef.current.currentTime = 0; 
-  //       }
-  //     } else {
-  //       audioRef.current = new Audio(audioUrl);
-  //     }
-  //   }
-  // }, [dataSong, currentSongId]); 
-
 
   useEffect(() => {
-    setCurrentSongId(id); // Mỗi khi `id` thay đổi từ props
+    setCurrentSongId(id); 
   }, [id]);
 
 

@@ -3,7 +3,6 @@
 import { Input } from "@/components/ui/input";
 import { PaperPlaneIcon, Cross2Icon } from "@radix-ui/react-icons";
 import { useEffect, useState, useRef, useCallback } from "react";
-// import { io, Socket } from "socket.io-client";
 import { useAppContext } from "@/app/AppProvider";
 import LoadingPage from "@/components/loadingPage";
 import { fetchApiData } from "@/app/api/appService";
@@ -12,7 +11,10 @@ import { decrypt } from "@/app/decode";
 import Image from "next/image";
 import { getMainArtistName, getPosterSong } from "@/utils/utils";
 import { IoSearch } from "react-icons/io5";
-import SongPlayedBanner from "@/components/songPlayedBanner";
+import SongPlayedBanner from "@/components/listenTogether/songPlayedBanner";
+import ChatMessage from "@/components/listenTogether/chatMessage";
+import ProposalList from "@/components/listenTogether/proposalList";
+import { useToast } from "@/hooks/use-toast"
 
 // let socket: Socket | null = null;
 
@@ -38,6 +40,9 @@ function Page() {
   const [currentSongId, setCurrentSongId] = useState<string>(
     ""
   );
+  const { toast } = useToast()
+
+
 
   const handleTimeUpdate = () => {
     if (audioRef.current && permit) {
@@ -45,7 +50,6 @@ function Page() {
     }
   };
 
-  // const accessToken = "hihi"
   useEffect(() => {
     const handler = setTimeout(async () => {
       if (searchTerm === "") {
@@ -180,16 +184,22 @@ function Page() {
 
   const handleAddSong = (song) => {
     // Kiểm tra xem bài hát đã tồn tại trong playlist chưa
-    if (!playlist.includes(song.id)) {
-      // Thêm ID của bài hát vào playlist
-      setPlaylist([...playlist, song.id]);
+    if (playlist.includes(song.id)) {
+      toast({
+        variant: "destructive",
+        title: "Song already added",
+        description: "This song is already in your waiting list.",
+      });
+      return; 
     }
+    
+    setPlaylist([...playlist, song.id]);
+
     if (!waitingSongs.some((waitingSong) => waitingSong.id === song.id)) {
       setWaitingSongs([...waitingSongs, song]);
     }
   };
   const handlePlaySong = (song) => {
-    // Cập nhật currentSongId khi người dùng nhấn Play
     setCurrentSongId(song.id);
   };
 
@@ -199,31 +209,7 @@ function Page() {
       <div className="w-2/4 h-screen flex flex-col gap-2">
         <SongPlayedBanner id={currentSongId} playlist={playlist} />
         {/* list chat */}
-        <div className="w-full flex-grow text-black flex flex-col gap-4 p-4 bg-secondColorBg rounded-lg">
-          <div className="w-full flex gap-4">
-            <Input
-              placeholder="enter message"
-              className="text-black border-primaryColorBlue h-10"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            ></Input>
-            <button
-              onClick={handleSentMessage}
-              className="h-10 w-10 p-2 text-textMedium bg-primaryColorPink rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-            >
-              <PaperPlaneIcon className="h-5 w-5 text-white" />
-            </button>
-          </div>
-
-          <div className="w-full border border-primaryColorBlue">
-            {chatMessages.map((msg, index) => (
-              <div key={index}>
-                <p>{msg.user}</p>
-                <h3>{msg.message}</h3>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ChatMessage />
       </div>
 
       <div className="w-1/4 h-screen flex flex-col gap-6 relative bg-secondColorBg rounded-lg">
@@ -338,35 +324,7 @@ function Page() {
       </div>
 
       {/* proposal */}
-      <div className="w-1/4 h-screen flex flex-col gap-4">
-        <div>
-          <p className="font-bold text-ml text-primaryColorPinkHover">
-            Proposal song for your stream room
-          </p>
-        </div>
-        <div className="w-full overflow-y-auto scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black bg-secondColorBg p-2 rounded-lg">
-          <ul className="list-none">
-            {waitingSongs.map((song, index) => (
-              <li key={index} className="flex items-center gap-3 mb-3">
-                <Image
-                  src={getPosterSong(song.album).image}
-                  alt="Song Poster"
-                  width={48}
-                  height={48}
-                  quality={100}
-                  className="object-cover rounded-md w-10 h-10"
-                />
-                <div>
-                  <p className="font-bold text-white">{song.title}</p>
-                  <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                    {getMainArtistName(song.artists)}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      <ProposalList onAddToPlaylist={handleAddSong}/>
     </div>
   );
 }
