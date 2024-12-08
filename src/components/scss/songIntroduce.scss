@@ -13,3 +13,21 @@
 .animate-slide-in-right {
     animation: slide-in-right 0.3s ease-out;
 }
+
+.marquee {
+    display: flex;
+    animation: marquee 8s linear infinite;
+    text-wrap: nowrap;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    20% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}

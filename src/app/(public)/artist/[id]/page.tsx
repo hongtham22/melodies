@@ -42,7 +42,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     }, [scrollAreaRef]);
 
     useEffect(() => {
-        const fetchSong = async () => {
+        const fetchArtist = async () => {
             setLoading(true);
             try {
                 const responses = await Promise.all([
@@ -80,7 +80,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 setLoading(false);
             }
         };
-        fetchSong();
+        fetchArtist();
     }, [params.id]);
 
     if (loading) return <LoadingPage />

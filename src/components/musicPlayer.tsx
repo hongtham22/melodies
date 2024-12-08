@@ -46,11 +46,11 @@ import { decrypt } from '@/app/decode';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { fetchApiData } from '@/app/api/appService';
 import { useAppContext } from '@/app/AppProvider';
 import { DataPlaylist } from '@/types/interfaces';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
+import { handleAddSongToNewUserPlaylist, handleAddToUserPlaylist, handleFetchPlaylistByUser } from '@/utils/api';
 
 const MusicPlayer: React.FC = () => {
     const { accessToken } = useAppContext()
@@ -242,69 +242,51 @@ const MusicPlayer: React.FC = () => {
     };
 
     const handleFetchPlaylist = async () => {
-        const result = await fetchApiData(
-            "/api/user/playlist",
-            "GET",
-            null,
-            accessToken,
-            { page: 1 }
-        );
-        if (result.success) {
-            setListPlayer(result.data.playlists)
-        } else {
-
+        if (accessToken) {
+            const playlists = await handleFetchPlaylistByUser(accessToken);
+            setListPlayer(playlists);
         }
     }
 
     const handleAddSongToPlaylist = async (playlistId: string) => {
-        const payload = {
-            songId: currentSong?.id,
-            playlistId: playlistId
-        }
-
-        const result = await fetchApiData(`/api/user/playlist/addSong`, "POST", JSON.stringify(payload), accessToken);
-        if (result.success) {
-            toast({
-                variant: "success",
-                title: "Congratulation!!!",
-                description: 'Add song to your playlist success',
-                action: <ToastAction altText="Try again">Try again</ToastAction>,
-            });
-        } else {
-            toast({
-                variant: "destructive",
-                title: "Uh oh! Something went wrong.",
-                description: result.error,
-                action: <ToastAction altText="Try again">Try again</ToastAction>,
-            });
+        if (accessToken && currentSong) {
+            const result = await handleAddToUserPlaylist(accessToken, currentSong?.id, playlistId)
+            if (result.success) {
+                toast({
+                    variant: "success",
+                    title: "Congratulation!!!",
+                    description: 'Add song to your playlist success',
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: result.error,
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+            }
         }
     }
 
     const handleAddSongToNewPlaylist = async () => {
-        const payload = {
-            songId: currentSong?.id,
-        }
-        const result = await fetchApiData(
-            "/api/user/playlist/create",
-            "POST",
-            JSON.stringify(payload),
-            accessToken
-        );
-        if (result.success && result.data?.newPlaylist) {
-            // setListPlayer(prevList => [result.data?.newPlaylist, ...(prevList || [])])
-            toast({
-                variant: "success",
-                title: "Congratulation!!!",
-                description: 'Add song to your playlist success',
-                action: <ToastAction altText="Try again">Try again</ToastAction>,
-            });
-        } else {
-            toast({
-                variant: "destructive",
-                title: "Uh oh! Something went wrong.",
-                description: result.error,
-                action: <ToastAction altText="Try again">Try again</ToastAction>,
-            });
+        if (accessToken && currentSong) {
+            const result = await handleAddSongToNewUserPlaylist(accessToken, currentSong?.id)
+            if (result.success) {
+                toast({
+                    variant: "success",
+                    title: "Congratulation!!!",
+                    description: 'Add song to your playlist success',
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: result.error,
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+            }
         }
     }
     if (!currentSong) return null;
