@@ -12,160 +12,154 @@ import { decrypt } from "@/app/decode";
 import Image from "next/image";
 import { getMainArtistName, getPosterSong } from "@/utils/utils";
 import { IoSearch } from "react-icons/io5";
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
 
+function ProposalList({
+  currentProposalList,
+  permit,
+}: {
+  currentProposalList: [];
+  permit: boolean;
+}) {
+  const { socket } = useAppContext();
+  const { loading, setLoading } = useAppContext();
+  const { accessToken } = useAppContext();
+  const { toast } = useToast();
 
-function ProposalList({onAddToPlaylist}: {onAddToPlaylist: (song: DataSong) => void}) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
+  // const [proposalSongs, setProposalSongs] = useState([]);
+  const [proposalList, setProposalList] = useState([]);
 
-    const { loading, setLoading } = useAppContext();
-    const { accessToken } = useAppContext();
-    const { toast } = useToast()
+  // console.log("proposalList: ", proposalList);
+  useEffect(() => {
+    setProposalList(currentProposalList);
+  }, [currentProposalList]);
 
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
-    const [proposalSongs, setProposalSongs] = useState([]);
-    const [proposalList, setProposalList] = useState<string[]>([]);
-  
+  useEffect(() => {
+    if (!socket) return;
 
-    useEffect(() => {
-        const handler = setTimeout(async () => {
-          if (searchTerm === "") {
-            setFilteredSongs([]);
-          } else {
-            const results = await fetchApiData(
-              `/api/songs/search`,
-              "GET",
-              null,
-              accessToken,
-              { query: searchTerm, page: 1 }
-            );
-            if (results.success) {
-              setFilteredSongs(results.data.songData);
-            }
-          }
-        }, 500);
-    
-        return () => {
-          clearTimeout(handler);
-        };
-      }, [searchTerm]);
+    socket.on("addSongToProposalListSuccess", () => {
+      alert("them bai playlist wait ok");
+    });
+    socket.on("updateProposalList", (proposalList) => {
+      console.log("list wait: ", proposalList);
+      setProposalList(proposalList);
+    });
+    socket.on("updateListSong", (data) => {
+      setProposalList(data.proposalList);
+    })
 
-      const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const query = e.target.value;
-        setSearchTerm(query);
-      };
+    return () => {
+      // socket?.disconnect();
+      console.log("disconnect socket"); 
+    }
+  }, [socket]);
 
-      const handleCloseSearch = () => {
-        setSearchTerm("");
+  useEffect(() => {
+    const handler = setTimeout(async () => {
+      if (searchTerm === "") {
         setFilteredSongs([]);
-      };
-    
-      const handleAddSong = (song) => {
-        // Kiểm tra xem bài hát đã tồn tại trong proposalList chưa
-        if (proposalList.includes(song.id)) {
-          // Hiển thị toast nếu bài hát đã có trong proposalList
-          toast({
-            variant: "destructive",
-            title: "Song already added",
-            description: "This song is already in your proposal list.",
-          });
-          return; 
+      } else {
+        const results = await fetchApiData(
+          `/api/songs/search`,
+          "GET",
+          null,
+          accessToken,
+          { query: searchTerm, page: 1 }
+        );
+        if (results.success) {
+          setFilteredSongs(results.data.songData);
         }
-      
-        setProposalList([...proposalList, song.id]);
-      
-        if (!proposalSongs.some((proposalSong) => proposalSong.id === song.id)) {
-          setProposalSongs([...proposalSongs, song]);
-        }
-      };
+      }
+    }, 500);
 
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
-      const handleAddSongPlaylist = (song) => {
-      onAddToPlaylist(song);
-      };
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchTerm(query);
+  };
+
+  const handleCloseSearch = () => {
+    setSearchTerm("");
+    setFilteredSongs([]);
+  };
+
+  const handleAddSong = (song) => {
+    socket?.emit("addSongToProposalList", song);
+    // // Kiểm tra xem bài hát đã tồn tại trong proposalList chưa
+    // if (proposalList.includes(song.id)) {
+    //   // Hiển thị toast nếu bài hát đã có trong proposalList
+    //   toast({
+    //     variant: "destructive",
+    //     title: "Song already added",
+    //     description: "This song is already in your proposal list.",
+    //   });
+    //   return;
+    // }
+
+    // setProposalList(listWait);
+
+    // if (!proposalSongs.some((proposalSong) => proposalSong.id === song.id)) {
+    //   setProposalSongs([...proposalSongs, song]);
+    // }
+  };
+
+  const handleAddSongPlaylist = (song) => {
+    console.log("song: ", song.id);
+    socket?.emit("forwardSong", song.id)
+  };
 
   return (
     <div className="w-1/4 h-screen flex flex-col gap-6 relative bg-secondColorBg rounded-lg">
-        {/* Search */}
-        <div className="absolute top-0 left-0 w-full h-full z-10 p-4 rounded-lg">
-          <div className="flex flex-col h-full w-full">
-            <p className="font-bold text-ml mb-3 text-white mr-2">
-              Let&apos;s find content for your recommend{" "}
-            </p>
-            <div className="flex items-center bg-[#2C2C2C] w-full p-2 gap-2 rounded-md mb-3">
-              <IoSearch className="text-[1.2rem]" />
-              <input
-                type="text"
-                placeholder="Find songs"
-                className="focus:outline-none placeholder:text-[0.9rem] placeholder:text-primaryColorGray text-primaryColorGray text-[0.9rem] bg-transparent w-full"
-                value={searchTerm}
-                onChange={handleSearch}
-              />
-            </div>
-            {/* Search Results */}
-            {filteredSongs.length > 0 ? (
-            <div className="w-full overflow-y-auto scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
-            <span>
-              <button
-                className="absolute top-5 right-2 text-white"
-                onClick={handleCloseSearch}
-              >
-                <Cross2Icon className="h-5 w-5 hover:text-primaryColorPinkHover" />
-              </button>
-            </span>
-            <table className="flex-1 text-white border-separate border-spacing-y-3">
-              <thead>
-                <tr>
-                  <th className="w-[75%]"></th>
-                  <th className="w-[25%]"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredSongs.map((song, index) => (
-                  <tr key={index}>
-                    <td className="group flex max-w-[75%]">
-                      <Image
-                        src={getPosterSong(song.album).image}
-                        alt="Song Poster"
-                        width={48}
-                        height={48}
-                        quality={100}
-                        className="object-cover rounded-md w-10 h-10"
-                      />
-                      <div className="ml-2 flex flex-col w-3/4">
-                        <p className="font-bold text-textMedium text-white truncate">
-                          {song.title}
-                        </p>
-                        <p className="font-thin text-primaryColorGray text-[0.9rem] truncate">
-                          {getMainArtistName(song.artists)}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="max-w-[25%]">
-                      <button
-                        className="px-3 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-black hover:bg-white transition-all duration-300"
-                        onClick={() => handleAddSong(song)}
-                      >
-                        Add
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Search */}
+      <div className="absolute top-0 left-0 w-full h-full z-10 p-4 rounded-lg">
+        <div className="flex flex-col h-full w-full">
+          {!permit && (
+
+          <div>
+          <p className="font-bold text-ml mb-3 text-white mr-2">
+            Let&apos;s find content for your recommend{" "}
+          </p>
+          <div className="flex items-center bg-[#2C2C2C] w-full p-2 gap-2 rounded-md mb-3">
+            <IoSearch className="text-[1.2rem]" />
+            <input
+              type="text"
+              placeholder="Find songs"
+              className="focus:outline-none placeholder:text-[0.9rem] placeholder:text-primaryColorGray text-primaryColorGray text-[0.9rem] bg-transparent w-full"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
           </div>
-          
-           
-            ) : (
-              // waiting songs
-              <div className="w-full flex flex-col bg-secondColorBg flex-grow overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
-                <p className="font-bold text-ml my-3 text-primaryColorPinkHover">
-                  Proposal song for host 
-                </p>
-                <div className="w-full flex ">
-                  <ul className="list-none w-full">
-                    {proposalSongs.map((song, index) => (
-                      <li key={index} className="flex items-center gap-3 mb-3">
+          </div>
+          )}
+
+          {/* Search Results */}
+          {filteredSongs.length > 0 ? (
+            <div className="w-full overflow-y-auto scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
+              <span>
+                <button
+                  className="absolute top-5 right-2 text-white"
+                  onClick={handleCloseSearch}
+                >
+                  <Cross2Icon className="h-5 w-5 hover:text-primaryColorPinkHover" />
+                </button>
+              </span>
+              <table className="flex-1 text-white border-separate border-spacing-y-3">
+                <thead>
+                  <tr>
+                    <th className="w-[75%]"></th>
+                    <th className="w-[25%]"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredSongs.map((song, index) => (
+                    <tr key={index}>
+                      <td className="group flex max-w-[75%]">
                         <Image
                           src={getPosterSong(song.album).image}
                           alt="Song Poster"
@@ -174,34 +168,74 @@ function ProposalList({onAddToPlaylist}: {onAddToPlaylist: (song: DataSong) => v
                           quality={100}
                           className="object-cover rounded-md w-10 h-10"
                         />
-                        <div className="w-full flex justify-between">
-                          <div className="flex flex-col w-full">
-                            <p className="font-bold text-white truncate">
-                              {song.title}
-                            </p>
-                            <p className="font-thin text-primaryColorGray text-[0.9rem] truncate">
-                              {getMainArtistName(song.artists)}
-                            </p>
-                          </div>
-                          <button
-                            className="h-8 px-2 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-primaryColorPink hover:bg-white transition-all duration-300"
-                            onClick={() => handleAddSongPlaylist(song)}
-                          >
-                            <PlusIcon className="h-4 w-4"/>
-                          </button>
-                         
+                        <div className="ml-2 flex flex-col w-3/4">
+                          <p className="font-bold text-textMedium text-white truncate">
+                            {song.title}
+                          </p>
+                          <p className="font-thin text-primaryColorGray text-[0.9rem] truncate">
+                            {getMainArtistName(song.artists)}
+                          </p>
                         </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                      </td>
+                      <td className="max-w-[25%]">
+                        <button
+                          className="px-3 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-black hover:bg-white transition-all duration-300"
+                          onClick={() => handleAddSong(song)}
+                        >
+                          Add
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="w-full flex flex-col bg-secondColorBg flex-grow overflow-y-auto scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
+              <p className="font-bold text-ml my-3 text-primaryColorPinkHover">
+                Proposal song for host
+              </p>
+              <div className="w-full flex ">
+                <ul className="list-none w-full">
+                  {proposalList.map((song, index) => (
+                    <li key={index} className="flex items-center gap-3 mb-3">
+                      <Image
+                        src={getPosterSong(song.album).image}
+                        alt="Song Poster"
+                        width={48}
+                        height={48}
+                        quality={100}
+                        className="object-cover rounded-md w-10 h-10"
+                      />
+                      <div className="w-full flex justify-between">
+                        <div className="flex flex-col w-full">
+                          <p className="font-bold text-white truncate">
+                            {song.title}
+                          </p>
+                          <p className="font-thin text-primaryColorGray text-[0.9rem] truncate">
+                            {getMainArtistName(song.artists)}
+                          </p>
+                        </div>
+                        { permit && (
+
+                          <button
+                          className="h-8 px-2 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-primaryColorPink hover:bg-white transition-all duration-300"
+                          onClick={() => handleAddSongPlaylist(song)}
+                          >
+                          <PlusIcon className="h-4 w-4" />
+                        </button>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-  )
+    </div>
+  );
 }
 
-export default ProposalList
+export default ProposalList;

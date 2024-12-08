@@ -63,7 +63,7 @@ export const AppProvider: React.FC<{
 
         useEffect(() => {
             if (accessToken) {
-              const newSocket = io("https://1vtglwl3-20099.asse.devtunnels.ms", {
+              const newSocket = io("https://1vtglwl3-2020.asse.devtunnels.ms", {
                 auth: { accessToken: accessToken },
               });
 

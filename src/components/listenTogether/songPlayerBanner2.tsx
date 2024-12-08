@@ -41,8 +41,17 @@ import { formatTime, getMainArtistName, getPosterSong } from "@/utils/utils";
 import WaveSurfer from "wavesurfer.js";
 import { decrypt } from "@/app/decode";
 import LoadingPage from "@/components/loadingPage";
+import { use } from "node-vibrant";
 
-function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) {
+function SongPlayedBanner2({
+  currentSong,
+  playlist,
+  permit,
+}: {
+  currentSong: object;
+  playlist: [];
+  permit: boolean;
+}) {
   const [notFound, setNotFound] = useState(false);
   const [dominantColor, setDominantColor] = useState<string>();
   const [dataSong, setDataSong] = useState<DataSong>();
@@ -53,148 +62,196 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
   const [isRepeat, setIsRepeat] = useState(false);
   const { accessToken, loading, setLoading } = useAppContext();
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [currentSongId, setCurrentSongId] = useState(id);
-
-  const currentIndex = playlist.findIndex((songId) => songId === currentSongId);
-
-  useEffect(() => {
-    setCurrentSongId(id); 
-  }, [id]);
-
-
+  const { socket } = useAppContext();
+  console.log('currentSong: ', currentSong);
   
-  useEffect(() => {
-    if (currentSongId) {
-      console.log("currentSongId:", currentSongId);
-      console.log("playlist:", playlist);
 
-      const fetchData = async () => {
-        setLoading(true);
-        const result = await fetchApiData(
-          `/api/song/${currentSongId}`,
-          "GET",
-          null,
-          accessToken
-        );
-        if (result.success) {
-          setDataSong(result.data.song);
-          // Xử lý màu sắc
-          const imageUrl =
-            typeof getPosterSong(result.data.song.album).image === "string"
-              ? getPosterSong(result.data.song.album).image
-              : "";
-          try {
-            const responses = await fetch(
-              `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`
-            );
-            const data = await responses.json();
-            if (responses.ok) setDominantColor(data.dominantColor);
-          } catch (error) {
-            console.error("Error fetching dominant color:", error);
-          }
+  const [loc1, setLoc1] = useState(currentSong);
+  const [loc2, setLoc2] = useState({});
+
+  // console.log("haha: ", currentSong);
+  // console.log("playlist: ", playlist);
+
+  // useEffect(() => {
+  //   if (!socket) {
+  //     console.log("null");
+  //     return;
+  //   }
+  //   socket?.on("UpdateAudio", (data) => {
+  //     console.log("Update audio:", data);
+
+  //     if (audioRef.current) {
+  //       console.log("run: ", currentSong);
+
+  //       if (data.song.id !== currentSong.song.id) {
+  //         currentSong.song = data.song;
+  //       }
+  //       const currentTime = data.currentTime;
+  //       setStartTime(currentTime);
+  //       // audioRef.current.currentTime = data.currentTime;
+  //       if (data.isPlaying) {
+  //         audioRef.current.play();
+  //       } else {
+  //         audioRef.current.pause();
+  //       }
+  //     }
+  //   });
+  //   return () => {
+  //     // socket?.disconnect();
+  //     console.log("disconnect socket");
+  //   };
+  // }, [socket, currentSong]);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket?.on("UpdateAudio", (data) => {
+      console.log("Update audio:", data);
+      setLoc2(data);
+    });
+    return () => {
+      // socket?.disconnect();
+      console.log("disconnect socket");
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (loc2?.song?.id !== loc1?.song?.id) {
+      setLoc1(loc2);
+    } else {
+      setIsPlaying(loc2.isPlaying);
+      setStartTime(loc2.currentTime);
+    }
+  }, [loc2]);
+
+  useEffect(() => {
+      if (audioRef.current) {
+        if (isPlaying) {
+          audioRef.current.play();
         } else {
-          setNotFound(true);
+          audioRef.current.pause();
+      }}
+
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (currentSong && currentSong.song) {
+      const fetchData = async () => {
+        const imageUrl =
+          typeof getPosterSong(currentSong.song.album).image === "string"
+            ? getPosterSong(currentSong.song.album).image
+            : posterImg;
+        try {
+          const responses = await fetch(
+            `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`
+          );
+          const data = await responses.json();
+          if (responses.ok) setDominantColor(data.dominantColor);
+        } catch (error) {
+          console.error("Error fetching dominant color:", error);
         }
-        setLoading(false);
       };
-  
       fetchData();
     }
-  }, [currentSongId, accessToken, setLoading]);
-
-  
- 
+  }, [currentSong]);
 
   useEffect(() => {
-    if (dataSong) {
-      const audioUrl = dataSong.filePathAudio
-        ? decrypt(dataSong.filePathAudio)
-        : "https://audiomelodies.nyc3.cdn.digitaloceanspaces.com/PBL6/AUDIO/OLD/Chillies/VaTheLaHet/VaTheLaHet.m4a";
-      
+    if (currentSong && currentSong.song) {
+      const audioUrl = currentSong.song.filePathAudio
+        ? decrypt(currentSong.song.filePathAudio)
+        : "";
+      // : "https://audiomelodies.nyc3.cdn.digitaloceanspaces.com/PBL6/AUDIO/OLD/Chillies/VaTheLaHet/VaTheLaHet.m4a";
+
+      console.log("song: ", audioUrl);
+
+      setIsPlaying(currentSong.song.isPlaying);
+      setStartTime(currentSong.song.currentTime);
       if (audioRef.current) {
         audioRef.current.pause(); // Dừng bài hát hiện tại
         audioRef.current.src = audioUrl; // Cập nhật src
         audioRef.current.load(); // Load lại audio
-        audioRef.current.play()
+        audioRef.current
+          .play()
           .then(() => setIsPlaying(true))
           .catch((error) => console.error("Autoplay failed:", error));
       } else {
         audioRef.current = new Audio(audioUrl);
-        audioRef.current.play()
+        audioRef.current
+          .play()
           .then(() => setIsPlaying(true))
           .catch((error) => console.error("Autoplay failed:", error));
       }
     }
-  }, [dataSong]);
-  
-  
-  useEffect(() => {
-    if (audioRef.current) {
-      const audioElement = audioRef.current;
-      if (audioElement.readyState >= 1) {
-        setEndTime(audioElement.duration);
-      }
-  
-      const handleMetadataLoaded = () => {
-        const duration = audioElement.duration;
-        setEndTime(duration);
-  
-        audioElement
-          .play()
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch((error) => {
-            console.error("Autoplay failed:", error);
-          });
-      };
-  
-      const handleTimeUpdate = () => {
-        if (audioRef.current) {
-          const currentTime = audioRef.current.currentTime;
-          setStartTime(currentTime);
-        }
-      };
-  
-      const handleAudioEnded = () => {
-        setIsPlaying(false);
-        setStartTime(0);
-      };
-  
-      audioElement.addEventListener("loadedmetadata", handleMetadataLoaded);
-      audioElement.addEventListener("timeupdate", handleTimeUpdate);
-      audioElement.addEventListener("ended", handleAudioEnded);
-  
-      return () => {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.removeEventListener("loadedmetadata", handleMetadataLoaded);
-          audioRef.current.removeEventListener("timeupdate", handleTimeUpdate);
-          audioRef.current.removeEventListener("ended", handleAudioEnded);
-        }
-      };
+  }, [currentSong]);
+
+  // useEffect(() => {
+  //   if (audioRef.current) {
+  //     const audioElement = audioRef.current;
+  //     if (audioElement.readyState >= 1) {
+  //       setEndTime(audioElement.duration);
+  //     }
+
+  //     const handleMetadataLoaded = () => {
+  //       const duration = audioElement.duration;
+  //       setEndTime(duration);
+
+  //       audioElement
+  //         .play()
+  //         .then(() => {
+  //           setIsPlaying(true);
+  //         })
+  //         .catch((error) => {
+  //           console.error("Autoplay failed:", error);
+  //         });
+  //     };
+
+  //     const handleTimeUpdate = () => {
+  //       if (audioRef.current) {
+  //         const currentTime = audioRef.current.currentTime;
+  //         setStartTime(currentTime);
+  //       }
+  //     };
+
+  //     const handleAudioEnded = () => {
+  //       setIsPlaying(false);
+  //       setStartTime(0);
+  //     };
+
+  //     audioElement.addEventListener("loadedmetadata", handleMetadataLoaded);
+  //     audioElement.addEventListener("timeupdate", handleTimeUpdate);
+  //     audioElement.addEventListener("ended", handleAudioEnded);
+
+  //     return () => {
+  //       if (audioRef.current) {
+  //         audioRef.current.pause();
+  //         audioRef.current.removeEventListener(
+  //           "loadedmetadata",
+  //           handleMetadataLoaded
+  //         );
+  //         audioRef.current.removeEventListener("timeupdate", handleTimeUpdate);
+  //         audioRef.current.removeEventListener("ended", handleAudioEnded);
+  //       }
+  //     };
+  //   }
+  // }, [audioRef.current]); // Ensure the effect runs when the audioRef.current changes
+
+  const handleRandomPlay = () => {
+    if (playlist.length > 1) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * playlist.length);
+      } while (randomIndex === currentIndex);
+      setCurrentSongId(playlist[randomIndex]);
     }
-  }, [audioRef.current]); // Ensure the effect runs when the audioRef.current changes
-  
+  };
 
-  
-    const handleRandomPlay = () => {
-      if (playlist.length > 1) {
-        let randomIndex;
-        do {
-          randomIndex = Math.floor(Math.random() * playlist.length);
-        } while (randomIndex === currentIndex);
-        setCurrentSongId(playlist[randomIndex]);
-      }
-    };
+  const handlePreviousSong = () => {
+    if (playlist.length > 0) {
+      const previousIndex =
+        (currentIndex - 1 + playlist.length) % playlist.length;
+      setCurrentSongId(playlist[previousIndex]);
+    }
+  };
 
-    const handlePreviousSong = () => {
-      if (playlist.length > 0) {
-        const previousIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-        setCurrentSongId(playlist[previousIndex]);
-      }
-    };
-  
   const handleNextSong = () => {
     if (playlist.length > 0) {
       const nextIndex = (currentIndex + 1) % playlist.length;
@@ -210,13 +267,6 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
   };
 
   useEffect(() => {
-    console.log("Current Song ID:", currentSongId);
-    console.log("Current Index:", currentIndex);
-    console.log("Playlist:", playlist);
-  }, [currentSongId, currentIndex, playlist]);
-  
- 
-  useEffect(() => {
     if (audioRef.current) {
       const handleAudioEnded = () => {
         if (isRepeat) {
@@ -225,9 +275,9 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
           handleNextSong();
         }
       };
-  
+
       audioRef.current.addEventListener("ended", handleAudioEnded);
-  
+
       return () => {
         audioRef.current?.removeEventListener("ended", handleAudioEnded);
       };
@@ -242,21 +292,28 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
       const clickX = e.clientX - rect.left;
       const newProgress = (clickX / rect.width) * 100;
       const newTime = (newProgress / 100) * endTime;
-  
+
       audioRef.current.currentTime = newTime;
-      setStartTime(newTime); 
+      setStartTime(newTime);
     }
   };
-  
+
   const handlePlayPause = () => {
     if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
+      if (permit) {
+        console.log("true");
+
+        if (isPlaying) {
+          audioRef.current.pause();
+        } else {
+          audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+        socket?.emit("SyncAudio", {
+          currentTime: startTime,
+          isPlaying: isPlaying,
+        });
       }
-      setIsPlaying(!isPlaying);
-      
     }
   };
 
@@ -271,13 +328,11 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
   const handleSkipBackward = () => {
     if (audioRef.current) {
       const audioElement = audioRef.current;
-      const newTime = Math.max(0, audioElement.currentTime - 5); // Đảm bảo không dưới 0
+      const newTime = Math.max(0, audioElement.currentTime - 5);
       audioElement.currentTime = newTime;
       setStartTime(newTime);
     }
   };
-  
-
 
   if (loading) return <LoadingPage />;
 
@@ -291,15 +346,15 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
           }}
         >
           {/* Nội dung của banner */}
-          <div className=" w-full h-[22vh] flex flex-col justify-end gap-6 rounded-t-lg bg-gradient-to-b from-transparent to-black/30">
+          <div className=" w-full h-[22vh] flex flex-col justify-end gap-3 rounded-t-lg bg-gradient-to-b from-transparent to-black/30">
             {/* Header */}
             {/* Content albums */}
             <div className="flex items-start gap-8">
               <div className="shadow-[0_4px_60px_rgba(0,0,0,0.5)] rounded-md">
                 <Image
                   src={
-                    dataSong?.album
-                      ? getPosterSong(dataSong.album).image
+                    currentSong.song?.album
+                      ? getPosterSong(currentSong.song.album).image
                       : posterImg
                   }
                   alt="Album Cover"
@@ -312,11 +367,13 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
               <div className="h-full flex flex-col justify-between">
                 <div className="flex gap-1 flex-col">
                   {/* <h3>Song</h3> */}
-                  <h1 className="mt-3 text-2xl font-bold">{dataSong?.title}</h1>
+                  <h1 className="mt-3 text-2xl font-bold">
+                    {currentSong.song?.title}
+                  </h1>
                   <div className="flex items-center space-x-2 text-textMedium ">
                     <p className="cursor-pointer hover:underline">
-                      {dataSong?.artists
-                        ? getMainArtistName(dataSong.artists)
+                      {currentSong.song?.artists
+                        ? getMainArtistName(currentSong.song.artists)
                         : "Unknown Artist"}
                     </p>
                   </div>
@@ -325,14 +382,19 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
                   <div className="flex items-center mb-1 text-primaryColorGray cursor-pointer">
                     <Tooltip>
                       <TooltipTrigger>
-                        <TbSwitch3 className="mx-3 w-[24px] h-[24px] hover:text-primaryColorPink" 
-                        onClick={handleRandomPlay}/>
+                        <TbSwitch3
+                          className="mx-3 w-[24px] h-[24px] hover:text-primaryColorPink"
+                          onClick={handleRandomPlay}
+                        />
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Turn on random play</p>
                       </TooltipContent>
                     </Tooltip>
-                    <BsFillSkipStartFill className="mx-3 w-[25px] h-[25px] hover:text-primaryColorPink" onClick={handlePreviousSong} />
+                    <BsFillSkipStartFill
+                      className="mx-3 w-[25px] h-[25px] hover:text-primaryColorPink"
+                      onClick={handlePreviousSong}
+                    />
                     <FaBackward
                       className="mx-3 w-[20px] h-[20px]  hover:text-primaryColorPink"
                       onClick={handleSkipBackward}
@@ -352,7 +414,10 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
                       className="mx-3 w-[20px] h-[20px] hover:text-primaryColorPink"
                       onClick={handleSkipForward}
                     />
-                    <BsSkipEndFill className="mx-3 w-[25px] h-[25px] hover:text-primaryColorPink" onClick={handleNextSong} />
+                    <BsSkipEndFill
+                      className="mx-3 w-[25px] h-[25px] hover:text-primaryColorPink"
+                      onClick={handleNextSong}
+                    />
                     <Tooltip>
                       <TooltipTrigger className="relative">
                         <FaRepeat
@@ -406,4 +471,4 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
   );
 }
 
-export default SongPlayedBanner;
+export default SongPlayedBanner2;
