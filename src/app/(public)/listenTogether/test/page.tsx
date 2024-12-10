@@ -43,6 +43,8 @@ function Page() {
   const [currentProposalList, setCurrentProposalList] = useState([]);
   const [waitingSongs, setWaitingSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState({});
+  const [isPlaying, setIsPlaying] = useState(true);
+
   const { toast } = useToast();
 
   const handleTimeUpdate = () => {
@@ -130,7 +132,7 @@ function Page() {
     });
 
     socket.on("updateListSongWait", (listWait) => {
-      console.log("list wait: ", listWait);
+      // console.log("list wait: ", listWait);
       setWaitingSongs(listWait);
     });
 
@@ -151,16 +153,22 @@ function Page() {
       alert("them bai playlist ok");
     });
     socket.on("updateWaitingList", (waitingList) => {
-      console.log("list wait: ", waitingList);
+      // console.log("list wait: ", waitingList);
       setWaitingSongs(waitingList);
     });
     socket.on("updateListSong", (data) => {
-      console.log("list wait: ", data.waitingList);
+      // console.log("list wait: ", data.waitingList);
       setWaitingSongs(data.waitingList);
     });
     socket.on("playSong", (currentSong) => {
       setCurrentSong(currentSong);
     })
+
+    // socket.on("UpdateAudio", (data) => {
+    //   // console.log("update audio", data)
+    //   setIsPlaying(data.isPlaying);
+    //   // setStartTime(data.currentTime);
+    // })
 
     return () => {
       // socket?.disconnect();
@@ -301,7 +309,7 @@ function Page() {
         {/* player */}
         <div className="w-2/4 h-screen flex flex-col gap-2">
           {/* <SongPlayedBanner id={currentSongId} playlist={playlist} /> */}
-          <SongPlayedBanner2 currentSong={currentSong} playlist={waitingSongs} permit = {permit}/>
+          <SongPlayedBanner2 currentSong={currentSong} playlist={waitingSongs} permit = {permit} />
           {/* list chat */}
           <ChatMessage />
         </div>

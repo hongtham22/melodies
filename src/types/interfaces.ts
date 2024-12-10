@@ -92,3 +92,10 @@ export interface DataPlaylist {
     createdAt: string;
     songsOfPlaylist: DataSong[];
 }
+
+// socket
+export interface DataCurrentSong {
+    song: DataSong,
+    isPlaying: boolean,
+    currentTime: number,
+}

@@ -63,7 +63,7 @@ export const AppProvider: React.FC<{
 
         useEffect(() => {
             if (accessToken) {
-              const newSocket = io("https://1vtglwl3-2020.asse.devtunnels.ms", {
+              const newSocket = io("http://localhost:20099", {
                 auth: { accessToken: accessToken },
               });
 
@@ -82,6 +82,10 @@ export const AppProvider: React.FC<{
                 alert(message);
                 newSocket.disconnect();
               });
+
+              newSocket.on("errTokenMising", (data) => {
+                alert(data)
+              })
               
 
               newSocket.on('paymentStatus', (data) =>{

@@ -43,7 +43,6 @@ function ProposalList({
       alert("them bai playlist wait ok");
     });
     socket.on("updateProposalList", (proposalList) => {
-      console.log("list wait: ", proposalList);
       setProposalList(proposalList);
     });
     socket.on("updateListSong", (data) => {
@@ -54,7 +53,8 @@ function ProposalList({
       // socket?.disconnect();
       console.log("disconnect socket"); 
     }
-  }, [socket]);
+  // }, [socket]);
+  }, []);
 
   useEffect(() => {
     const handler = setTimeout(async () => {
@@ -197,7 +197,7 @@ function ProposalList({
               </p>
               <div className="w-full flex ">
                 <ul className="list-none w-full">
-                  {proposalList.map((song, index) => (
+                  {proposalList?.map((song, index) => (
                     <li key={index} className="flex items-center gap-3 mb-3">
                       <Image
                         src={getPosterSong(song.album).image}
