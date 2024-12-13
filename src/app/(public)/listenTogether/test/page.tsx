@@ -53,6 +53,7 @@ function Page() {
     }
   };
 
+  // use effect search song
   useEffect(() => {
     const handler = setTimeout(async () => {
       if (searchTerm === "") {
@@ -76,49 +77,23 @@ function Page() {
     };
   }, [searchTerm]);
 
+  // use effect socket
   useEffect(() => {
-    // Khởi tạo socket
-    // socket = io("https://1vtglwl3-20099.asse.devtunnels.ms");
-
-    // socket.on("connect", () => {
-    //   console.log("Đã kết nối tới server:", socket?.id);
-    // });
     if (!socket) return;
 
-    // socket.emit("JoinRoom", { roomId: "someRoomId" });
     socket.emit("Error", (message) => {
       console.log("Error:", message);
     });
     socket.on("CreateRoomSuccess", (id) => {
       console.log("Đã kết nối tới room:", id);
     });
-
     socket.on("JoinRoomSuccess", (data) => {
       console.log("Join Success to room:", data);
       setPermit(data.permit);
     });
-
     socket.on("Users", (id) => {
       console.log("Userid:", id);
     });
-
-    // socket.on("PermissionUpdateFail", (status) => {
-    //   setPermit(status);
-    //   console.log("Permission update fail:", status); // Ghi log giá trị status
-    // });
-
-    // socket.on("UpdateAudio", (data) => {
-    //   console.log("Update audio:", data);
-    //   if (audioRef.current) {
-    //     audioRef.current.currentTime = data.currentTime;
-    //     if (data.isPlaying) {
-    //       audioRef.current.play();
-    //     } else {
-    //       audioRef.current.pause();
-    //     }
-    //   }
-    // });
-
     socket.on("ServerSendMessage", (data) => {
       console.log("Message:", data);
       setChatMessages((prevMessages) => [
@@ -144,14 +119,12 @@ function Page() {
       console.log("list play: ", listPlay);
       setPlaylist(listPlay);
     });
-
-    socket.on("playSong", (currentSong) => {
-      setCurrentSong(currentSong);
-    });
-
     socket.on("addSongToWaitingListSuccess", () => {
       alert("them bai playlist ok");
     });
+    socket.on("addSongToWaitingListFailed", (data) => {
+      alert(data)
+    })
     socket.on("updateWaitingList", (waitingList) => {
       // console.log("list wait: ", waitingList);
       setWaitingSongs(waitingList);
@@ -163,12 +136,7 @@ function Page() {
     socket.on("playSong", (currentSong) => {
       setCurrentSong(currentSong);
     })
-
-    // socket.on("UpdateAudio", (data) => {
-    //   // console.log("update audio", data)
-    //   setIsPlaying(data.isPlaying);
-    //   // setStartTime(data.currentTime);
-    // })
+    
 
     return () => {
       // socket?.disconnect();
@@ -203,25 +171,25 @@ function Page() {
     });
   };
 
-  const handlePlay = () => {
-    if (permit) {
-      socket?.emit("SyncAudio", {
-        accessToken: accessToken,
-        currentTime: currentTime,
-        isPlaying: true,
-      });
-    }
-  };
+  // const handlePlay = () => {
+  //   if (permit) {
+  //     socket?.emit("SyncAudio", {
+  //       accessToken: accessToken,
+  //       currentTime: currentTime,
+  //       isPlaying: true,
+  //     });
+  //   }
+  // };
 
-  const handlePause = () => {
-    if (permit) {
-      socket?.emit("SyncAudio", {
-        accessToken: accessToken,
-        currentTime: currentTime,
-        isPlaying: false,
-      });
-    }
-  };
+  // const handlePause = () => {
+  //   if (permit) {
+  //     socket?.emit("SyncAudio", {
+  //       accessToken: accessToken,
+  //       currentTime: currentTime,
+  //       isPlaying: false,
+  //     });
+  //   }
+  // };
 
   const handleSentMessage = () => {
     socket?.emit("SendMessage", {
@@ -243,23 +211,6 @@ function Page() {
   const handleAddSong = (song) => {
     console.log("song: ", song);
     socket?.emit("addSongToWaitingList", song);
-    // socket?.emit("addSongToListPlay", song);
-
-    // // Kiểm tra xem bài hát đã tồn tại trong playlist chưa
-    // if (playlist.includes(song.id)) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Song already added",
-    //     description: "This song is already in your waiting list.",
-    //   });
-    //   return;
-    // }
-
-    // setPlaylist([...playlist, song.id]);
-
-    // if (!waitingSongs.some((waitingSong) => waitingSong.id === song.id)) {
-    //   setWaitingSongs([...waitingSongs, song]);
-    // }
   };
   const handlePlaySong = (song) => {
     // setCurrentSongId(song.id);

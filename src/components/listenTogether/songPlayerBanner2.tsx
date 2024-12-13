@@ -61,65 +61,91 @@ function SongPlayedBanner2({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { socket } = useAppContext();
 
+  // doi nhacj
   useEffect(() => {
-    console.log("tìm hieeurL ", permit);
+    console.log("đổi nhạc từ playlist");
   }, [currentSong]);
 
+  // use effect socket
+  // useEffect(() => {
+  //   if (!socket) return;
+
+  //   // socket.on("UpdateAudio", (data) => {
+  //   //   // if (!permit) {
+  //   //     console.log("khách", data);
+  //   //     setIsPlaying(data.isPlaying);
+  //   //     setStartTime(data.currentTime);
+  //   //   // }
+  //   // });
+
+  //   const handleAudioUpdate = (data) => {
+  //     console.log("khách", data);
+  //     setIsPlaying(data.isPlaying);
+  //     setStartTime(data.currentTime);
+  //   };
+
+  //   socket.on("UpdateAudio", handleAudioUpdate);
+
+  //   return () => {
+  //     socket.off("UpdateAudio", handleAudioUpdate);
+  //   };
+  // }, [socket]);
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("UpdateAudio", (data) => {
-      if (!permit) {
-        console.log("khách", data);
-        setIsPlaying(data.isPlaying);
-        setStartTime(data.currentTime);
-      }
-    });
+    const handleAudioUpdate = (data) => {
+      console.log("khách", data);
+      setIsPlaying(data.isPlaying);
+      setStartTime(data.currentTime);
+    };
+
+    // Xóa tất cả listener cũ trước khi thêm mới
+    socket.off("UpdateAudio", handleAudioUpdate);
+    socket.on("UpdateAudio", handleAudioUpdate);
+
+    return () => {
+      socket.off("UpdateAudio", handleAudioUpdate);
+    };
   }, [socket]);
 
   useEffect(() => {
-    if (permit) {
-      socket?.emit("SyncAudio", {
-        isPlaying: isPlaying,
-        currentTime: audioRef.current?.currentTime,
-      });
-    } else {
-      if (audioRef.current) {
-        if (isPlaying) {
-          audioRef.current.play();
-        } else {
-          audioRef.current.pause();
-        }
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
       }
     }
   }, [isPlaying]);
 
   useEffect(() => {
-    if (permit) {
-      socket?.emit("SyncAudio", {
-        isPlaying: isPlaying,
-        currentTime: startTime,
-      });
-    } else {
-      audioRef.current.currentTime = startTime
-      setStartTime(startTime);
+    if (audioRef.current && !permit) {
+      audioRef.current.currentTime = startTime;
     }
   }, [startTime]);
 
   const handlePlayPause = () => {
     if (permit && audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-      // socket?.emit("SyncAudio", {
-      //   isPlaying: !isPlaying,
-      //   currentTime: audioRef.current?.currentTime,
-      // });
+      const newIsPlaying = !isPlaying;
+      setIsPlaying(newIsPlaying);
+      socket?.emit("SyncAudio", {
+        isPlaying: newIsPlaying,
+        currentTime: startTime,
+      });
     }
   };
+  // const handlePlayPause = () => {
+  //   if (permit && audioRef.current) {
+  //     setIsPlaying((prev) => {
+  //       const newIsPlaying = !prev;
+  //       socket?.emit("SyncAudio", {
+  //         isPlaying: newIsPlaying,
+  //         currentTime: audioRef.current?.currentTime || 0,
+  //       });
+  //       return newIsPlaying;
+  //     });
+  //   }
+  // };
 
   const handleClickOnProgress = (e: React.MouseEvent<HTMLDivElement>) => {
     if (audioRef.current) {
@@ -146,15 +172,6 @@ function SongPlayedBanner2({
       const handleMetadataLoaded = () => {
         const duration = audioElement.duration;
         setEndTime(duration);
-
-        audioElement
-          .play()
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch((error) => {
-            console.error("Autoplay failed:", error);
-          });
       };
 
       const handleTimeUpdate = () => {
@@ -162,19 +179,14 @@ function SongPlayedBanner2({
           const currentTime = audioRef.current.currentTime;
           if (permit) {
             setStartTime(currentTime);
+            if (!audioRef.current.paused) {
+              socket?.emit("SyncAudio", {
+                isPlaying: true,
+                currentTime: currentTime,
+              });
+            }
           }
         }
-        //  if (isPlaying) {
-        //   console.log("stop")
-        // if (audioRef.current && permit) {
-        //   const currentTime = audioRef.current.currentTime;
-        //   socket?.emit("SyncAudio", {
-        //     isPlaying: isPlaying,
-        //     currentTime: currentTime,
-        //   });
-        //   // setStartTime(currentTime);
-        // }
-        //  }
       };
       audioElement.addEventListener("loadedmetadata", handleMetadataLoaded);
 
@@ -191,8 +203,9 @@ function SongPlayedBanner2({
         }
       };
     }
-  }, [audioRef.current]); // Ensure the effect runs when the audioRef.current changes
+  }, [audioRef.current]); // Ensure the effect runs when the permit or socket changes
 
+  // lấy màu ảnh
   useEffect(() => {
     if (currentSong && currentSong.song) {
       const fetchData = async () => {
@@ -214,6 +227,7 @@ function SongPlayedBanner2({
     }
   }, [currentSong]);
 
+  // lấy url nhạc
   useEffect(() => {
     if (currentSong && currentSong.song) {
       // console.log("thay doi current song")
@@ -224,8 +238,8 @@ function SongPlayedBanner2({
 
       console.log("song: ", audioUrl);
 
-        setIsPlaying(currentSong.isPlaying);
-        setStartTime(currentSong.currentTime);
+      // setIsPlaying(currentSong.isPlaying);
+      // setStartTime(currentSong.currentTime);
       if (audioRef.current) {
         audioRef.current.pause(); // Dừng bài hát hiện tại
         audioRef.current.src = audioUrl; // Cập nhật src
@@ -300,11 +314,6 @@ function SongPlayedBanner2({
                     </Tooltip>
                     <BsFillSkipStartFill className="mx-3 w-[25px] h-[25px] hover:text-primaryColorPink" />
                     <FaBackward className="mx-3 w-[20px] h-[20px]  hover:text-primaryColorPink" />
-                    {/* <FaCirclePause
-                      className="mx-3 w-[32px] h-[32px]  hover:text-primaryColorPink"
-                      onClick={handlePlayPause}
-                    /> */}
-
                     {isPlaying ? (
                       <FaCirclePause
                         className="mx-3 w-[32px] h-[32px]  hover:text-primaryColorPink"
@@ -339,9 +348,10 @@ function SongPlayedBanner2({
                     <p className="mx-2 text-[0.9rem]">
                       {formatTime(startTime * 1000)}
                     </p>
-                    <div className="relative group hover:cursor-pointer"
-                     onClick={handleClickOnProgress}>
-                   
+                    <div
+                      className="relative group hover:cursor-pointer"
+                      onClick={handleClickOnProgress}
+                    >
                       <div
                         className="absolute -top-[270%] left-0 w-full h-full opacity-0 group-hover:opacity-100 -z-10"
                         id="waveform"

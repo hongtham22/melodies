@@ -48,6 +48,9 @@ function ProposalList({
     socket.on("updateListSong", (data) => {
       setProposalList(data.proposalList);
     })
+    socket.on("addSongToProposalListFailed", (data) => {
+      alert(data)
+    })
 
     return () => {
       // socket?.disconnect();
@@ -91,22 +94,6 @@ function ProposalList({
 
   const handleAddSong = (song) => {
     socket?.emit("addSongToProposalList", song);
-    // // Kiểm tra xem bài hát đã tồn tại trong proposalList chưa
-    // if (proposalList.includes(song.id)) {
-    //   // Hiển thị toast nếu bài hát đã có trong proposalList
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Song already added",
-    //     description: "This song is already in your proposal list.",
-    //   });
-    //   return;
-    // }
-
-    // setProposalList(listWait);
-
-    // if (!proposalSongs.some((proposalSong) => proposalSong.id === song.id)) {
-    //   setProposalSongs([...proposalSongs, song]);
-    // }
   };
 
   const handleAddSongPlaylist = (song) => {
