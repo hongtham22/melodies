@@ -29,9 +29,9 @@ function Page() {
   const [permit, setPermit] = useState(true);
 
   const [message, setMessage] = useState<string>("");
-  const [chatMessages, setChatMessages] = useState<
-    { user: string; message: string }[]
-  >([]);
+  // const [chatMessages, setChatMessages] = useState<
+  //   { user: string; message: string }[]
+  // >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
@@ -94,13 +94,13 @@ function Page() {
     socket.on("Users", (id) => {
       console.log("Userid:", id);
     });
-    socket.on("ServerSendMessage", (data) => {
-      console.log("Message:", data);
-      setChatMessages((prevMessages) => [
-        ...prevMessages,
-        { user: data.user.username, message: data.message },
-      ]);
-    });
+    // socket.on("ServerSendMessage", (data) => {
+    //   console.log("Message:", data);
+    //   setChatMessages((prevMessages) => [
+    //     ...prevMessages,
+    //     { user: data.user.username, message: data.message },
+    //   ]);
+    // });
 
     socket.on("addSongToListWaitSuccess", () => {
       alert("them bai playlist wait ok");

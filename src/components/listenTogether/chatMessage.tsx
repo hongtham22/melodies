@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Input } from "@/components/ui/input";
 import { PaperPlaneIcon} from "@radix-ui/react-icons";
 import { useAppContext } from '@/app/AppProvider';
@@ -7,16 +7,26 @@ import { useAppContext } from '@/app/AppProvider';
 function ChatMessage() {
     const [message, setMessage] = useState<string>("");
     const [chatMessages, setChatMessages] = useState<
-      { user: string; message: string }[]
+      { user: object; message: string }[]
     >([]);
   const { accessToken } = useAppContext();
   const { socket } = useAppContext();
 
 
+  useEffect(() => {
+    if (!socket) return
+    socket.on("ServerSendMessage", (data) => {
+      console.log("Message:", data);
+      setChatMessages((prevMessages) => [
+        ...prevMessages,
+        { user: data.user, message: data.message },
+      ]);
+    });
+  }, [socket])
+
 
     const handleSentMessage = () => {
         socket?.emit("SendMessage", {
-          accessToken: accessToken,
           message: message,
         });
       };
@@ -42,7 +52,8 @@ function ChatMessage() {
     <div className="w-full border border-primaryColorBlue">
       {chatMessages.map((msg, index) => (
         <div key={index}>
-          <p>{msg.user}</p>
+          <img src={msg.user?.image} alt='' height={"100"} width={"100"}/>
+          <p>{msg.user?.username}</p>
           <h3>{msg.message}</h3>
         </div>
       ))}

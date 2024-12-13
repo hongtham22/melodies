@@ -56,8 +56,8 @@ function ProposalList({
       // socket?.disconnect();
       console.log("disconnect socket"); 
     }
-  // }, [socket]);
-  }, []);
+  }, [socket]);
+  // }, []);
 
   useEffect(() => {
     const handler = setTimeout(async () => {
