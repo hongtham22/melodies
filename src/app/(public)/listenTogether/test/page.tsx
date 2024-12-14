@@ -1,7 +1,13 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { PlusIcon, Cross2Icon } from "@radix-ui/react-icons";
+import {
+  PlusIcon,
+  Cross2Icon,
+  DotsHorizontalIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@radix-ui/react-icons";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import LoadingPage from "@/components/loadingPage";
@@ -16,6 +22,7 @@ import ChatMessage from "@/components/listenTogether/chatMessage";
 import ProposalList from "@/components/listenTogether/proposalList";
 import { useToast } from "@/hooks/use-toast";
 import SongPlayedBanner2 from "@/components/listenTogether/songPlayerBanner2";
+import ListUser from "@/components/listenTogether/listUser";
 
 // let socket: Socket | null = null;
 
@@ -44,13 +51,16 @@ function Page() {
   const [waitingSongs, setWaitingSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState({});
   const [isPlaying, setIsPlaying] = useState(true);
-
+  const [showUsers, setShowUsers] = useState(false);
   const { toast } = useToast();
 
   const handleTimeUpdate = () => {
     if (audioRef.current && permit) {
       setCurrentTime(audioRef.current.currentTime);
     }
+  };
+  const handleViewUser = () => {
+    setShowUsers((prev) => !prev);
   };
 
   // use effect search song
@@ -123,8 +133,8 @@ function Page() {
       alert("them bai playlist ok");
     });
     socket.on("addSongToWaitingListFailed", (data) => {
-      alert(data)
-    })
+      alert(data);
+    });
     socket.on("updateWaitingList", (waitingList) => {
       // console.log("list wait: ", waitingList);
       setWaitingSongs(waitingList);
@@ -135,12 +145,23 @@ function Page() {
     });
     socket.on("playSong", (currentSong) => {
       setCurrentSong(currentSong);
-    })
-    
+    });
 
     return () => {
       // socket?.disconnect();
       console.log("Đã ngắt kết nối socket");
+      socket?.off("CreateRoomSuccess");
+      socket?.off("JoinRoomSuccess");
+      socket?.off("Users");
+      socket?.off("addSongToListWaitSuccess");
+      socket?.off("updateListSongWait");
+      socket?.off("addSongToListPlaySuccess");
+      socket?.off("updateListSongPlay");
+      socket?.off("addSongToWaitingListSuccess");
+      socket?.off("addSongToWaitingListFailed");
+      socket?.off("updateWaitingList");
+      socket?.off("updateListSong");
+      socket?.off("playSong");
     };
   }, [socket]);
 
@@ -214,7 +235,7 @@ function Page() {
   };
   const handlePlaySong = (song) => {
     // setCurrentSongId(song.id);
-    socket?.emit("selectSongToPlay", song.id)
+    socket?.emit("selectSongToPlay", song.id);
   };
 
   const handleLeaveRoom = async () => {
@@ -227,7 +248,7 @@ function Page() {
 
   return (
     <div className="w-full my-20 m-6 p-8 flex flex-col gap-4">
-      <div className="w-full flex gap-2 jutify-between mb-4">
+      {/* <div className="w-full flex gap-2">
         <button
           onClick={handleCreateRoom}
           className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
@@ -255,12 +276,47 @@ function Page() {
             Leave Room
           </button>
         </div>
+      </div> */}
+      <div className="w-full flex items-center justify-start">
+        <div className="w-2/4 flex items-center justify-between pr-6">
+          <p className="">Room ID: {roomId || ""}</p>
+          <button
+            onClick={handleLeaveRoom}
+            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+          >
+            Leave Room
+          </button>
+        </div>
+        <div className="w-1/4"></div>
+        <div className="w-1/4 flex gap-2 items-center px-3">
+        <button
+        onClick={handleViewUser}
+        className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+        aria-label={showUsers ? "Hide Participants" : "View Participants"}
+      >
+        {showUsers ? (
+          <>
+            Hide 5 Participants
+            <ChevronUpIcon />
+          </>
+        ) : (
+          <>
+            View 5 Participants
+            <ChevronDownIcon />
+          </>
+        )}
+      </button>
+        </div>
       </div>
       <div className="w-full flex gap-6 ">
         {/* player */}
         <div className="w-2/4 h-screen flex flex-col gap-2">
           {/* <SongPlayedBanner id={currentSongId} playlist={playlist} /> */}
-          <SongPlayedBanner2 currentSong={currentSong} playlist={waitingSongs} permit = {permit} />
+          <SongPlayedBanner2
+            currentSong={currentSong}
+            playlist={waitingSongs}
+            permit={permit}
+          />
           {/* list chat */}
           <ChatMessage />
         </div>
@@ -386,13 +442,15 @@ function Page() {
             </div>
           </div>
         </div>
-
-        {/* proposal */}
-        <ProposalList
-          socket={socket}
-          currentProposalList={currentProposalList}
-          permit={permit}
-        />
+        {showUsers ? (
+          <ListUser /> // Hiển thị danh sách người dùng
+        ) : (
+          <ProposalList
+            socket={socket}
+            currentProposalList={currentProposalList}
+            permit={permit}
+          />
+        )}
       </div>
     </div>
   );

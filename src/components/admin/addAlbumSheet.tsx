@@ -352,7 +352,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
                       role="combobox"
                       aria-expanded={openListSong}
                       className="w-full justify-between border-darkBlue col-span-3 truncate"
-                      disabled={!mainArtist}
+                      disabled={!mainArtist || !typeAlbum}
                     >
                       Select songs of main artist
                       <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
