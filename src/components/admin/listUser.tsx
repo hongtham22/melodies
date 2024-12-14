@@ -129,7 +129,7 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
                   {(page - 1) * itemsPerPage + index + 1}
                   </td>
                   <td className="">
-                    <div className="pl-2 flex felx-col gap-2 justify-center">
+                    <div className="pl-2 flex felx-col gap-2 items-start">
                       <Image
                         src={user.image || songimg}
                         alt="song"
@@ -196,8 +196,7 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
               );
             })}
           </tbody>
-        </table>
-       
+        </table>    
       </div>
   );
 }

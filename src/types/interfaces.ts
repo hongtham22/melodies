@@ -99,3 +99,10 @@ export interface DataCurrentSong {
     isPlaying: boolean,
     currentTime: number,
 }
+
+// genre
+
+export interface GenreData {
+    genreId: string;
+    name: string;
+  }

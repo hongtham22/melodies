@@ -11,7 +11,9 @@ import {
 } from "@radix-ui/react-icons";
 import { MdQueueMusic } from "react-icons/md";
 import { FaMicrophoneAlt } from "react-icons/fa";
+import { MdPayment } from "react-icons/md";
 import Link from "next/link";
+import { TbMessageReport } from "react-icons/tb";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -72,7 +74,7 @@ const SidebarAdmin = () => {
 
   const getMenuClass = (menuItem: string) => {
     return activeMenu === menuItem
-      ? "bg-primaryColorPink rounded-xl px-2 font-semibold"
+      ? "bg-primaryColorPink rounded-xl px-2 font-bold"
       : "text-[0.9rem]";
   };
   return (
@@ -155,6 +157,26 @@ const SidebarAdmin = () => {
         >
           <AvatarIcon className="w-[24px] h-[24px] mr-3" />
           <Link href="/admin/users">Users</Link>
+        </div>
+        
+        <div
+          className={`flex my-2 cursor-pointer ${getMenuClass(
+            "payments"
+          )} py-2 items-center`}
+          onClick={() => handleMenuClick("payments")}
+        >
+          <MdPayment className="w-[24px] h-[24px] mr-3" />
+          <Link href="/admin/payments">Payments</Link>
+        </div>
+
+        <div
+          className={`flex my-2 cursor-pointer ${getMenuClass(
+            "reportedComments"
+          )} py-2 items-center`}
+          onClick={() => handleMenuClick("reportedComments")}
+        >
+          <TbMessageReport className="w-[24px] h-[24px] mr-2" />
+          <Link href="/admin/reportedComments">Report Comment</Link>
         </div>
       </div>
 
