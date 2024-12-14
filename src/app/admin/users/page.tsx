@@ -1,5 +1,5 @@
 "use client";
-import ListUser from "@/components/listUser";
+import ListUser from "@/components/admin/listUser";
 import { BiUser } from "react-icons/bi";
 import { MdOutlineWorkspacePremium } from "react-icons/md";
 import { TbUserCheck } from "react-icons/tb";
