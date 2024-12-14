@@ -6,7 +6,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import LoadingPage from "@/components/loadingPage";
 import { fetchApiData } from "@/app/api/appService";
-import { DataSong } from "@/types/interfaces";
+import { DataCurrentSong, DataSong } from "@/types/interfaces";
 import { decrypt } from "@/app/decode";
 import Image from "next/image";
 import { getMainArtistName, getPosterSong } from "@/utils/utils";
@@ -42,7 +42,8 @@ function Page() {
   // check
   const [currentProposalList, setCurrentProposalList] = useState([]);
   const [waitingSongs, setWaitingSongs] = useState([]);
-  const [currentSong, setCurrentSong] = useState({});
+  const [currentSong, setCurrentSong] = useState<DataCurrentSong | null>(null);
+
   const [isPlaying, setIsPlaying] = useState(true);
 
   const { toast } = useToast();
@@ -87,9 +88,19 @@ function Page() {
     socket.on("CreateRoomSuccess", (id) => {
       console.log("Đã kết nối tới room:", id);
     });
-    socket.on("JoinRoomSuccess", (data) => {
-      console.log("Join Success to room:", data);
+    // socket.on("JoinRoomSuccess", (data) => {
+    //   console.log("Join Success to room:", data);
+    //   setPermit(data.permit);
+    // });
+    socket.on("joinRoomSuccess", (data) => {
+      console.log("Join Success to room:", data.roomId);
       setPermit(data.permit);
+      setCurrentSong(data.currentSong)
+      setWaitingSongs(data.waitingList);
+      setCurrentProposalList(data.proposalList);
+    });
+    socket?.on("joinRoomFailed", (data) => {
+      console.log("joinRoomFailed", data);
     });
     socket.on("Users", (id) => {
       console.log("Userid:", id);
@@ -136,6 +147,7 @@ function Page() {
     socket.on("playSong", (currentSong) => {
       setCurrentSong(currentSong);
     })
+
     
 
     return () => {
@@ -146,18 +158,8 @@ function Page() {
 
   const handleJoinRoom = async () => {
     socket?.emit("joinRoom", roomId);
-    socket?.on("joinRoomSuccess", (data) => {
-      console.log("Join Success to room:", data.roomId);
-      setPermit(data.permit);
-      // setWaitingSongs(data.listWait)
-      // setPlaylist(data.listPlay)
-      // setVisible(true);
-      setWaitingSongs(data.waitingList);
-      setCurrentProposalList(data.proposalList);
-    });
-    socket?.on("joinRoomFailed", (data) => {
-      console.log("joinRoomFailed", data);
-    });
+    
+    
   };
 
   const handleCreateRoom = async () => {
@@ -214,7 +216,9 @@ function Page() {
   };
   const handlePlaySong = (song) => {
     // setCurrentSongId(song.id);
-    socket?.emit("selectSongToPlay", song.id)
+    if (permit) {
+      socket?.emit("selectSongToPlay", song.id)
+    }
   };
 
   const handleLeaveRoom = async () => {
@@ -350,6 +354,8 @@ function Page() {
                         <li
                           key={index}
                           className="flex items-center gap-3 mb-3"
+                          // style={{backgroundColor: "red"}}
+                          style={{ backgroundColor: song?.id === currentSong?.song.id ? "red" : "transparent" }}
                         >
                           <Image
                             src={getPosterSong(song.album).image}

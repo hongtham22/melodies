@@ -51,6 +51,9 @@ function ProposalList({
     socket.on("addSongToProposalListFailed", (data) => {
       alert(data)
     })
+    socket.on("forwardSongFailed", (data) => {
+      alert(data)
+    })
 
     return () => {
       // socket?.disconnect();
