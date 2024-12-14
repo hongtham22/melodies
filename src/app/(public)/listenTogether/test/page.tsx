@@ -173,33 +173,6 @@ function Page() {
     });
   };
 
-  // const handlePlay = () => {
-  //   if (permit) {
-  //     socket?.emit("SyncAudio", {
-  //       accessToken: accessToken,
-  //       currentTime: currentTime,
-  //       isPlaying: true,
-  //     });
-  //   }
-  // };
-
-  // const handlePause = () => {
-  //   if (permit) {
-  //     socket?.emit("SyncAudio", {
-  //       accessToken: accessToken,
-  //       currentTime: currentTime,
-  //       isPlaying: false,
-  //     });
-  //   }
-  // };
-
-  const handleSentMessage = () => {
-    socket?.emit("SendMessage", {
-      accessToken: accessToken,
-      message: message,
-    });
-  };
-
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchTerm(query);

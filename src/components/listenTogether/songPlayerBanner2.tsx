@@ -86,6 +86,13 @@ function SongPlayedBanner2({
       alert(data)
     })
 
+    socket.on("repeatSong", () => {
+      setIsRepeat(!isRepeat);
+      if (audioRef.current) {
+        audioRef.current.loop = !audioRef.current.loop;
+      }
+    })
+
     // Xóa tất cả listener cũ trước khi thêm mới
     socket.on("UpdateAudio", handleAudioUpdate);
 
@@ -214,8 +221,8 @@ function SongPlayedBanner2({
 
       console.log("song: ", audioUrl);
 
-      // setIsPlaying(currentSong.isPlaying);
-      // setStartTime(currentSong.currentTime);
+      setIsPlaying(currentSong.isPlaying);
+      setStartTime(currentSong.currentTime);
       if (audioRef.current) {
         audioRef.current.pause(); // Dừng bài hát hiện tại
         audioRef.current.src = audioUrl; // Cập nhật src
@@ -283,6 +290,7 @@ function SongPlayedBanner2({
       if (audioRef.current) {
         audioRef.current.loop = !audioRef.current.loop;
       }
+      socket?.emit("repeatSong")
     }
   };
   const handleRandomPlay = () => {
