@@ -3,10 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import Image from "next/image";
 import posterImg from "@/assets/img/placeholderSong.jpg";
-import { fetchApiData } from "@/app/api/appService";
 import { DataCurrentSong, DataSong } from "@/types/interfaces";
-import { getMainArtistId } from "@/utils/utils";
-// import "@/components/scss/musicPlayer.scss";
 
 import {
   FaCirclePlay,
@@ -14,23 +11,12 @@ import {
   FaForward,
   FaBackward,
   FaRepeat,
-  FaListCheck,
 } from "react-icons/fa6";
 import {
-  BsFilePlayFill,
   BsSkipEndFill,
   BsFillSkipStartFill,
 } from "react-icons/bs";
-import {
-  PiSpeakerHighFill,
-  PiSpeakerXFill,
-  PiSpeakerLowFill,
-} from "react-icons/pi";
-import { MdLyrics } from "react-icons/md";
-import { RiExpandDiagonalLine } from "react-icons/ri";
-
 import { TbSwitch3 } from "react-icons/tb";
-
 import {
   Tooltip,
   TooltipContent,
@@ -41,7 +27,6 @@ import { formatTime, getMainArtistName, getPosterSong } from "@/utils/utils";
 import WaveSurfer from "wavesurfer.js";
 import { decrypt } from "@/app/decode";
 import LoadingPage from "@/components/loadingPage";
-import { use } from "node-vibrant";
 
 function SongPlayedBanner2({
   currentSong,
@@ -66,30 +51,6 @@ function SongPlayedBanner2({
     console.log("đổi nhạc từ playlist");
   }, [currentSong]);
 
-  // use effect socket
-  // useEffect(() => {
-  //   if (!socket) return;
-
-  //   // socket.on("UpdateAudio", (data) => {
-  //   //   // if (!permit) {
-  //   //     console.log("khách", data);
-  //   //     setIsPlaying(data.isPlaying);
-  //   //     setStartTime(data.currentTime);
-  //   //   // }
-  //   // });
-
-  //   const handleAudioUpdate = (data) => {
-  //     console.log("khách", data);
-  //     setIsPlaying(data.isPlaying);
-  //     setStartTime(data.currentTime);
-  //   };
-
-  //   socket.on("UpdateAudio", handleAudioUpdate);
-
-  //   return () => {
-  //     socket.off("UpdateAudio", handleAudioUpdate);
-  //   };
-  // }, [socket]);
   useEffect(() => {
     if (!socket) return;
 
@@ -99,12 +60,32 @@ function SongPlayedBanner2({
       setStartTime(data.currentTime);
     };
 
-    // Xóa tất cả listener cũ trước khi thêm mới
     socket.off("UpdateAudio", handleAudioUpdate);
+    socket.on("previousSongFailed", (data) => {
+      alert(data);
+    });
+    socket.on("nextSongFailed", (data) => {
+      alert(data);
+    });
+    socket.on("randomSongPlayFailed", (data) => {
+      alert(data);
+    });
+
+    socket.on("repeatSong", () => {
+      setIsRepeat(!isRepeat);
+      if (audioRef.current) {
+        audioRef.current.loop = !audioRef.current.loop;
+      }
+    })
+
+    // Xóa tất cả listener cũ trước khi thêm mới
+    // socket.off("UpdateAudio", handleAudioUpdate);
     socket.on("UpdateAudio", handleAudioUpdate);
 
     return () => {
       socket.off("UpdateAudio", handleAudioUpdate);
+      // socket.off("previousSongFailed");
+      // socket.off("randomSongPlayFailed");
     };
   }, [socket]);
 
@@ -134,18 +115,6 @@ function SongPlayedBanner2({
       });
     }
   };
-  // const handlePlayPause = () => {
-  //   if (permit && audioRef.current) {
-  //     setIsPlaying((prev) => {
-  //       const newIsPlaying = !prev;
-  //       socket?.emit("SyncAudio", {
-  //         isPlaying: newIsPlaying,
-  //         currentTime: audioRef.current?.currentTime || 0,
-  //       });
-  //       return newIsPlaying;
-  //     });
-  //   }
-  // };
 
   const handleClickOnProgress = (e: React.MouseEvent<HTMLDivElement>) => {
     if (audioRef.current) {
@@ -238,8 +207,8 @@ function SongPlayedBanner2({
 
       console.log("song: ", audioUrl);
 
-      // setIsPlaying(currentSong.isPlaying);
-      // setStartTime(currentSong.currentTime);
+      setIsPlaying(currentSong.isPlaying);
+      setStartTime(currentSong.currentTime);
       if (audioRef.current) {
         audioRef.current.pause(); // Dừng bài hát hiện tại
         audioRef.current.src = audioUrl; // Cập nhật src
@@ -257,6 +226,62 @@ function SongPlayedBanner2({
       }
     }
   }, [currentSong]);
+
+  const handleNextSong = () => {
+    if (permit) {
+      console.log("next song");
+      socket?.emit("nextSong");
+    }
+  };
+  const handlePreviousSong = () => {
+    if (permit) {
+      console.log("previous song");
+      socket?.emit("previousSong");
+    }
+  };
+  const handleSkipBackward = () => {
+    if (audioRef.current && permit) {
+      const audioElement = audioRef.current;
+      const newTime = Math.max(0, audioElement.currentTime - 5);
+      audioElement.currentTime = newTime;
+      setStartTime(newTime);
+      socket?.emit("SyncAudio", {
+        isPlaying: isPlaying,
+        currentTime: startTime,
+      });
+    }
+    console.log("previous back song");
+  };
+  const handleSkipForward = () => {
+    if (audioRef.current && permit) {
+      const audioElement = audioRef.current;
+      const newTime = Math.max(0, audioElement.currentTime + 5);
+      audioElement.currentTime = newTime;
+      setStartTime(newTime);
+      socket?.emit("SyncAudio", {
+        isPlaying: isPlaying,
+        currentTime: startTime,
+      });
+    }
+    console.log("next time song");
+  };
+  // const handleRepeat = () => {
+  // }
+  const handleRepeat = () => {
+    if (permit) {
+      setIsRepeat(!isRepeat);
+      if (audioRef.current) {
+        audioRef.current.loop = !audioRef.current.loop;
+      }
+      socket?.emit("repeatSong");
+    }
+  };
+  const handleRandomPlay = () => {
+    if (permit) {
+      socket?.emit("randomSongPlay");
+      console.log("random song");
+    }
+  };
 
   if (loading) return <LoadingPage />;
 
@@ -306,14 +331,23 @@ function SongPlayedBanner2({
                   <div className="flex items-center mb-1 text-primaryColorGray cursor-pointer">
                     <Tooltip>
                       <TooltipTrigger>
-                        <TbSwitch3 className="mx-3 w-[24px] h-[24px] hover:text-primaryColorPink" />
+                        <TbSwitch3
+                          className="mx-3 w-[24px] h-[24px] hover:text-primaryColorPink"
+                          onClick={handleRandomPlay}
+                        />
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Turn on random play</p>
                       </TooltipContent>
                     </Tooltip>
-                    <BsFillSkipStartFill className="mx-3 w-[25px] h-[25px] hover:text-primaryColorPink" />
-                    <FaBackward className="mx-3 w-[20px] h-[20px]  hover:text-primaryColorPink" />
+                    <BsFillSkipStartFill
+                      className="mx-3 w-[25px] h-[25px] hover:text-primaryColorPink"
+                      onClick={handlePreviousSong}
+                    />
+                    <FaBackward
+                      className="mx-3 w-[20px] h-[20px]  hover:text-primaryColorPink"
+                      onClick={handleSkipBackward}
+                    />
                     {isPlaying ? (
                       <FaCirclePause
                         className="mx-3 w-[32px] h-[32px]  hover:text-primaryColorPink"
@@ -326,14 +360,21 @@ function SongPlayedBanner2({
                       />
                     )}
 
-                    <FaForward className="mx-3 w-[20px] h-[20px] hover:text-primaryColorPink" />
-                    <BsSkipEndFill className="mx-3 w-[25px] h-[25px] hover:text-primaryColorPink" />
+                    <FaForward
+                      className="mx-3 w-[20px] h-[20px] hover:text-primaryColorPink"
+                      onClick={handleSkipForward}
+                    />
+                    <BsSkipEndFill
+                      className="mx-3 w-[25px] h-[25px] hover:text-primaryColorPink"
+                      onClick={handleNextSong}
+                    />
                     <Tooltip>
                       <TooltipTrigger className="relative">
                         <FaRepeat
                           className={`mx-3 w-[20px] h-[20px] hover:text-primaryColorPink ${
                             isRepeat ? "text-primaryColorPink" : "text-white"
                           }`}
+                          onClick={handleRepeat}
                         />
                         {isRepeat && (
                           <div className="absolute left-2 -bottom-2 mx-3 w-[5px] h-[5px] bg-primaryColorPink rounded-full"></div>

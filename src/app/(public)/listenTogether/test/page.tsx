@@ -12,12 +12,10 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import LoadingPage from "@/components/loadingPage";
 import { fetchApiData } from "@/app/api/appService";
-import { DataSong } from "@/types/interfaces";
-import { decrypt } from "@/app/decode";
+import { DataCurrentSong, DataSong } from "@/types/interfaces";
 import Image from "next/image";
 import { getMainArtistName, getPosterSong } from "@/utils/utils";
 import { IoSearch } from "react-icons/io5";
-import SongPlayedBanner from "@/components/listenTogether/songPlayedBanner";
 import ChatMessage from "@/components/listenTogether/chatMessage";
 import ProposalList from "@/components/listenTogether/proposalList";
 import { useToast } from "@/hooks/use-toast";
@@ -37,22 +35,13 @@ function Page() {
   const [currentTime, setCurrentTime] = useState(0);
   const [permit, setPermit] = useState(true);
 
-  const [message, setMessage] = useState<string>("");
-  // const [chatMessages, setChatMessages] = useState<
-  //   { user: string; message: string }[]
-  // >([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
   const [playlist, setPlaylist] = useState<string[]>([]);
-
-  const [currentSongId, setCurrentSongId] = useState<string>("");
-
   // check
   const [currentProposalList, setCurrentProposalList] = useState([]);
   const [waitingSongs, setWaitingSongs] = useState([]);
-  const [currentSong, setCurrentSong] = useState({});
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [currentSong, setCurrentSong] = useState<DataCurrentSong | null>(null);
   const [showUsers, setShowUsers] = useState(false);
   const { toast } = useToast();
 
@@ -99,9 +88,19 @@ function Page() {
     socket.on("CreateRoomSuccess", (id) => {
       console.log("Đã kết nối tới room:", id);
     });
-    socket.on("JoinRoomSuccess", (data) => {
-      console.log("Join Success to room:", data);
+    // socket.on("JoinRoomSuccess", (data) => {
+    //   console.log("Join Success to room:", data);
+    //   setPermit(data.permit);
+    // });
+    socket.on("joinRoomSuccess", (data) => {
+      console.log("Join Success to room:", data.roomId);
       setPermit(data.permit);
+      setCurrentSong(data.currentSong);
+      setWaitingSongs(data.waitingList);
+      setCurrentProposalList(data.proposalList);
+    });
+    socket?.on("joinRoomFailed", (data) => {
+      console.log("joinRoomFailed", data);
     });
     socket.on("Users", (id) => {
       console.log("Userid:", id);
@@ -154,6 +153,7 @@ function Page() {
       console.log("Đã ngắt kết nối socket");
       socket?.off("CreateRoomSuccess");
       socket?.off("JoinRoomSuccess");
+      socket?.off("joinRoomFailed");
       socket?.off("Users");
       socket?.off("addSongToListWaitSuccess");
       socket?.off("updateListSongWait");
@@ -169,18 +169,18 @@ function Page() {
 
   const handleJoinRoom = async () => {
     socket?.emit("joinRoom", roomId);
-    socket?.on("joinRoomSuccess", (data) => {
-      console.log("Join Success to room:", data.roomId);
-      setPermit(data.permit);
-      // setWaitingSongs(data.listWait)
-      // setPlaylist(data.listPlay)
-      // setVisible(true);
-      setWaitingSongs(data.waitingList);
-      setCurrentProposalList(data.proposalList);
-    });
-    socket?.on("joinRoomFailed", (data) => {
-      console.log("joinRoomFailed", data);
-    });
+    // socket?.on("joinRoomSuccess", (data) => {
+    //   console.log("Join Success to room:", data.roomId);
+    //   setPermit(data.permit);
+    //   // setWaitingSongs(data.listWait)
+    //   // setPlaylist(data.listPlay)
+    //   // setVisible(true);
+    //   setWaitingSongs(data.waitingList);
+    //   setCurrentProposalList(data.proposalList);
+    // });
+    // socket?.on("joinRoomFailed", (data) => {
+    //   console.log("joinRoomFailed", data);
+    // });
   };
 
   const handleCreateRoom = async () => {
@@ -191,33 +191,6 @@ function Page() {
     });
     socket?.on("createRoomFailed", (data) => {
       console.log("createRoomFailed", data);
-    });
-  };
-
-  // const handlePlay = () => {
-  //   if (permit) {
-  //     socket?.emit("SyncAudio", {
-  //       accessToken: accessToken,
-  //       currentTime: currentTime,
-  //       isPlaying: true,
-  //     });
-  //   }
-  // };
-
-  // const handlePause = () => {
-  //   if (permit) {
-  //     socket?.emit("SyncAudio", {
-  //       accessToken: accessToken,
-  //       currentTime: currentTime,
-  //       isPlaying: false,
-  //     });
-  //   }
-  // };
-
-  const handleSentMessage = () => {
-    socket?.emit("SendMessage", {
-      accessToken: accessToken,
-      message: message,
     });
   };
 
@@ -237,7 +210,9 @@ function Page() {
   };
   const handlePlaySong = (song) => {
     // setCurrentSongId(song.id);
-    socket?.emit("selectSongToPlay", song.id);
+    if (permit) {
+      socket?.emit("selectSongToPlay", song.id);
+    }
   };
 
   const handleLeaveRoom = async () => {
@@ -412,6 +387,12 @@ function Page() {
                           <li
                             key={index}
                             className="flex items-center gap-3 mb-3"
+                            style={{
+                              backgroundColor:
+                                song?.id === currentSong?.song.id
+                                  ? "red"
+                                  : "transparent",
+                            }}
                           >
                             <Image
                               src={getPosterSong(song.album).image}

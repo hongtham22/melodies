@@ -5,10 +5,8 @@ import { PlusIcon, Cross2Icon } from "@radix-ui/react-icons";
 import { useEffect, useState, useRef, useCallback } from "react";
 // import { io, Socket } from "socket.io-client";
 import { useAppContext } from "@/app/AppProvider";
-import LoadingPage from "@/components/loadingPage";
 import { fetchApiData } from "@/app/api/appService";
 import { DataSong } from "@/types/interfaces";
-import { decrypt } from "@/app/decode";
 import Image from "next/image";
 import { getMainArtistName, getPosterSong } from "@/utils/utils";
 import { IoSearch } from "react-icons/io5";
@@ -22,7 +20,6 @@ function ProposalList({
   permit: boolean;
 }) {
   const { socket } = useAppContext();
-  const { loading, setLoading } = useAppContext();
   const { accessToken } = useAppContext();
   const { toast } = useToast();
 
@@ -51,8 +48,17 @@ function ProposalList({
     socket.on("addSongToProposalListFailed", (data) => {
       alert(data)
     })
+    socket.on("forwardSongFailed", (data) => {
+      alert(data)
+    })
 
     return () => {
+      socket?.off("addSongToProposalListSuccess");
+      socket?.off("updateProposalList");
+      socket?.off("updateListSong");
+      socket?.off("addSongToProposalListFailed");
+      socket?.off("forwardSongFailed");
+      
       // socket?.disconnect();
       console.log("disconnect socket"); 
     }
