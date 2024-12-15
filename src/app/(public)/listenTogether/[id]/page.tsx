@@ -23,10 +23,12 @@ import SongPlayedBanner2 from "@/components/listenTogether/songPlayerBanner2";
 import ListUser from "@/components/listenTogether/listUser";
 import animation from "../../../../../public/animation/Animation - song.json";
 import Lottie from "react-lottie-player";
+import { useRouter } from "next/navigation";
 
 // let socket: Socket | null = null;
 
-function Page() {
+function Page({params}) {
+  const { id } = params;
   const { loading, setLoading } = useAppContext();
   const { socket } = useAppContext();
   const { accessToken } = useAppContext();
@@ -44,6 +46,7 @@ function Page() {
   const [currentSong, setCurrentSong] = useState<DataCurrentSong | null>(null);
   const [showUsers, setShowUsers] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleTimeUpdate = () => {
     if (audioRef.current && permit) {
@@ -219,13 +222,15 @@ function Page() {
     socket?.emit("leaveRoom");
     socket?.on("leaveRoomSuccess", () => {
       console.log("Leave room success");
+      router.push(`/listenTogether`);
+
       // setVisible(false);
     });
   };
 
   return (
     <div className="w-full my-20 m-6 p-8 flex flex-col gap-4">
-      <div className="w-full flex gap-2">
+      {/* <div className="w-full flex gap-2">
         <button
           onClick={handleCreateRoom}
           className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
@@ -253,10 +258,10 @@ function Page() {
             Leave Room
           </button>
         </div>
-      </div>
+      </div> */}
       <div className="w-full flex items-center justify-start">
         <div className="w-2/4 flex items-center justify-between pr-6">
-          <p className="">Room ID: {roomId || ""}</p>
+          <p className="">Room ID: {id || ""}</p>
           <button
             onClick={handleLeaveRoom}
             className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"

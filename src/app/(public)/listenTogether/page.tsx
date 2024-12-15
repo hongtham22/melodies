@@ -8,6 +8,8 @@ import { fetchApiData } from "@/app/api/appService";
 import { DataSong } from "@/types/interfaces";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
+import bannerImg from "@/assets/img/listen_together2.jpeg";
+import { useRouter } from "next/navigation";
 
 function Page() {
   const { socket } = useAppContext();
@@ -18,12 +20,11 @@ function Page() {
 
   const [playlist, setPlaylist] = useState<string[]>([]);
 
-
   // check
   const [currentProposalList, setCurrentProposalList] = useState([]);
   const [waitingSongs, setWaitingSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState({});
-
+  const router = useRouter();
 
   useEffect(() => {
     if (!socket) return;
@@ -42,8 +43,7 @@ function Page() {
       console.log("Userid:", id);
     });
 
-
-    return () => { 
+    return () => {
       // socket?.disconnect();
       console.log("Đã ngắt kết nối socket");
       socket?.off("CreateRoomSuccess");
@@ -62,6 +62,7 @@ function Page() {
       // setVisible(true);
       setWaitingSongs(data.waitingList);
       setCurrentProposalList(data.proposalList);
+      router.push(`/listenTogether/${roomId}`);
     });
     socket?.on("joinRoomFailed", (data) => {
       console.log("joinRoomFailed", data);
@@ -73,6 +74,8 @@ function Page() {
     socket?.on("createRoomSuccess", (id) => {
       console.log("Create room success: " + id);
       // setVisible(true);
+      router.push(`/listenTogether/${id}`);
+
     });
     socket?.on("createRoomFailed", (data) => {
       console.log("createRoomFailed", data);
@@ -80,16 +83,16 @@ function Page() {
   };
 
   return (
-    <div className="w-full my-20 m-6 p-8 flex-col gap-4">
-      <div className="w-full flex gap-2 jutify-between mb-4">
+    <div className="w-full my-20 m-6 p-8 gap-4 flex justify-between items-center">
+      <div className="w-1/2 flex flex-col gap-6">
         <button
           onClick={handleCreateRoom}
-          className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+          className="w-fit p-2 text-textMedium bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
         >
           <PlusIcon className="text-white w-5 h-5" />
           Create a room
         </button>
-        <div className="flex w-1/4 gap-2 items-center">
+        <div className="w-fit flex gap-2 items-center">
           <Input
             className="border-white"
             placeholder="enter room"
@@ -103,6 +106,12 @@ function Page() {
             Join room
           </button>
         </div>
+      </div>
+
+      <div
+        className="w-1/2"
+      >
+        <Image src={bannerImg} alt="banner" />
       </div>
     </div>
   );
