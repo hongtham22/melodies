@@ -23,6 +23,8 @@ import ProposalList from "@/components/listenTogether/proposalList";
 import { useToast } from "@/hooks/use-toast";
 import SongPlayedBanner2 from "@/components/listenTogether/songPlayerBanner2";
 import ListUser from "@/components/listenTogether/listUser";
+import animation from "../../../../../public/animation/Animation - song.json";
+import Lottie from "react-lottie-player";
 
 // let socket: Socket | null = null;
 
@@ -248,7 +250,7 @@ function Page() {
 
   return (
     <div className="w-full my-20 m-6 p-8 flex flex-col gap-4">
-      {/* <div className="w-full flex gap-2">
+      <div className="w-full flex gap-2">
         <button
           onClick={handleCreateRoom}
           className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
@@ -276,7 +278,7 @@ function Page() {
             Leave Room
           </button>
         </div>
-      </div> */}
+      </div>
       <div className="w-full flex items-center justify-start">
         <div className="w-2/4 flex items-center justify-between pr-6">
           <p className="">Room ID: {roomId || ""}</p>
@@ -289,23 +291,23 @@ function Page() {
         </div>
         <div className="w-1/4"></div>
         <div className="w-1/4 flex gap-2 items-center px-3">
-        <button
-        onClick={handleViewUser}
-        className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-        aria-label={showUsers ? "Hide Participants" : "View Participants"}
-      >
-        {showUsers ? (
-          <>
-            Hide 5 Participants
-            <ChevronUpIcon />
-          </>
-        ) : (
-          <>
-            View 5 Participants
-            <ChevronDownIcon />
-          </>
-        )}
-      </button>
+          <button
+            onClick={handleViewUser}
+            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+            aria-label={showUsers ? "Hide Participants" : "View Participants"}
+          >
+            {showUsers ? (
+              <>
+                Hide 5 Participants
+                <ChevronUpIcon />
+              </>
+            ) : (
+              <>
+                View 5 Participants
+                <ChevronDownIcon />
+              </>
+            )}
+          </button>
         </div>
       </div>
       <div className="w-full flex gap-6 ">
@@ -402,39 +404,56 @@ function Page() {
                   </p>
                   <div className="w-full flex ">
                     <ul className="list-none w-full">
-                      {waitingSongs?.map((song, index) => (
-                        <li
-                          key={index}
-                          className="flex items-center gap-3 mb-3"
-                        >
-                          <Image
-                            src={getPosterSong(song.album).image}
-                            alt="Song Poster"
-                            width={48}
-                            height={48}
-                            quality={100}
-                            className="object-cover rounded-md w-10 h-10"
-                          />
-                          <div className="w-full flex justify-between">
-                            <div>
-                              <p className="font-bold text-white truncate text-ellipsis">
-                                {song.title}
-                              </p>
-                              <p className="font-thin text-primaryColorGray text-[0.9rem] truncate text-ellipsis">
-                                {getMainArtistName(song.artists)}
-                              </p>
+                      {waitingSongs?.map((song, index) => {
+                        const isCurrentSong = currentSong?.song?.id === song.id;
+                        console.log("isCurrentSong: ", isCurrentSong);
+                        console.log("currentSong: ", currentSong);
+                        return (
+                          <li
+                            key={index}
+                            className="flex items-center gap-3 mb-3"
+                          >
+                            <Image
+                              src={getPosterSong(song.album).image}
+                              alt="Song Poster"
+                              width={48}
+                              height={48}
+                              quality={100}
+                              className="object-cover rounded-md w-10 h-10"
+                            />
+                            <div className="w-full flex justify-between items-center">
+                              <div>
+                                <p className="font-bold text-white truncate">
+                                  {song.title}
+                                </p>
+                                <p className="font-thin text-primaryColorGray text-[0.9rem] truncate">
+                                  {getMainArtistName(song.artists)}
+                                </p>
+                              </div>
+                              {isCurrentSong ? (
+                                <div className="absolute right-3">
+                                  <Lottie
+                                    loop
+                                    animationData={animation}
+                                    play={currentSong?.isPlaying}
+                                    style={{ width: 24, height: 24 }}
+                                    className="text-primaryColorPink"
+                                  />
+                                </div>
+                              ) : (
+                                permit && (
+                                  <button
+                                    className="h-8 px-4 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-black hover:bg-white transition-all duration-300"
+                                    onClick={() => handlePlaySong(song)}
+                                  >
+                                    Play
+                                  </button>
+                                )
+                              )}
                             </div>
-                            {permit && (
-                              <button
-                                className="h-8 px-4 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-black hover:bg-white transition-all duration-300"
-                                onClick={() => handlePlaySong(song)}
-                              >
-                                Play
-                              </button>
-                            )}
-                          </div>
-                        </li>
-                      ))}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </div>
