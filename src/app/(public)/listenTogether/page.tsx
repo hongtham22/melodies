@@ -32,23 +32,9 @@ function Page() {
     socket.emit("Error", (message) => {
       console.log("Error:", message);
     });
-    socket.on("CreateRoomSuccess", (id) => {
-      console.log("Đã kết nối tới room:", id);
-    });
-    socket.on("JoinRoomSuccess", (data) => {
-      console.log("Join Success to room:", data);
-      setPermit(data.permit);
-    });
-    socket.on("Users", (id) => {
-      console.log("Userid:", id);
-    });
-
+    
+    
     return () => {
-      // socket?.disconnect();
-      console.log("Đã ngắt kết nối socket");
-      socket?.off("CreateRoomSuccess");
-      socket?.off("JoinRoomSuccess");
-      socket?.off("Users");
     };
   }, [socket]);
 
@@ -57,9 +43,6 @@ function Page() {
     socket?.on("joinRoomSuccess", (data) => {
       console.log("Join Success to room:", data.roomId);
       setPermit(data.permit);
-      // setWaitingSongs(data.listWait)
-      // setPlaylist(data.listPlay)
-      // setVisible(true);
       setWaitingSongs(data.waitingList);
       setCurrentProposalList(data.proposalList);
       router.push(`/listenTogether/${roomId}`);
@@ -73,9 +56,7 @@ function Page() {
     socket?.emit("createRoom");
     socket?.on("createRoomSuccess", (id) => {
       console.log("Create room success: " + id);
-      // setVisible(true);
       router.push(`/listenTogether/${id}`);
-
     });
     socket?.on("createRoomFailed", (data) => {
       console.log("createRoomFailed", data);

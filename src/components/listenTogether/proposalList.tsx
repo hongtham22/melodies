@@ -60,7 +60,7 @@ function ProposalList({
       socket?.off("forwardSongFailed");
       
       // socket?.disconnect();
-      console.log("disconnect socket"); 
+      // console.log("disconnect socket"); 
     }
   }, [socket]);
   // }, []);
