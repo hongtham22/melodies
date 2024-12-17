@@ -21,30 +21,24 @@ function Page() {
   const [playlist, setPlaylist] = useState<string[]>([]);
 
   // check
-  const [currentProposalList, setCurrentProposalList] = useState([]);
-  const [waitingSongs, setWaitingSongs] = useState([]);
-  const [currentSong, setCurrentSong] = useState({});
   const router = useRouter();
 
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.emit("Error", (message) => {
-      console.log("Error:", message);
-    });
+  // useEffect(() => {
+  //   if (!socket) return;
     
     
-    return () => {
-    };
-  }, [socket]);
+  //   return () => {
+  //     socket.off("joinRoomSuccess")
+  //     socket.off("joinRoomFailed")
+  //     socket.off("createRoomSuccess")
+  //     socket.off("createRoomFailed")
+  //   };
+  // }, [socket]);
 
   const handleJoinRoom = async () => {
     socket?.emit("joinRoom", roomId);
     socket?.on("joinRoomSuccess", (data) => {
       console.log("Join Success to room:", data.roomId);
-      setPermit(data.permit);
-      setWaitingSongs(data.waitingList);
-      setCurrentProposalList(data.proposalList);
       router.push(`/listenTogether/${roomId}`);
     });
     socket?.on("joinRoomFailed", (data) => {

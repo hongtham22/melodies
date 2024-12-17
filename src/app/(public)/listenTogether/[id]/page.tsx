@@ -50,6 +50,10 @@ function Page({params}) {
   const [listUser, setListUser] = useState<User[]>([]);
   
 
+  useEffect(() => {
+    socket?.emit("getData");
+  }, [])
+
   const handleTimeUpdate = () => {
     if (audioRef.current && permit) {
       setCurrentTime(audioRef.current.currentTime);
@@ -87,9 +91,6 @@ function Page({params}) {
   useEffect(() => {
     if (!socket) return;
 
-    socket.emit("Error", (message) => {
-      console.log("Error:", message);
-    });
     socket.on("addSongToListWaitSuccess", () => {
       alert("them bai playlist wait ok");
     });
@@ -140,6 +141,12 @@ function Page({params}) {
       console.log("members: ", data)
       setListUser(data);
     })
+    socket.on("roomData", (data) => {
+      setPermit(data.permit);
+      setWaitingSongs(data.waitingList);
+      setCurrentProposalList(data.proposalList);
+      setCurrentSong(data.currentSong);
+    })
 
     return () => {
       socket?.off("addSongToListWaitSuccess");
@@ -154,6 +161,7 @@ function Page({params}) {
       socket?.off("roomClosed");
       socket?.off("leaveRoomSuccess");
       socket?.off("members");
+      socket?.off("roomData");
     };
   }, [socket]);
 
