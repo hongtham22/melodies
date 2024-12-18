@@ -147,6 +147,10 @@ function Page({params}) {
       setCurrentProposalList(data.proposalList);
       setCurrentSong(data.currentSong);
     })
+    socket.on("disconnect", () => {
+      alert("Lost connection to server")
+      router.push(`/listenTogether`);
+    })
 
     return () => {
       socket?.off("addSongToListWaitSuccess");
