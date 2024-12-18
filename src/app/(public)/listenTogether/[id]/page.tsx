@@ -47,6 +47,12 @@ function Page({params}) {
   const [showUsers, setShowUsers] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const [listUser, setListUser] = useState<User[]>([]);
+
+  useEffect(() => {
+    socket?.emit("getData");
+  }, [])
+
 
   const handleTimeUpdate = () => {
     if (audioRef.current && permit) {
@@ -85,36 +91,36 @@ function Page({params}) {
   useEffect(() => {
     if (!socket) return;
 
-    socket.emit("Error", (message) => {
-      console.log("Error:", message);
-    });
-    socket.on("CreateRoomSuccess", (id) => {
-      console.log("Đã kết nối tới room:", id);
-    });
-    // socket.on("JoinRoomSuccess", (data) => {
-    //   console.log("Join Success to room:", data);
+    // socket.emit("Error", (message) => {
+    //   console.log("Error:", message);
+    // });
+    // socket.on("CreateRoomSuccess", (id) => {
+    //   console.log("Đã kết nối tới room:", id);
+    // });
+    // // socket.on("JoinRoomSuccess", (data) => {
+    // //   console.log("Join Success to room:", data);
+    // //   setPermit(data.permit);
+    // // });
+    // socket.on("joinRoomSuccess", (data) => {
+    //   console.log("Join Success to room:", data.roomId);
     //   setPermit(data.permit);
+    //   setCurrentSong(data.currentSong);
+    //   setWaitingSongs(data.waitingList);
+    //   setCurrentProposalList(data.proposalList);
     // });
-    socket.on("joinRoomSuccess", (data) => {
-      console.log("Join Success to room:", data.roomId);
-      setPermit(data.permit);
-      setCurrentSong(data.currentSong);
-      setWaitingSongs(data.waitingList);
-      setCurrentProposalList(data.proposalList);
-    });
-    socket?.on("joinRoomFailed", (data) => {
-      console.log("joinRoomFailed", data);
-    });
-    socket.on("Users", (id) => {
-      console.log("Userid:", id);
-    });
-    // socket.on("ServerSendMessage", (data) => {
-    //   console.log("Message:", data);
-    //   setChatMessages((prevMessages) => [
-    //     ...prevMessages,
-    //     { user: data.user.username, message: data.message },
-    //   ]);
+    // socket?.on("joinRoomFailed", (data) => {
+    //   console.log("joinRoomFailed", data);
     // });
+    // socket.on("Users", (id) => {
+    //   console.log("Userid:", id);
+    // });
+    // // socket.on("ServerSendMessage", (data) => {
+    // //   console.log("Message:", data);
+    // //   setChatMessages((prevMessages) => [
+    // //     ...prevMessages,
+    // //     { user: data.user.username, message: data.message },
+    // //   ]);
+    // // });
 
     socket.on("addSongToListWaitSuccess", () => {
       alert("them bai playlist wait ok");
@@ -151,13 +157,38 @@ function Page({params}) {
       setCurrentSong(currentSong);
     });
 
+    socket.on("roomClosed", (data) => {
+      console.log(data)
+      alert(data);
+      router.back();
+      // setTimeout(() => {
+      //   router.back();
+      // }, 3000);
+    })
+    socket.on("leaveRoomSuccess", () => {
+      alert("Leave room success");
+      console.log("Leave room success");
+      router.push(`/listenTogether`);
+    });
+    socket.on("members", (data) => {
+      console.log("members: ", data)
+      setListUser(data);
+    })
+
+    socket.on("roomData", (data) => {
+      setPermit(data.permit);
+      setWaitingSongs(data.waitingList);
+      setCurrentProposalList(data.proposalList);
+      setCurrentSong(data.currentSong);
+    })
+
     return () => {
       // socket?.disconnect();
-      console.log("Đã ngắt kết nối socket");
-      socket?.off("CreateRoomSuccess");
-      socket?.off("JoinRoomSuccess");
-      socket?.off("joinRoomFailed");
-      socket?.off("Users");
+      // console.log("Đã ngắt kết nối socket");
+      // socket?.off("CreateRoomSuccess");
+      // socket?.off("JoinRoomSuccess");
+      // socket?.off("joinRoomFailed");
+      // socket?.off("Users");
       socket?.off("addSongToListWaitSuccess");
       socket?.off("updateListSongWait");
       socket?.off("addSongToListPlaySuccess");
@@ -167,35 +198,39 @@ function Page({params}) {
       socket?.off("updateWaitingList");
       socket?.off("updateListSong");
       socket?.off("playSong");
+      socket?.off("roomClosed");
+      socket?.off("leaveRoomSuccess");
+      socket?.off("members");
+      socket?.off("roomData");
     };
   }, [socket]);
 
-  const handleJoinRoom = async () => {
-    socket?.emit("joinRoom", roomId);
-    // socket?.on("joinRoomSuccess", (data) => {
-    //   console.log("Join Success to room:", data.roomId);
-    //   setPermit(data.permit);
-    //   // setWaitingSongs(data.listWait)
-    //   // setPlaylist(data.listPlay)
-    //   // setVisible(true);
-    //   setWaitingSongs(data.waitingList);
-    //   setCurrentProposalList(data.proposalList);
-    // });
-    // socket?.on("joinRoomFailed", (data) => {
-    //   console.log("joinRoomFailed", data);
-    // });
-  };
+  // const handleJoinRoom = async () => {
+  //   socket?.emit("joinRoom", roomId);
+  //   // socket?.on("joinRoomSuccess", (data) => {
+  //   //   console.log("Join Success to room:", data.roomId);
+  //   //   setPermit(data.permit);
+  //   //   // setWaitingSongs(data.listWait)
+  //   //   // setPlaylist(data.listPlay)
+  //   //   // setVisible(true);
+  //   //   setWaitingSongs(data.waitingList);
+  //   //   setCurrentProposalList(data.proposalList);
+  //   // });
+  //   // socket?.on("joinRoomFailed", (data) => {
+  //   //   console.log("joinRoomFailed", data);
+  //   // });
+  // };
 
-  const handleCreateRoom = async () => {
-    socket?.emit("createRoom");
-    socket?.on("createRoomSuccess", (id) => {
-      console.log("Create room success: " + id);
-      // setVisible(true);
-    });
-    socket?.on("createRoomFailed", (data) => {
-      console.log("createRoomFailed", data);
-    });
-  };
+  // const handleCreateRoom = async () => {
+  //   socket?.emit("createRoom");
+  //   socket?.on("createRoomSuccess", (id) => {
+  //     console.log("Create room success: " + id);
+  //     // setVisible(true);
+  //   });
+  //   socket?.on("createRoomFailed", (data) => {
+  //     console.log("createRoomFailed", data);
+  //   });
+  // };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -220,45 +255,16 @@ function Page({params}) {
 
   const handleLeaveRoom = async () => {
     socket?.emit("leaveRoom");
-    socket?.on("leaveRoomSuccess", () => {
-      console.log("Leave room success");
-      router.push(`/listenTogether`);
+    // socket?.on("leaveRoomSuccess", () => {
+    //   console.log("Leave room success");
+    //   router.push(`/listenTogether`);
 
-      // setVisible(false);
-    });
+    //   // setVisible(false);
+    // });
   };
 
   return (
     <div className="w-full my-20 m-6 p-8 flex flex-col gap-4">
-      {/* <div className="w-full flex gap-2">
-        <button
-          onClick={handleCreateRoom}
-          className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-        >
-          <PlusIcon className="text-white w-5 h-5" />
-          Create a room
-        </button>
-        <div className="flex w-1/4 gap-2 items-center">
-          <Input
-            className="border-white"
-            placeholder="enter room"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-          />
-          <button
-            onClick={handleJoinRoom}
-            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-          >
-            Join room
-          </button>
-          <button
-            onClick={handleLeaveRoom}
-            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-          >
-            Leave Room
-          </button>
-        </div>
-      </div> */}
       <div className="w-full flex items-center justify-start">
         <div className="w-2/4 flex items-center justify-between pr-6">
           <p className="">Room ID: {id || ""}</p>
@@ -448,7 +454,7 @@ function Page({params}) {
           </div>
         </div>
         {showUsers ? (
-          <ListUser /> // Hiển thị danh sách người dùng
+          <ListUser listUser={listUser} /> // Hiển thị danh sách người dùng
         ) : (
           <ProposalList
             socket={socket}
