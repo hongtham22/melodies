@@ -116,6 +116,8 @@ function SongPlayedBanner2({
     }
   };
 
+  const progressWidth = (startTime / endTime) * 100 || 0;
+
   const handleClickOnProgress = (e: React.MouseEvent<HTMLDivElement>) => {
     if (audioRef.current) {
       const rect = e.currentTarget.getBoundingClientRect();
@@ -172,7 +174,7 @@ function SongPlayedBanner2({
         }
       };
     }
-  }, [audioRef.current]); // Ensure the effect runs when the permit or socket changes
+  }, [audioRef.current]); 
 
   // lấy màu ảnh
   useEffect(() => {
@@ -398,8 +400,16 @@ function SongPlayedBanner2({
                         id="waveform"
                       ></div>
                       <div className="w-[15vw] bg-[#4D4D4D] h-1 rounded-md "></div>
-                      <div className="absolute bg-white top-0 w-full h-1 rounded-md"></div>
-                      <div className="absolute -top-[100%] left-[50%] w-3 h-3 bg-white rounded-full transform -translate-x-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+                      {/* <div className="absolute bg-white top-0 w-full h-1 rounded-md"></div> */}
+                      <div
+                        className="absolute bg-white top-0 w-full h-1 rounded-md"
+                        style={{ width: `${progressWidth}%` }}
+                      ></div>
+                      <div
+                        className="absolute -top-[100%] left-[50%] w-3 h-3 bg-white rounded-full transform -translate-x-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                        style={{ left: `calc(${progressWidth}%)` }}
+                      ></div>
+                      {/* <div className="absolute -top-[100%] left-[50%] w-3 h-3 bg-white rounded-full transform -translate-x-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div> */}
                     </div>
                     <p className="mx-2 text-[0.9rem]">
                       {formatTime(endTime * 1000)}
