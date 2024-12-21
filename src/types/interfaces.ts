@@ -106,3 +106,22 @@ export interface GenreData {
     genreId: string;
     name: string;
   }
+
+
+export interface UserRoom {
+    id: string;
+    username: string;
+    image: string | null;
+    accountType: string;
+    name: string;
+    host: boolean   
+}
+
+
+export interface Message {
+    user: UserRoom,
+    message: string,
+    userSend: string
+}
+
+

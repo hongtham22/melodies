@@ -11,7 +11,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import LoadingPage from "@/components/loadingPage";
 import { fetchApiData } from "@/app/api/appService";
-import { DataCurrentSong, DataSong } from "@/types/interfaces";
+import { DataCurrentSong, DataSong, UserRoom } from "@/types/interfaces";
 import Image from "next/image";
 import { getMainArtistName, getPosterSong } from "@/utils/utils";
 import { IoSearch } from "react-icons/io5";
@@ -45,7 +45,9 @@ function Page({params}) {
   const [showUsers, setShowUsers] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
-  const [listUser, setListUser] = useState<User[]>([]);
+  const [listUser, setListUser] = useState<UserRoom[]>([]);
+  const [enableAnimation, setEnableAnimation] = useState(true);
+  const [myId, setMyId] = useState<string>("");
 
   useEffect(() => {
     socket?.emit("getData");
@@ -120,34 +122,26 @@ function Page({params}) {
     socket.on("playSong", (currentSong) => {
       setCurrentSong(currentSong);
     });
-    socket.on("roomClosed", (data) => {
-      console.log(data)
-      alert(data);
-      router.back();
-      // setTimeout(() => {
-      //   router.back();
-      // }, 3000);
-    })
-    socket.on("leaveRoomSuccess", () => {
-      alert("Leave room success");
-      console.log("Leave room success");
-      router.push(`/listenTogether`);
-    });
     socket.on("members", (data) => {
       console.log("members: ", data)
       setListUser(data);
     })
     socket.on("roomData", (data) => {
+      console.log("nhaanj room data")
       setPermit(data.permit);
       setWaitingSongs(data.waitingList);
       setCurrentProposalList(data.proposalList);
       setCurrentSong(data.currentSong);
+      // if (data.currentSong) {
+      //   console.log("room data: ", data.currentSong.song)
+      // } else {
+      //   console.log("room data empty: ", )
+      // }
     })
     socket.on("disconnect", () => {
       alert("Lost connection to server")
       router.push(`/listenTogether`);
     })
-
     socket.on("roomClosed", (data) => {
       console.log(data)
       alert(data);
@@ -169,21 +163,29 @@ function Page({params}) {
       setCurrentProposalList(data.proposalList);
       setCurrentSong(data.currentSong);
     })
+    socket.on("animation", (data) => {
+      setEnableAnimation(data)
+    })
+    socket.on("myId", (data) => {
+      console.log("id haha: ", data)
+      setMyId(data)
+    })
 
     return () => {
-      socket?.off("addSongToListWaitSuccess");
-      socket?.off("updateListSongWait");
-      socket?.off("addSongToListPlaySuccess");
-      socket?.off("updateListSongPlay");
-      socket?.off("addSongToWaitingListSuccess");
-      socket?.off("addSongToWaitingListFailed");
-      socket?.off("updateWaitingList");
-      socket?.off("updateListSong");
-      socket?.off("playSong");
-      socket?.off("roomClosed");
-      socket?.off("leaveRoomSuccess");
-      socket?.off("members");
-      socket?.off("roomData");
+      socket.off("addSongToListWaitSuccess");
+      socket.off("updateListSongWait");
+      socket.off("addSongToListPlaySuccess");
+      socket.off("updateListSongPlay");
+      socket.off("addSongToWaitingListSuccess");
+      socket.off("addSongToWaitingListFailed");
+      socket.off("updateWaitingList");
+      socket.off("updateListSong");
+      socket.off("playSong");
+      socket.off("roomClosed");
+      socket.off("leaveRoomSuccess");
+      socket.off("members");
+      socket.off("roomData");
+      socket.off("myId");
     };
   }, [socket]);
 
@@ -256,7 +258,7 @@ function Page({params}) {
             permit={permit}
           />
           {/* list chat */}
-          <ChatMessage />
+          <ChatMessage myId={myId}/>
         </div>
 
         <div className="w-1/4 h-screen flex flex-col gap-6 relative bg-secondColorBg rounded-lg">
@@ -372,7 +374,7 @@ function Page({params}) {
                                   {getMainArtistName(song.artists)}
                                 </p>
                               </div>
-                              {isCurrentSong ? (
+                              {(isCurrentSong && enableAnimation) ? (
                                 <div className="absolute right-3">
                                   <Lottie
                                     loop

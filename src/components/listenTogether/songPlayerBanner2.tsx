@@ -38,7 +38,7 @@ function SongPlayedBanner2({
   permit: boolean;
 }) {
   const [dominantColor, setDominantColor] = useState<string>();
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [endTime, setEndTime] = useState<number>(0);
   const [startTime, setStartTime] = useState<number>(0);
   const [isRepeat, setIsRepeat] = useState(false);
@@ -48,7 +48,7 @@ function SongPlayedBanner2({
 
   // doi nhacj
   useEffect(() => {
-    console.log("đổi nhạc từ playlist");
+    console.log("đổi nhạc từ playlist", permit);
   }, [currentSong]);
 
   useEffect(() => {
@@ -84,7 +84,8 @@ function SongPlayedBanner2({
 
     return () => {
       socket.off("UpdateAudio", handleAudioUpdate);
-      // socket.off("previousSongFailed");
+      socket.off('nextSongFailed');
+      socket.off("previousSongFailed");
       // socket.off("randomSongPlayFailed");
     };
   }, [socket]);
@@ -200,8 +201,7 @@ function SongPlayedBanner2({
 
   // lấy url nhạc
   useEffect(() => {
-    if (currentSong && currentSong.song) {
-      // console.log("thay doi current song")
+    if (currentSong && currentSong.song && currentSong.song.id) {
       const audioUrl = currentSong.song.filePathAudio
         ? decrypt(currentSong.song.filePathAudio)
         : "";

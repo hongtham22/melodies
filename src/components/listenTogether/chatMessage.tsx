@@ -4,21 +4,27 @@ import { PaperPlaneIcon } from "@radix-ui/react-icons";
 import { useAppContext } from "@/app/AppProvider";
 import Image from "next/image";
 import userImg from "@/assets/img/placeholderUser.jpg";
-function ChatMessage() {
+import { Message } from "@/types/interfaces";
+function ChatMessage({myId} : {myId: string}) {
   const [message, setMessage] = useState<string>("");
-  const [chatMessages, setChatMessages] = useState<
-    { user: object; message: string }[]
-  >([]);
+  // const [chatMessages, setChatMessages] = useState<
+  //   { user: object; message: string }[]
+  // >([]);
+  const [chatMessages, setChatMessages] = useState<Message[]>([]);
+  const [myIdMes, setMyIdMes] = useState<string>(myId);
   const { accessToken } = useAppContext();
   const { socket } = useAppContext();
+
+  console.log("my id:" , myIdMes, myId)
 
   useEffect(() => {
     if (!socket) return;
     socket.on("ServerSendMessage", (data) => {
       console.log("Message:", data);
+      // setChatMessages(data)
       setChatMessages((prevMessages) => [
         ...prevMessages,
-        { user: data.user, message: data.message },
+        { user: data.user, message: data.message, userSend: data.userSend },
       ]);
     });
   }, [socket]);
@@ -49,7 +55,10 @@ function ChatMessage() {
         {chatMessages.map((msg, index) => (
           <div
             key={index}
-            className="w-fit flex gap-2 items-center py-1 px-2 border bg-darkerBlue rounded-full"
+            // className="w-fit flex gap-2 items-center py-1 px-2 border bg-darkerBlue rounded-full"
+            // className="w-fit flex gap-2 items-center py-1 px-2 border "
+            // style={{backgroundColor: msg.user?.isSender ? 'red' : 'transparent'}}
+            className={`w-fit flex gap-2 items-center py-1 px-2 border  ${msg.userSend == myId ? 'ml-0': 'ml-auto'}`} // Thêm điều kiện
           >
             <Image
               src={msg.user?.image || userImg}

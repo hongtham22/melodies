@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import songimg from "@/assets/img/songs.png";
 import { Divide } from "lucide-react";
-import { User } from "@/types/interfaces";
+import { UserRoom } from "@/types/interfaces";
 
 
 function ListUser({ listUser }: { listUser: User[] }) {
-  const [users, setUsers] = useState<User[]>(listUser);
+  const [users, setUsers] = useState<UserRoom[]>(listUser);
   useEffect(() => {
     setUsers(listUser);
     console.log("listUser", listUser);
@@ -17,7 +17,10 @@ function ListUser({ listUser }: { listUser: User[] }) {
       {users.length > 0 ? (
         <div className="w-full flex flex-col gap-4 p-2 overflow-y-auto scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
           {users.map((item, index) => (
-            <div key={index} className="flex gap-2 items-center">
+            
+            <div key={index} className="flex gap-2 items-center" 
+            style={{ backgroundColor: item.host ? 'red' : 'transparent' }} // Kiểm tra item.host
+            >
               <Image
                 src={songimg}
                 alt="song"
