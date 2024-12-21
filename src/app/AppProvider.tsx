@@ -87,6 +87,10 @@ export const AppProvider: React.FC<{
         console.log("payment", data);
       });
 
+      newSocket.on("newNoti", (data) => {
+        alert("bạn có thông báo mới, hãy get thông báo")
+      })
+
       setSocket(newSocket);
 
       // Cleanup on Unmount or Token Change
