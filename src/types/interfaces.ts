@@ -93,3 +93,36 @@ export interface DataPlaylist {
     createdAt: string;
     songsOfPlaylist: DataSong[];
 }
+
+// socket
+export interface DataCurrentSong {
+    song: DataSong,
+    isPlaying: boolean,
+    currentTime: number,
+}
+
+// genre
+
+export interface GenreData {
+    genreId: string;
+    name: string;
+  }
+
+
+export interface UserRoom {
+    id: string;
+    username: string;
+    image: string | null;
+    accountType: string;
+    name: string;
+    host: boolean   
+}
+
+
+export interface Message {
+    user: UserRoom,
+    message: string,
+    userSend: string
+}
+
+

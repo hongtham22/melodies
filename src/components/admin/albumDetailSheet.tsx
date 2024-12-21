@@ -234,8 +234,8 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
         `/api/admin/update/album/${albumId}`,
         "PATCH",
         formData,
+        accessToken,
         null,
-        accessToken
       );
   
       if (response.success) {

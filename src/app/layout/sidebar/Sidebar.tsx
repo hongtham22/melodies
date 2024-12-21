@@ -19,13 +19,16 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
+import { BiAperture } from "react-icons/bi";
 
 const Sidebar = () => {
   const { accessToken, setAccessToken, setRole, setShowPlaylistMenu } =
     useAppContext();
   const [showRequireLogin, setShowRequireLogin] = useState(false);
-  const [showRequireLoginForListenTogether, setShowRequireLoginForListenTogether] =
-    useState(false);
+  const [
+    showRequireLoginForListenTogether,
+    setShowRequireLoginForListenTogether,
+  ] = useState(false);
 
   const handleShowPlaylist = () => {
     if (accessToken) {
@@ -204,12 +207,8 @@ const Sidebar = () => {
             "listen-together"
           )} py-2 items-center`}
         >
-          <ListBulletIcon className="w-[24px] h-[24px] mr-3" />
-          <p
-            onClick={handleListenTogether}
-          >
-            Listen Together
-          </p>
+          <BiAperture className="w-[24px] h-[24px] mr-3" />
+          <p onClick={handleListenTogether}>Listen Together</p>
           {showRequireLoginForListenTogether && (
             <div className="absolute z-20 w-[21rem] transition-opacity duration-300 ease-in-out px-6 py-4 text-sm text-black bg-[#69BFFF] rounded-lg shadow-lg transform -translate-y-1/2 left-48 top-1/2">
               <p className="font-bold mb-2">Listen Together</p>

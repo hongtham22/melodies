@@ -1,142 +1,40 @@
 "use client";
-
 import { Input } from "@/components/ui/input";
-import { PlusIcon } from "@radix-ui/react-icons";
-import { useEffect, useState, useRef, useCallback } from "react";
-// import { io, Socket } from "socket.io-client";
+import { PlusIcon, EnterIcon } from "@radix-ui/react-icons";
+import { useEffect, useState } from "react";
 import { useAppContext } from "@/app/AppProvider";
-import LoadingPage from "@/components/loadingPage";
-import { fetchApiData } from "@/app/api/appService";
-import { DataSong } from "@/types/interfaces";
-import { decrypt } from "@/app/decode";
 import Image from "next/image";
-import { getMainArtistName, getPosterSong } from "@/utils/utils";
-import { IoSearch } from "react-icons/io5";
-
-// let socket: Socket | null = null;
+import { useToast } from "@/hooks/use-toast";
+import bannerImg from "@/assets/img/together2.png";
+import { useRouter } from "next/navigation";
 
 function Page() {
-  const { loading, setLoading } = useAppContext();
   const { socket } = useAppContext();
-  const { accessToken } = useAppContext();
+  const [textIndex, setTextIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
   const [roomId, setRoomId] = useState<string>("");
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [permit, setPermit] = useState(true);
-
-  const [message, setMessage] = useState<string>("");
-  const [chatMessages, setChatMessages] = useState<
-    { user: object; message: string }[]
-  >([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
-  const [visible, setVisible] = useState<boolean>(false);
-  const [members, setMembers] = useState<string[]>([]);
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current && permit) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
+  const router = useRouter();
+  const messages = [
+    "Let's experience with Melodies",
+    "Enjoy listening to music together",
+  ];
 
   useEffect(() => {
-    const handler = setTimeout(async () => {
-      if (searchTerm === "") {
-        setFilteredSongs([]);
-      } else {
-        const results = await fetchApiData(
-          `/api/songs/search`,
-          "GET",
-          null,
-          null,
-          { query: searchTerm, page: 1 }
-        );
-        if (results.success) {
-          setFilteredSongs(results.data.songData);
-        }
-      }
-    }, 500);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchTerm]);
-
- 
-
-  useEffect(() => {
-    if (!socket) return;
-
-    socket?.on("UpdateAudio", (data) => {
-      console.log("Update audio:", data);
-      if (audioRef.current) {
-        audioRef.current.currentTime = data.currentTime;
-        if (data.isPlaying) {
-          audioRef.current.play();
-        } else {
-          audioRef.current.pause();
-        }
-      }
-    });
-
-    socket?.on("memberJoined", (data) => {
-      console.log("member: ", data.username);
-    });
-
-    socket?.on("memberLeft", (data) => {
-      console.log("member đã rời khỏi: ", data.username);
-    });
-
-    socket?.on("members", (data) => {
-      console.log("members: ", data);
-      setMembers(data);
-    });
-
-    socket?.on("leaveRoomFailed", () => {
-      console.log("leaveRoomFailed");
-    });
-
-    socket?.on("roomClosed", () => {
-      setVisible(false);
-      console.log("host đã thoát");
-      socket.emit("leaveRoom");
-      socket.on("leaveRoomSuccess", () => {
-        console.log("Leave room success");
-        setVisible(false);
-      });
-    });
-
-    socket?.on("ServerSendMessage", (data) => {
-      console.log("Received message data:", data);
-      setChatMessages((prevMessages) => [
-        ...prevMessages,
-        { user: data.user, message: data.message },
-      ]);
-    });
-
-    socket?.on("disconnect", () => {
-      console.log("Đã ngắt kết nối socket");
-      setVisible(false);
-    });
-
-    return () => {
-      socket.off("UpdateAudio");
-      socket.off("memberJoined");
-      socket.off("memberLeft");
-      socket.off("members");
-      socket.off("leaveRoomFailed");
-      socket.off("roomClosed");
-      socket.off("ServerSendMessage");
-      socket.off("disconnect");
-    };
-  }, [socket]);
+    const interval = setInterval(() => {
+      setIsVisible(false);
+      setTimeout(() => {
+        setTextIndex((prevIndex) => (prevIndex + 1) % messages.length);
+        setIsVisible(true);
+      }, 500); // Match fade-out duration
+    }, 4000); // Total duration for each message
+    return () => clearInterval(interval);
+  }, []);
 
   const handleJoinRoom = async () => {
     socket?.emit("joinRoom", roomId);
     socket?.on("joinRoomSuccess", (data) => {
       console.log("Join Success to room:", data.roomId);
-      setPermit(data.permit);
-      setVisible(true);
+      router.push(`/listenTogether/${roomId}`);
     });
     socket?.on("joinRoomFailed", (data) => {
       console.log("joinRoomFailed", data);
@@ -147,224 +45,65 @@ function Page() {
     socket?.emit("createRoom");
     socket?.on("createRoomSuccess", (id) => {
       console.log("Create room success: " + id);
-      setVisible(true);
+      router.push(`/listenTogether/${id}`);
     });
     socket?.on("createRoomFailed", (data) => {
       console.log("createRoomFailed", data);
     });
   };
 
-  const handleLeaveRoom = async () => {
-    socket?.emit("leaveRoom");
-    socket?.on("leaveRoomSuccess", () => {
-      console.log("Leave room success");
-      setVisible(false);
-    });
-  };
-
-  const handlePlay = () => {
-    if (permit) {
-      socket?.emit("SyncAudio", {
-        accessToken: accessToken,
-        currentTime: currentTime,
-        isPlaying: true,
-      });
-    }
-  };
-
-  const handlePause = () => {
-    if (permit) {
-      socket?.emit("SyncAudio", {
-        accessToken: accessToken,
-        currentTime: currentTime,
-        isPlaying: false,
-      });
-    }
-  };
-
-  const handleSentMessage = () => {
-    socket?.emit("SendMessage", {
-      accessToken: accessToken,
-      message: message,
-    });
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-  };
-
   return (
-    <div className="w-full my-20 m-6 p-8 flex flex-col gap-4">
-      <div className="flex mb-5 gap-6 items-center">
-        <div className="">
+    <div className="w-full mt-20 m-6 p-8 gap-12 flex justify-between items-center">
+      <div className="w-1/2 flex flex-col gap-6 items-start">
+        <h1
+          className={`text-4xl font-bold transition-opacity duration-500 text-primaryColorPink leading-normal ${
+            isVisible ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {messages[textIndex]}
+        </h1>
+        <h2 className="text-xl font-bold text-white/90">No matter where you are.</h2>
+        <h2 className="text-base text-white/90">
+          Grab some friends, join a room and listen to music in sync with each
+          other
+        </h2>
+        <div className="w-full flex flex-col gap-4 items-start bg-darkerPink p-4 rounded-md shadow-md">
+          <p className="text-textLight text-sm">
+            Start a new room to enjoy synchronized music with your friends.
+          </p>
           <button
             onClick={handleCreateRoom}
-            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+            className="w-fit p-3 text-textMedium font-bold bg-primaryColorPink flex items-center gap-2 rounded-md shadow-md hover:bg-darkPinkHover transition-all duration-300"
           >
-            <PlusIcon className="text-white w-5 h-5" />
+            <PlusIcon className="text-white w-5 h-5 stroke-white" />
             Create a room
           </button>
         </div>
-        <div className="flex w-1/4 gap-2 items-center">
-          <Input
-            className="border-white"
-            placeholder="enter room"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-          />
-          <button
-            onClick={handleJoinRoom}
-            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-          >
-            Join room
-          </button>
-          <button
-            onClick={handleLeaveRoom}
-            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-          >
-            Leave Room
-          </button>
+        <div className="w-full flex flex-col gap-4 items-start bg-darkerBlue p-4 rounded-md shadow-md">
+          <p className="text-textLight text-sm">
+            Enter the Room ID to join and listen together with others.
+          </p>
+          <div className="flex gap-2 items-center w-full">
+            <Input
+              className="w-2/3 border-primaryColorBlue focus:outline-none focus:ring focus:ring-primaryColorBlue/50"
+              placeholder="Enter Room ID"
+              value={roomId}
+              onChange={(e) => setRoomId(e.target.value)}
+            />
+            <button
+              onClick={handleJoinRoom}
+              className="p-3 text-textMedium font-bold bg-primaryColorBlue flex items-center shrink-0 gap-2 rounded-md shadow-md hover:bg-darkBlueHover transition-all duration-300"
+            >
+              <EnterIcon className="text-white w-5 h-5 stroke-white" />
+              Join room
+            </button>
+          </div>
         </div>
       </div>
 
-      {visible === true && (
-        <div className="w-full flex justify-between gap-4">
-          <h1>List user</h1>
-          <ul>
-            {/* {members.map((member, index) => (
-              <li key={index}>{member}</li>
-            ))} */}
-
-            {members.map((member, index) => {
-              const memberId = Object.keys(member)[0];
-              const memberInfo = member[memberId];
-              return (
-                <li key={index} style={{ display: "flex" }}>
-                  <Image
-                    src={memberInfo.image}
-                    alt={memberInfo.username}
-                    height="30"
-                    width="30"
-                  />
-                  {memberInfo.username} {/* Hiển thị tên người dùng */}
-                </li>
-              );
-            })}
-          </ul>
-          <div className="w-1/3 flex flex-col gap-4">
-            <h1 className="text-primaryColorPink">List Music</h1>
-            <div className="w-full">
-              <audio
-                ref={audioRef}
-                controls
-                onPause={permit ? handlePause : undefined}
-                onPlay={permit ? handlePlay : undefined}
-                onTimeUpdate={permit ? handleTimeUpdate : undefined}
-                className={!permit ? "pointer-events-none opacity-50" : ""}
-              >
-                <source
-                  // src="https://audiomelodies.nyc3.digitaloceanspaces.com/AUDIO/OLD/HoangThuyLinh/VIETNAMESECONCERTTHEALBUM/BanhTroiNuocVietnameseConcertEdition.m4a"
-                  src={decrypt(
-                    "U2FsdGVkX1/SJM4yu3157rno3f0JC1AY1vLJhSn4tNlnszs7Bqn4vhiNmZCi4Th79Rsa1Wa2RDqkcGru94ff1DZjvWXG8Vdr8TBRTBduMkUD1AAmjI9fCl3B2pzPsd/0jMpNItmuu4dn3qSCss33pDZrt4UQ6M5BGVOSbP28s8MpL9L69b4Y8mt4sj3xLYIe"
-                  )}
-                  type="audio/mpeg"
-                />
-                Your browser does not support the audio element.
-              </audio>
-            </div>
-            <div className="w-full h-[400px] bg-slate-200 text-black flex flex-col gap-4 p-4">
-              <div className="w-full flex gap-4">
-                <Input
-                  placeholder="enter message"
-                  className="text-black"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                ></Input>
-                <button
-                  onClick={handleSentMessage}
-                  className="h-[45px] p-2 text-textMedium bg-primaryColorPink rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-                >
-                  Sent
-                </button>
-              </div>
-
-              <div className="w-full border border-primaryColorBlue">
-                {chatMessages.map((msg, index) => (
-                  <div key={index}>
-                    <p style={{ display: "flex" }}>
-                      <Image
-                        src={msg.user.image}
-                        alt={msg.user.username}
-                        height="30"
-                        width="30"
-                      />{" "}
-                      {msg.user.username} : {msg.message}
-                    </p>
-                    {/* <h3>{msg.message}</h3> */}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="w-1/4 h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
-            <div>
-              <p className="font-bold text-ml mb-3">
-                Let&apos;s find content for your playlist
-              </p>
-              <div className="flex items-center bg-[#2C2C2C] w-[35%] p-2 gap-2 rounded-md">
-                <IoSearch className="text-[1.2rem]" />
-                <input
-                  type="text"
-                  placeholder="Find songs"
-                  className="focus:outline-none placeholder:text-[0.9rem] placeholder:text-primaryColorGray text-primaryColorGray text-[0.9rem] bg-transparent w-full"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                />
-              </div>
-            </div>
-            <table className="max-w-full text-white border-separate border-spacing-y-3 ">
-              <thead className="w-full max-h-[32px]">
-                <tr>
-                  <th className="w-[75%] pl-4"></th>
-                  <th className="w-[25%] pl-4"></th>
-                </tr>
-              </thead>
-              <tbody className="mt-4">
-                {filteredSongs.length > 0 &&
-                  filteredSongs.map((song, index) => (
-                    <tr key={index}>
-                      <td className="relative group flex pr-2">
-                        <Image
-                          src={getPosterSong(song.album).image}
-                          alt="Song Poster"
-                          width={48}
-                          height={48}
-                          quality={100}
-                          className="object-cover rounded-md w-10 h-10"
-                        />
-                        <div className="ml-3">
-                          <p className="font-bold text-white">{song.title}</p>
-                          <p className="font-thin text-primaryColorGray text-[0.9rem]">
-                            {getMainArtistName(song.artists)}
-                          </p>
-                        </div>
-                      </td>
-                      <td>
-                        <button
-                          className="px-4 py-1 border-white border-2 text-[0.8rem] text-white font-bold rounded-full hover:text-black hover:bg-white transition-all duration-300"
-                          // onClick={() => handleAddSong(song.id)}
-                        >
-                          Add
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      <div className="w-3/4 rounded-2xl  shadow-primaryColorPinkHover">
+        <Image src={bannerImg} alt="gif" className="rounded-2xl " />
+      </div>
     </div>
   );
 }
