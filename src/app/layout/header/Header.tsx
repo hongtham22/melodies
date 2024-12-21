@@ -11,11 +11,11 @@ import { Link } from 'react-scroll';
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from "react-icons/fa";
-import { BellIcon } from "@radix-ui/react-icons";
 
 import Image from "next/image";
 import { fetchApiData } from "@/app/api/appService";
 import { User } from "@/types/interfaces";
+import Notification from "@/components/notification";
 
 const Header = () => {
     const { accessToken, setSearch } = useAppContext();
@@ -133,7 +133,7 @@ const Header = () => {
 
             {accessToken ? (
                 <div className="flex gap-5 justify-center items-center">
-                    <BellIcon className="w-5 h-5" />
+                    <Notification />
                     <div className="flex gap-2">
                         <Image
                             src={user?.image || UserImage}

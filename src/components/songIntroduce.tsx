@@ -36,20 +36,22 @@ const SongIntroduce: React.FC = () => {
   const [listPlayer, setListPlayer] = useState<DataPlaylist[]>()
   const mainArtistId = currentSong?.artists ? getMainArtistInfo(currentSong.artists)?.id : undefined;
   useEffect(() => {
-    const fetchArtist = async () => {
-      try {
-        const responses = await Promise.all([
-          fetchApiData(`/api/artist/${mainArtistId}`, "GET"),
-        ]);
-        if (responses[0].success) {
-          setDataArtist(responses[0].data.artist)
+    if (currentSong) {
+      const fetchArtist = async () => {
+        try {
+          const responses = await Promise.all([
+            fetchApiData(`/api/artist/${mainArtistId}`, "GET"),
+          ]);
+          if (responses[0].success) {
+            setDataArtist(responses[0].data.artist)
+          }
+        } catch (error) {
+          console.error("Error fetching songs:", error);
+        } finally {
         }
-      } catch (error) {
-        console.error("Error fetching songs:", error);
-      } finally {
-      }
-    };
-    fetchArtist();
+      };
+      fetchArtist();
+    }
   }, [mainArtistId]);
 
   const handleFetchPlaylist = async () => {

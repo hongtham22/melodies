@@ -35,3 +35,10 @@ export const handleAddSongToNewUserPlaylist = async (accessToken: string, songId
     );
     return result
 }
+
+export const fetchNotification = async (accessToken: string) => {
+    const response = await fetchApiData('/api/user/notifications', 'GET', null, accessToken)
+    if (response.success) {
+        return response.data.notifications
+    }
+}

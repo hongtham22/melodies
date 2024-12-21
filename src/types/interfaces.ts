@@ -106,7 +106,7 @@ export interface DataCurrentSong {
 export interface GenreData {
     genreId: string;
     name: string;
-  }
+}
 
 
 export interface UserRoom {
@@ -115,7 +115,7 @@ export interface UserRoom {
     image: string | null;
     accountType: string;
     name: string;
-    host: boolean   
+    host: boolean
 }
 
 
@@ -123,6 +123,18 @@ export interface Message {
     user: UserRoom,
     message: string,
     userSend: string
+}
+
+//notification
+export interface Notification {
+    id: string;
+    userId: string;
+    type: string;
+    message: string;
+    isRead: boolean;
+    from: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 
