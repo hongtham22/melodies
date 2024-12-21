@@ -1,12 +1,11 @@
 "use client";
-
-import { Input } from "@/components/ui/input";
 import {
   PlusIcon,
   Cross2Icon,
   DotsHorizontalIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  ExitIcon,
 } from "@radix-ui/react-icons";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useAppContext } from "@/app/AppProvider";
@@ -29,7 +28,6 @@ import { useRouter } from "next/navigation";
 
 function Page({params}) {
   const { id } = params;
-  const { loading, setLoading } = useAppContext();
   const { socket } = useAppContext();
   const { accessToken } = useAppContext();
   const [roomId, setRoomId] = useState<string>("");
@@ -48,7 +46,6 @@ function Page({params}) {
   const { toast } = useToast();
   const router = useRouter();
   const [listUser, setListUser] = useState<User[]>([]);
-  
 
   useEffect(() => {
     socket?.emit("getData");
@@ -87,7 +84,6 @@ function Page({params}) {
     };
   }, [searchTerm]);
 
-  // use effect socket
   useEffect(() => {
     if (!socket) return;
 
@@ -152,6 +148,28 @@ function Page({params}) {
       router.push(`/listenTogether`);
     })
 
+    socket.on("roomClosed", (data) => {
+      console.log(data)
+      alert(data);
+      router.back();
+    })
+    socket.on("leaveRoomSuccess", () => {
+      alert("Leave room success");
+      console.log("Leave room success");
+      router.push(`/listenTogether`);
+    });
+    socket.on("members", (data) => {
+      console.log("members: ", data)
+      setListUser(data);
+    })
+
+    socket.on("roomData", (data) => {
+      setPermit(data.permit);
+      setWaitingSongs(data.waitingList);
+      setCurrentProposalList(data.proposalList);
+      setCurrentSong(data.currentSong);
+    })
+
     return () => {
       socket?.off("addSongToListWaitSuccess");
       socket?.off("updateListSongWait");
@@ -196,42 +214,14 @@ function Page({params}) {
 
   return (
     <div className="w-full my-20 m-6 p-8 flex flex-col gap-4">
-      {/* <div className="w-full flex gap-2">
-        <button
-          onClick={handleCreateRoom}
-          className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-        >
-          <PlusIcon className="text-white w-5 h-5" />
-          Create a room
-        </button>
-        <div className="flex w-1/4 gap-2 items-center">
-          <Input
-            className="border-white"
-            placeholder="enter room"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-          />
-          <button
-            onClick={handleJoinRoom}
-            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-          >
-            Join room
-          </button>
-          <button
-            onClick={handleLeaveRoom}
-            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-          >
-            Leave Room
-          </button>
-        </div>
-      </div> */}
       <div className="w-full flex items-center justify-start">
         <div className="w-2/4 flex items-center justify-between pr-6">
-          <p className="">Room ID: {id || ""}</p>
+          <p className="text-white/70 truncate">Room ID: {id || ""}</p>
           <button
             onClick={handleLeaveRoom}
-            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+            className="p-3 text-textMedium font-bold bg-primaryColorBlueHover flex items-center shrink-0 gap-2 rounded-md shadow-md hover:bg-darkBlueHover transition-all duration-300"
           >
+             <ExitIcon className="text-white w-5 h-5 stroke-white" />
             Leave Room
           </button>
         </div>
@@ -239,18 +229,18 @@ function Page({params}) {
         <div className="w-1/4 flex gap-2 items-center px-3">
           <button
             onClick={handleViewUser}
-            className="p-2 text-textMedium bg-primaryColorPink flex items-center shrink-0 gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+            className="p-3 text-textMedium font-bold bg-primaryColorPinkHover flex items-center shrink-0 gap-2 rounded-md shadow-md hover:bg-darkPinkHover transition-all duration-300"
             aria-label={showUsers ? "Hide Participants" : "View Participants"}
           >
             {showUsers ? (
               <>
-                Hide 5 Participants
-                <ChevronUpIcon />
+                Hide <span>{listUser.length}</span> Participants
+                <ChevronUpIcon className="text-white w-5 h-5 stroke-white"/>
               </>
             ) : (
               <>
-                View 5 Participants
-                <ChevronDownIcon />
+                View <span>{listUser.length}</span> Participants
+                <ChevronDownIcon className="text-white w-5 h-5 stroke-white"/>
               </>
             )}
           </button>
@@ -358,12 +348,12 @@ function Page({params}) {
                           <li
                             key={index}
                             className="flex items-center gap-3 mb-3"
-                            style={{
-                              backgroundColor:
-                                song?.id === currentSong?.song.id
-                                  ? "red"
-                                  : "transparent",
-                            }}
+                            // style={{
+                            //   backgroundColor:
+                            //     song?.id === currentSong?.song.id
+                            //       ? "red"
+                            //       : "transparent",
+                            // }}
                           >
                             <Image
                               src={getPosterSong(song.album).image}
@@ -414,7 +404,7 @@ function Page({params}) {
           </div>
         </div>
         {showUsers ? (
-          <ListUser listUser={listUser}/> // Hiển thị danh sách người dùng
+          <ListUser listUser={listUser} />
         ) : (
           <ProposalList
             socket={socket}
