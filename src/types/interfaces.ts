@@ -59,6 +59,7 @@ export interface User {
     image: string | null;
     accountType: string;
     name: string;
+    email: string
 }
 
 //comment

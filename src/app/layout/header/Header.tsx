@@ -132,8 +132,8 @@ const Header = () => {
             </div>
 
             {accessToken ? (
-                <div className="flex gap-3 justify-center items-center">
-                    <BellIcon className="w-6 h-6" />
+                <div className="flex gap-5 justify-center items-center">
+                    <BellIcon className="w-5 h-5" />
                     <div className="flex gap-2">
                         <Image
                             src={user?.image || UserImage}

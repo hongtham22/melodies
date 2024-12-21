@@ -1,7 +1,32 @@
+'use client'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import './premium.scss'
 import Logo from '@/assets/img/vnpay-logo.jpg'
-const page = () => {
+import { fetchApiData } from '@/app/api/appService'
+import { useAppContext } from '@/app/AppProvider'
+const Page = () => {
+    const router = useRouter()
+    const { accessToken } = useAppContext()
+    const handlePay = async () => {
+        const payload = {
+            packageId: 'eff9cb0d-cf7d-4d45-9c94-f056e1dd398f'
+        }
+        try {
+            const result = await fetchApiData(
+                "/api/payment/create",
+                "POST",
+                JSON.stringify(payload),
+                accessToken
+            );
+            if (result.success) {
+                router.push(result.data.paymentUrl)
+            }
+        } catch {
+
+        }
+
+    }
     return (
         <div className="relative w-full my-24">
             <div className="banner-premium h-[28rem] w-full">
@@ -56,7 +81,12 @@ const page = () => {
                             Listen with friends in real time (3 people in room)
                         </li>
                     </ul>
-                    <a href="#" aria-describedby="tier-hobby" className="mt-8 block rounded-md px-3.5 py-2.5 text-center text-sm font-semibold text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:mt-10">Get started today</a>
+                    <button aria-describedby="tier-hobby"
+                        className="mt-8 block rounded-md px-3.5 py-2.5 text-center text-sm font-semibold text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:mt-10"
+                        onClick={handlePay}
+                    >
+                        Get started today
+                    </button>
                 </div>
                 <div className="relative rounded-3xl bg-gray-900 p-8 shadow-2xl ring-1 ring-gray-900/10 sm:p-10">
                     <h3 id="tier-enterprise" className="text-base/7 font-semibold text-indigo-400">Plus</h3>
@@ -124,4 +154,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page
