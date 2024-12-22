@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from "next/image";
 import artistimg from "@/assets/img/placeholderUser.jpg";
-
+import { TimerIcon } from '@radix-ui/react-icons';
 
 interface User {
   id: string;
@@ -34,7 +34,7 @@ function ListRecentUserAdmin({ data }: ListRecentUserAdminProps) {
 
     return (
     <div className=" w-1/3 bg-secondColorBg rounded-xl flex flex-col gap-4 p-3 shadow-sm shadow-primaryColorBlue">
-    <p className="text-h3 text-primaryColorPink">Recent Users</p>
+    <p className="text-h3 text-primaryColorPink flex gap-2 items-center"> <span><TimerIcon className='w-5 h-5'/></span>Recent Users</p>
     {data.map((user) => {
       const { id, username, email, image, createdAt } = user;
       return (

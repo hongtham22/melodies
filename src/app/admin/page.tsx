@@ -98,12 +98,12 @@ const Page = () => {
     };
 
     fetchAdminDashboard();
-  }, [setLoading]);
+  }, [setLoading, accessToken]);
 
   if (loading) return <LoadingPage />;
 
   return (
-    <div className="p-8 my-20 w-full space-y-6">
+    <div className="p-8 mt-20 w-full space-y-6">
       <OverallAdmin data={overallAdminData} />
       <div className="flex gap-7">
         <div className="flex w-2/3 bg-secondColorBg rounded-xl">
