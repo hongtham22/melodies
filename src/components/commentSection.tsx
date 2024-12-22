@@ -37,7 +37,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
     const [totalComment, setTotalCmt] = useState<number>(0)
     const [contentCmt, setContentComment] = useState<string>('')
     const [errorPost, setErrorPost] = useState<boolean>(false)
-    const [messageError, setMessageError] = useState<string>('')
     const [newCmt, setNewCmt] = useState<{ data: Comment; cmtChild: Comment[] }[]>([])
 
     const handleClickSort = () => {
@@ -78,6 +77,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
     };
 
     const handleComment = async () => {
+        if (contentCmt.trim() === '') return
         setErrorPost(false)
         const payload = {
             songId: id,
@@ -89,14 +89,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
                 setNewCmt((prev) => [{ data: response.data.comment, cmtChild: [] }, ...prev])
                 setTotalCmt((prev) => prev + 1)
             } else {
-                setMessageError(response.data.message)
                 setErrorPost(true)
                 setTimeout(() => {
                     setErrorPost(false);
                 }, 5000);
             }
         } else {
-            setMessageError(response.error)
             setErrorPost(true)
             setTimeout(() => {
                 setErrorPost(false);
@@ -174,7 +172,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
                         </svg>
                         <span className="sr-only">Info</span>
                         <div>
-                            <span className="font-medium">Danger alert!</span> {messageError}
+                            <span className="font-medium">Danger alert!</span> Your comment violates community standards
                         </div>
                     </div>
                 )

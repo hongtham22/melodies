@@ -36,7 +36,6 @@ const CommentPart: React.FC<CommentPartProps> = ({ data, songId, setTotalCmt }) 
     const [contentCmt, setContentComment] = useState<string>('')
     const [cmtUp, setCmtUp] = useState<number>(0)
     const [errorPost, setErrorPost] = useState<boolean>(false)
-    const [messageError, setMessageError] = useState<string>('')
 
     const ViewChildrenComment = async () => {
         setShowCmtChild(true)
@@ -60,10 +59,12 @@ const CommentPart: React.FC<CommentPartProps> = ({ data, songId, setTotalCmt }) 
             }
         } else {
             setCmtRemain(0)
+            setIsHidden(true)
         }
     }
 
     const handleComment = async () => {
+        if (contentCmt.trim() === '') return
         setErrorPost(false)
         const payload = {
             songId: songId,
@@ -84,14 +85,12 @@ const CommentPart: React.FC<CommentPartProps> = ({ data, songId, setTotalCmt }) 
                 setCmtUp((prev) => prev + 1)
                 setTotalCmt((prev) => prev + 1)
             } else {
-                setMessageError(response.data.message)
                 setErrorPost(true)
                 setTimeout(() => {
                     setErrorPost(false);
                 }, 5000);
             }
         } else {
-            setMessageError(response.error)
             setErrorPost(true)
             setTimeout(() => {
                 setErrorPost(false);
@@ -163,7 +162,7 @@ const CommentPart: React.FC<CommentPartProps> = ({ data, songId, setTotalCmt }) 
                                 </svg>
                                 <span className="sr-only">Info</span>
                                 <div>
-                                    <span className="font-medium">Danger alert!</span> {messageError}
+                                    <span className="font-medium">Danger alert!</span> Your comment violates community standards
                                 </div>
                             </div>
                         )}
@@ -175,6 +174,8 @@ const CommentPart: React.FC<CommentPartProps> = ({ data, songId, setTotalCmt }) 
                                         src={avatar && avatar !== "null" ? avatar : UserImage}
                                         alt="avatar"
                                         className="rounded-full w-[40px] h-[40px] mr-3"
+                                        width={40}
+                                        height={40}
                                     />
                                 </div>
 
