@@ -169,7 +169,7 @@ function Page() {
               Delete Artist
             </button>
 
-            <AddArtistSheet onSave={handleAddArtist} genre={genreList} fetchGenres={fetchGenres}/>
+            <AddArtistSheet onSave={handleAddArtist}/>
           </div>
         </div>
       </div>

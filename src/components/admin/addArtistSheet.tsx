@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +30,8 @@ import {
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import AddGenre from "@/components/admin/addGenre";
+import { fetchApiData } from "@/app/api/appService";
+import { useAppContext } from "@/app/AppProvider";
 
 interface Genre {
   genreId: string;
@@ -42,56 +44,86 @@ interface AddArtistSheetProps {
     avatar: string;
     genre: string[];
   }) => void;
-  genre: Genre[];
-  fetchGenres: () => Promise<void>;
 }
 
-const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre, fetchGenres }) => {
+const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
   const [artistName, setArtistName] = React.useState("");
   const [artistBio, setArtistBio] = React.useState("");
   const [artistAvatar, setArtistAvatar] = React.useState<File | null>(null);
   const [artistGenre, setArtistGenre] = React.useState<string[]>([]);
   const [openGenre, setOpenGenre] = React.useState(false);
-
-  const [reorderedGenre, setGenre] = React.useState<Genre[]>(genre || []);
+  const [loading, setLoading] = useState(false);
+  const [reorderedGenre, setReorderedGenre] = React.useState<Genre[]>([]);
+    const { accessToken } = useAppContext()
   
-  React.useEffect(() => {
-    setGenre(genre.map((item) => ({
-      ...item,
-      selected: artistGenre.includes(item.genreId),
-    })));    
-  }, [genre, artistGenre]);
+  // React.useEffect(() => {
+  //   setGenre(genre.map((item) => ({
+  //     ...item,
+  //     selected: artistGenre.includes(item.genreId),
+  //   })));    
+  // }, [genre, artistGenre]);
   
+  const fetchGenres = useCallback(async () => {
+    setLoading(true);
+    try {
+      const genresResponse = await fetchApiData("/api/admin/allGenre", "GET", null, accessToken);
 
-  const handleAddGenre = async (newGenre: Genre) => {
-    setArtistGenre((prevGenres) => [newGenre.genreId,...prevGenres]);
+      if (genresResponse.success) {
+        setReorderedGenre(genresResponse.data.genres);
+      }
+    } catch (error) {
+      console.error("Error fetching genres:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [setLoading, accessToken]);
 
-    setGenre((prev) => {
-      const updatedGenres = [newGenre, ...prev]; 
-      return updatedGenres;
-    });
-    await fetchGenres();
+  useEffect(() => {
+    fetchGenres();
+  }, [fetchGenres]);
+
+  const handleAddGenre = (newGenre: Genre) => {
+    setArtistGenre((prev) => [newGenre.genreId, ...prev]);
+    setReorderedGenre((prev) => [newGenre, ...prev]);
   };
 
   const handleGenreChange = (genreId: string) => {
-    setArtistGenre((prevGenres) =>
-      prevGenres.includes(genreId)
-        ? prevGenres.filter((id) => id !== genreId)
-        : [...prevGenres, genreId]
+    setArtistGenre((prev) =>
+      prev.includes(genreId)
+        ? prev.filter((id) => id !== genreId)
+        : [...prev, genreId]
     );
-
-    const reorderedGenres = genre
-      .filter(
-        (item) => artistGenre.includes(item.genreId) || item.genreId === genreId
-      )
-      .concat(
-        genre.filter(
-          (item) =>
-            !artistGenre.includes(item.genreId) && item.genreId !== genreId
-        )
-      );
-    setGenre(reorderedGenres); 
   };
+
+  // const handleAddGenre = async (newGenre: Genre) => {
+  //   setArtistGenre((prevGenres) => [newGenre.genreId,...prevGenres]);
+
+  //   setGenre((prev) => {
+  //     const updatedGenres = [newGenre, ...prev]; 
+  //     return updatedGenres;
+  //   });
+  //   // await fetchGenres();
+  // };
+
+  // const handleGenreChange = (genreId: string) => {
+  //   setArtistGenre((prevGenres) =>
+  //     prevGenres.includes(genreId)
+  //       ? prevGenres.filter((id) => id !== genreId)
+  //       : [...prevGenres, genreId]
+  //   );
+
+  //   const reorderedGenres = genre
+  //     .filter(
+  //       (item) => artistGenre.includes(item.genreId) || item.genreId === genreId
+  //     )
+  //     .concat(
+  //       genre.filter(
+  //         (item) =>
+  //           !artistGenre.includes(item.genreId) && item.genreId !== genreId
+  //       )
+  //     );
+  //   setGenre(reorderedGenres); 
+  // };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
