@@ -136,12 +136,7 @@ const SongIntroduce: React.FC = () => {
           </div>
         </div>
         <div
-          className="w-full self-center flex flex-col overflow-auto mt-16 h-screen
-[&::-webkit-scrollbar]:w-2
-  [&::-webkit-scrollbar-track]:bg-inherit
-  hover:[&::-webkit-scrollbar-thumb]:bg-white/30
-  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-  hover:dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 "
+          className="w-full self-center flex flex-col overflow-auto mt-16 h-screen scrollbar-thin scrollbar-track-black scrollbar-thumb-darkBlue"
         >
           <div className="self-center mb-6">
             <Image
@@ -215,8 +210,8 @@ const SongIntroduce: React.FC = () => {
                           required
                         />
                         <CommandList>
-                          <CommandEmpty>No playlist found.</CommandEmpty>
                           <ScrollArea className="h-40">
+                            <CommandEmpty>No playlist found.</CommandEmpty>
                             <CommandGroup>
                               {listPlayer?.map((playlist) => (
                                 <CommandItem

@@ -68,9 +68,11 @@ const MusicPlayer: React.FC = () => {
         previousSong,
         startTime,
         setStartTime,
+        isPlaying,
+        setIsPlaying
     } = useSongContext()
     const [listPlayer, setListPlayer] = useState<DataPlaylist[]>()
-    const [isPlaying, setIsPlaying] = useState(false);
+    // const [isPlaying, setIsPlaying] = useState(false);
     const [endTime, setEndTime] = useState<number>(0);
     // const [startTime, setStartTime] = useState<number>(0);
     const [progressWidth, setProgressWidth] = useState(0);
@@ -350,8 +352,8 @@ const MusicPlayer: React.FC = () => {
                                         required
                                     />
                                     <CommandList>
-                                        <CommandEmpty>No playlist found.</CommandEmpty>
                                         <ScrollArea className="h-60">
+                                            <CommandEmpty>No playlist found.</CommandEmpty>
                                             <CommandGroup>
                                                 {listPlayer?.map((playlist) => (
                                                     <CommandItem

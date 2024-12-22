@@ -2,6 +2,7 @@
 
 import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from "@/app/AppProvider";
+import { useAppContext as usePlaylistContext } from '@/components/provider/playlistProvider';
 import { DataPlaylist } from "@/types/interfaces";
 import { useRouter } from "next/navigation";
 
@@ -16,16 +17,16 @@ const ConfirmDeletePlaylist: React.FC<ConfirmDeletePlaylistProps> = ({ onClose, 
             onClose();
         }
     };
-    const { accessToken, setShowPlaylistMenu } = useAppContext()
+    const { accessToken } = useAppContext()
+    const { setPlaylistList } = usePlaylistContext()
     const router = useRouter();
 
     const handleDelete = async (idPlaylist: string) => {
         const result = await fetchApiData(`/api/user/playlist/deletePlaylist/${idPlaylist}`, 'DELETE', null, accessToken)
         if (result.success) {
             router.push('/')
-            setShowPlaylistMenu(false)
+            setPlaylistList(result.data.playlists)
             onClose();
-            setShowPlaylistMenu(true)
         }
     }
 

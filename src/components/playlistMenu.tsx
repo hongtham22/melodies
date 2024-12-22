@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { useAppContext as useSongContext } from '@/components/provider/songProvider';
+import { useAppContext as usePlaylistContext } from '@/components/provider/playlistProvider';
 import { useAppContext } from "@/app/AppProvider";
 import { BiSolidPlaylist } from "react-icons/bi";
 import { IoMdClose } from "react-icons/io";
@@ -16,12 +17,13 @@ import '@/components/scss/playlistMenu.scss'
 import Image from "next/image";
 import Playlist from '@/assets/img/placeholderPlaylist.png'
 import { fetchApiData } from "@/app/api/appService";
-import { DataPlaylist } from "@/types/interfaces";
+
 const PlaylistMenu = () => {
     const router = useRouter();
     const { accessToken, setShowPlaylistMenu } = useAppContext()
     const { currentSong } = useSongContext();
-    const [listPlayer, setListPlayer] = useState<DataPlaylist[]>()
+    const { playlistList, setPlaylistList } = usePlaylistContext()
+
     const [pb, setPb] = useState(false)
 
     useEffect(() => {
@@ -40,12 +42,11 @@ const PlaylistMenu = () => {
                 { page: 1 }
             );
             if (result.success) {
-                setListPlayer(result.data.playlists)
+                setPlaylistList(result.data.playlists)
             } else {
 
             }
         };
-
         fetchData();
     }, [accessToken])
 
@@ -57,7 +58,7 @@ const PlaylistMenu = () => {
             accessToken
         );
         if (result.success && result.data?.newPlaylist) {
-            setListPlayer(prevList => [result.data?.newPlaylist, ...(prevList || [])])
+            setPlaylistList([result.data?.newPlaylist, ...playlistList])
             router.push(`/playlist/${result.data.newPlaylist.playlistId}`)
         } else {
 
@@ -97,7 +98,7 @@ const PlaylistMenu = () => {
                     ${pb ? 'pb-[15.5rem]' : 'pb-[10rem]'} 
                 `}>
                 {
-                    listPlayer?.map((playlist, index) => (
+                    playlistList?.map((playlist, index) => (
                         <div key={index}
                             className="relative group flex items-center p-2 hover:bg-[#1F1F1F] cursor-pointer rounded-md"
                             onClick={() => router.push(`/playlist/${playlist.playlistId}`)}

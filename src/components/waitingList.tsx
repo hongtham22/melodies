@@ -11,7 +11,7 @@ import { IoIosClose } from "react-icons/io";
 import { getMainArtistInfo, getPosterSong } from "@/utils/utils";
 
 const WaitingList: React.FC = () => {
-  const { showWaitingList, setShowWaitingList, setShowSidebarRight, currentSong, waitingList, setCurrentSong } = useAppContext();
+  const { showWaitingList, setShowWaitingList, setShowSidebarRight, currentSong, waitingList, setCurrentSong, isPlaying } = useAppContext();
 
   if (!showWaitingList) return null;
 
@@ -93,7 +93,7 @@ const WaitingList: React.FC = () => {
                         <Lottie
                           loop
                           animationData={animation}
-                          play
+                          play={isPlaying}
                           style={{ width: 24, height: 24 }}
                         />
                       </div>

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/app/AppProvider";
+import { useAppContext as useSongContext } from "@/components/provider/songProvider";
 import Image from "next/image";
 import { fetchApiData } from "@/app/api/appService";
 import LoadingPage from "@/components/loadingPage";
@@ -9,6 +10,7 @@ import NotFound from "@/app/not-found";
 
 import { IoPlayCircleOutline } from "react-icons/io5";
 import { TfiMoreAlt } from "react-icons/tfi";
+import { RiPlayListAddLine } from "react-icons/ri";
 import CommentSection from "@/components/commentSection";
 import AvatarArtist from "@/components/avatarArtist";
 import SongList from "@/components/listSong";
@@ -19,11 +21,14 @@ import { getAllArtistsInfo, getMainArtistInfo, getPosterSong } from "@/utils/uti
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter()
     const { loading, setLoading } = useAppContext();
+    const { addToWaitingList, setCurrentSong } = useSongContext();
     const [notFound, setNotFound] = useState(false);
     const [dominantColor, setDominantColor] = useState<string>();
     const [dataSong, setDataSong] = useState<DataSong>()
     const [anotherSong, setAnotherSong] = useState<DataSong[]>([])
     const [mainArtist, setMainArtist] = useState<string | undefined>()
+    const [showMenuMore, setShowMenuMore] = useState<boolean>(false)
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -144,11 +149,26 @@ const Page = ({ params }: { params: { id: string } }) => {
                 </div>
 
                 <div className="m-3">
-                    <div className="flex gap-5 items-center">
-                        <IoPlayCircleOutline className="ml-3 mt-1 w-16 h-16 text-primaryColorPink" />
-                        <button className=" text-primaryColorPink">
+                    <div className="relative flex gap-5 items-center">
+                        <IoPlayCircleOutline
+                            className="ml-3 mt-1 w-16 h-16 text-primaryColorPink cursor-pointer"
+                            onClick={() => dataSong && setCurrentSong(dataSong)}
+                        />
+                        <button className="text-primaryColorPink" onClick={() => setShowMenuMore(!showMenuMore)}>
                             <TfiMoreAlt className="w-5 h-5 shadow-[0_4px_60px_rgba(0,0,0,0.3)]" />
                         </button>
+                        {
+                            showMenuMore && (
+                                <div className="absolute top-14 left-20 bg-[#1F1F1F] p-2 rounded-md">
+                                    <ul className="">
+                                        <li
+                                            className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md"
+                                            onClick={() => { if (dataSong) { addToWaitingList(dataSong); setShowMenuMore(false); } }}
+                                        ><RiPlayListAddLine /> Add to waiting list</li>
+                                    </ul>
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
                 <div className="flex pl-5 pr-16 gap-16">

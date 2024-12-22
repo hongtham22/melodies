@@ -67,7 +67,9 @@ const TrendingSongs: React.FC<SongListProps> = ({ maintitle, subtitle, data }) =
                     />
                   </td>
                   <td className="pl-4">
-                    <h3 className="text-h4 mb-1 line-clamp-2 hover:underline">
+                    <h3 className="text-h4 mb-1 line-clamp-2 hover:underline"
+                      onClick={() => router.push(`/song/${song.id}`)}
+                    >
                       {song.title}
                     </h3>
                     <div className="flex flex-wrap text-[0.9rem]">
