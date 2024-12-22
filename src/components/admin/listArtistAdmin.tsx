@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import songimg from "@/assets/img/songs.png";
+import artistImg from "@/assets/img/placeholderUser.jpg";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -98,7 +99,6 @@ function ListArtistAdmin({
           </tr>
         </thead>
         <tbody className="">
-          {/* {Array.from({ length: 10 }, (_, index) => ( */}
           {data &&
             data.map((artist, index) => (
               <tr
@@ -119,25 +119,25 @@ function ListArtistAdmin({
                 <td className="">
                   <div className="pl-4 flex felx-col gap-2 justify-start items-center">
                     <Image
-                      src={artist.avatar || songimg}
+                      src={artist.avatar || artistImg}
                       alt={artist.name}
                       width={50}
                       height={50}
                       className="rounded-lg w-12 h-12"
                     />
                     <h3 className="text-h4 mb-1 hover:underline line-clamp-1">
-                      {artist.name}
+                      {artist.name || "Unknown Artist"}
                     </h3>
                   </div>
                 </td>
                 <td className="text-textMedium pl-2 text-center">
-                  <div className="line-clamp-1">{artist.totalSong}</div>
+                  <div className="line-clamp-1">{artist.totalSong || 0}</div>
                 </td>
                 <td className="text-textMedium pl-2 text-center">
-                  <div className="line-clamp-1">{artist.totalAlbum}</div>
+                  <div className="line-clamp-1">{artist.totalAlbum || 0}</div>
                 </td>
                 <td className="text-textMedium pl-2 text-center rounded-tr-lg rounded-br-lg">
-                  <div className="line-clamp-1">{artist.totalFollow}</div>
+                  <div className="line-clamp-1">{artist.totalFollow || 0}</div>
                 </td>
               </tr>
             ))}

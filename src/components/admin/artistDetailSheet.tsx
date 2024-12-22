@@ -34,15 +34,11 @@ import {
 } from "@/components/ui/command";
 
 import { Button } from "@/components/ui/button";
-
 import { fetchApiData } from "@/app/api/appService";
-import albumImg from "@/assets/img/placeholderPlaylist.png";
-import artistImg from "@/assets/img/placeholderUser.jpg";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { set } from "zod";
-import LoadingPage from "@/components/loadingPage";
 import { useAppContext } from "@/app/AppProvider";
+import artistImg from "@/assets/img/placeholderUser.jpg";
 
 interface Genre {
   genreId: string;
@@ -74,7 +70,6 @@ const ArtistDetailSheet: React.FC<
   const [artistGenre, setArtistGenre] = useState<string[]>([]);
   const [genreList, setGenreList] = useState<Genre[]>([]);
   const [openGenre, setOpenGenre] = useState(false);
-  const { loading, setLoading } = useAppContext();
   const { toast } = useToast();
   const { accessToken } = useAppContext()
 
@@ -95,7 +90,7 @@ const ArtistDetailSheet: React.FC<
       console.error("Error fetching genres:", error);
     } finally {
     }
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     const fetchArtistDetail = async () => {
@@ -282,18 +277,20 @@ const handleUpdateClick = () => {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between truncate border-primaryColorBlueHover"
+                      className="w-full flex justify-between items-center border-primaryColorBlueHover p-2"
                     >
+                    <span className="truncate max-w-full capitalize">
                       {artistGenre.length > 0
                         ? genreList
                             .filter((g) => artistGenre.includes(g.genreId))
                             .map((g) => g.name)
                             .join(", ")
                         : "Select genres"}
-                      <CaretSortIcon className="ml-2 h-4 w-4" />
+                    </span>
+                      <CaretSortIcon className="ml-2 h-4 w-4 flex-shrink-0" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
+                  <PopoverContent className="w-full p-0 capitalize">
                     <Command>
                       <CommandInput placeholder="Search genres..." />
                       <CommandList>

@@ -50,26 +50,34 @@ const Page = () => {
     totalUsers: 0,
   });
   const { loading, setLoading } = useAppContext();
-
   const [recentCommentData, setRecentCommentData] = useState([]);
-  const [todayBestSongData, setTodayBestSongData] = useState<TodayBestSong | null>(null);
+  const [todayBestSongData, setTodayBestSongData] =
+    useState<TodayBestSong | null>(null);
   const [userGrowthData, setUserGrowthData] = useState([]);
   const [totalPlayAndCmtYearData, setTotalPlayAndCmtYearData] = useState([]);
   const [recentUserData, setRecentUserData] = useState([]);
-  const { accessToken } = useAppContext()
-
+  const { accessToken } = useAppContext();
 
   useEffect(() => {
     const fetchAdminDashboard = async () => {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/admin/total", "GET",null, accessToken, null),
-          fetchApiData("/api/admin/recentComment", "GET", null, accessToken, { page: 1 }),
+          fetchApiData("/api/admin/total", "GET", null, accessToken, null),
+          fetchApiData("/api/admin/recentComment", "GET", null, accessToken, {
+            page: 1,
+          }),
           fetchApiData("/api/admin/todayBestSong", "GET", null, accessToken),
           fetchApiData("/api/admin/userGrowth", "GET", null, accessToken),
-          fetchApiData("/api/admin/totalPlayAndCmtYear", "GET", null, accessToken),
-          fetchApiData("/api/admin/recentUser", "GET", null, accessToken, { page: 1 }),
+          fetchApiData(
+            "/api/admin/totalPlayAndCmtYear",
+            "GET",
+            null,
+            accessToken
+          ),
+          fetchApiData("/api/admin/recentUser", "GET", null, accessToken, {
+            page: 1,
+          }),
         ]);
 
         if (responses[0].success) {
@@ -115,7 +123,9 @@ const Page = () => {
               <p className="text-h3 text-primaryColorPink">Today Best Song</p>
               <div className="flex gap-3 w-full mt-2">
                 <Image
-                  src={todayBestSongData.album[0]?.albumImages[0]?.image ?? songimg}
+                  src={
+                    todayBestSongData.album[0]?.albumImages[0]?.image ?? songimg
+                  }
                   alt="Today Best Song Poster"
                   width={60}
                   height={60}

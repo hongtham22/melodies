@@ -185,8 +185,8 @@ const Genre: React.FC<GenreData> = ({ genreList: initialGenreList }) => {
     <div>
       <Sheet>
         <SheetTrigger asChild>
-          <button className="text-textMedium py-3 px-3 bg-primaryColorPink flex items-center rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover">
-            <SewingPinIcon className="text-white w-5 h-5" />
+          <button className="text-textMedium py-3 px-3 bg-primaryColorPink flex items-center rounded-md shadow-sm shadow-white/60  hover:bg-darkPinkHover transition-all duration-300">
+            <SewingPinIcon className="text-white w-5 h-5 stroke-white" />
             Manage Genres
           </button>
         </SheetTrigger>

@@ -40,7 +40,7 @@ function Page() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading]);
+  }, [setLoading, accessToken]);
 
   // Hàm fetch Genres
   const fetchGenres = useCallback(async () => {
@@ -56,7 +56,7 @@ function Page() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading]);
+  }, [setLoading, accessToken]);
 
   useEffect(() => {
     fetchArtists(page);
@@ -146,7 +146,7 @@ function Page() {
   if (loading) return <LoadingPage />;
 
   return (
-    <div className="w-full my-20 m-6 p-8 flex flex-col items-center justify-center">
+    <div className="w-full mt-20 m-6 p-8 flex flex-col items-center justify-center">
       <div className="w-[90%] py-3 flex flex-col items-center justify-center rounded-xl">
         <div className="w-full flex items-center justify-between px-3 mb-3">
           <h1 className="text-h2 text-primaryColorPink">List Artists</h1>
@@ -163,9 +163,9 @@ function Page() {
           </div>
           <div className="flex gap-4">
             <Genre genreList={genreList} />
-            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
+            <button className="text-textMedium font-bold p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md  hover:text-darkBlueHover transition-all duration-300"
             onClick={handleDeleteArtist}>
-              <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
+              <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue stroke-primaryColorBlue" />
               Delete Artist
             </button>
 

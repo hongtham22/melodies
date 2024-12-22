@@ -61,9 +61,10 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre, fetchGen
       selected: artistGenre.includes(item.genreId),
     })));    
   }, [genre, artistGenre]);
+  
 
   const handleAddGenre = async (newGenre: Genre) => {
-    setArtistGenre((prevGenres) => [...prevGenres, newGenre.genreId]);
+    setArtistGenre((prevGenres) => [newGenre.genreId,...prevGenres]);
 
     setGenre((prev) => {
       const updatedGenres = [newGenre, ...prev]; 
@@ -91,8 +92,6 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre, fetchGen
       );
     setGenre(reorderedGenres); 
   };
-
-
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -126,8 +125,8 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre, fetchGen
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover">
-          <PlusIcon className="text-white w-5 h-5" />
+        <button className="text-textMedium font-bold p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover  transition-all duration-300">
+          <PlusIcon className="text-white w-5 h-5 stroke-white" />
           Add New Artist
         </button>
       </SheetTrigger>
@@ -145,7 +144,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre, fetchGen
               value={artistName}
               onChange={(e) => setArtistName(e.target.value)}
               placeholder="Enter artist name"
-              className="col-span-3 border-darkerBlue"
+              className="col-span-3 border-darkBlue"
             />
           </div>
           {/* Bio */}
@@ -167,7 +166,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre, fetchGen
               type="file"
               accept="image/*"
               onChange={handleAvatarChange}
-              className="col-span-3 border-darkerBlue"
+              className="col-span-3 border-darkBlue"
             />
           </div>
           {/* Genre */}
@@ -180,15 +179,18 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave, genre, fetchGen
                     variant="outline"
                     role="combobox"
                     aria-expanded={openGenre}
-                    className="w-full justify-between border-darkBlue col-span-3 truncate capitalize"
+                    className="w-full flex justify-between items-center border-darkBlue p-2"
                   >
+                    <span className="truncate max-w-full capitalize">
+
                     {artistGenre.length > 0
                       ? reorderedGenre
                           .filter((g) => artistGenre.includes(g.genreId))
                           .map((g) => g.name)
                           .join(", ")
                       : "Select genre"}
-                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </span>
+                    <CaretSortIcon className="ml-2 h-4 w-4 flex shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-full p-0 border-darkBlue">
