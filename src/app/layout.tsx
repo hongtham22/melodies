@@ -6,6 +6,7 @@ import { ScrollProvider } from "@/components/provider/scrollProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { AppProvider } from "@/app/AppProvider";
 import { ArtistProvider } from "@/components/provider/artistProvider";
+import { GenreProvider } from "@/components/provider/genreProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,7 +40,9 @@ export default function RootLayout({
           <ScrollProvider>
             <SongProvider>
               <ArtistProvider>
-              <main className="">{children}</main>
+                <GenreProvider>
+                  <main className="">{children}</main>
+                </GenreProvider>
               </ArtistProvider>
             </SongProvider>
           </ScrollProvider>

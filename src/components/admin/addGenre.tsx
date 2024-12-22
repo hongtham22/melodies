@@ -43,7 +43,7 @@ const AddGenre: React.FC<AddGenreProps> = ({ onAddGenre }) => {
             description: `Genre "${genreName}" has been added successfully.`,
             variant: "success",
           });
-          onAddGenre(response.data);
+          onAddGenre(response.data.genre);
           setGenreName("");
           setIsAdding(false);
         } else if (response.error === "Genre exists") {

@@ -18,7 +18,7 @@ function Page() {
   const page = parseInt(searchParams?.get("page") || "1", 10);
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsAdminData, setListArtistsAdminData] = useState([]);
-  const [genreList, setGenreList] = useState([]);
+  // const [genreList, setGenreList] = useState([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
   const { accessToken } = useAppContext()
@@ -42,26 +42,9 @@ function Page() {
     }
   }, [setLoading, accessToken]);
 
-  // Hàm fetch Genres
-  const fetchGenres = useCallback(async () => {
-    setLoading(true);
-    try {
-      const genresResponse = await fetchApiData("/api/admin/allGenre", "GET", null, accessToken);
-
-      if (genresResponse.success) {
-        setGenreList(genresResponse.data.genres);
-      }
-    } catch (error) {
-      console.error("Error fetching genres:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [setLoading, accessToken]);
-
   useEffect(() => {
     fetchArtists(page);
-    fetchGenres();
-  }, [fetchArtists, fetchGenres, page]);
+  }, [fetchArtists, page]);
 
   const handleAddArtist = async (artistData: { name: string; bio: string; avatar: File; genre: string[] }) => {
     const { name, bio, avatar, genre } = artistData;
@@ -162,7 +145,7 @@ function Page() {
             />
           </div>
           <div className="flex gap-4">
-            <Genre genreList={genreList} />
+            <Genre />
             <button className="text-textMedium font-bold p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md  hover:text-darkBlueHover transition-all duration-300"
             onClick={handleDeleteArtist}>
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue stroke-primaryColorBlue" />

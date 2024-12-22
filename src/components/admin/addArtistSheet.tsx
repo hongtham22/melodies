@@ -32,11 +32,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import AddGenre from "@/components/admin/addGenre";
 import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from "@/app/AppProvider";
+import { useGenreContext } from "@/components/provider/genreProvider";
+import { GenreData } from "@/types/interfaces";
+import { useToast } from "@/hooks/use-toast"
 
-interface Genre {
-  genreId: string;
-  name: string;
-}
 interface AddArtistSheetProps {
   onSave: (artistData: {
     name: string;
@@ -52,39 +51,12 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
   const [artistAvatar, setArtistAvatar] = React.useState<File | null>(null);
   const [artistGenre, setArtistGenre] = React.useState<string[]>([]);
   const [openGenre, setOpenGenre] = React.useState(false);
-  const [loading, setLoading] = useState(false);
-  const [reorderedGenre, setReorderedGenre] = React.useState<Genre[]>([]);
-    const { accessToken } = useAppContext()
+  const { listGenres, setListGenres } = useGenreContext();
+  const { toast } = useToast()
   
-  // React.useEffect(() => {
-  //   setGenre(genre.map((item) => ({
-  //     ...item,
-  //     selected: artistGenre.includes(item.genreId),
-  //   })));    
-  // }, [genre, artistGenre]);
-  
-  const fetchGenres = useCallback(async () => {
-    setLoading(true);
-    try {
-      const genresResponse = await fetchApiData("/api/admin/allGenre", "GET", null, accessToken);
-
-      if (genresResponse.success) {
-        setReorderedGenre(genresResponse.data.genres);
-      }
-    } catch (error) {
-      console.error("Error fetching genres:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [setLoading, accessToken]);
-
-  useEffect(() => {
-    fetchGenres();
-  }, [fetchGenres]);
-
-  const handleAddGenre = (newGenre: Genre) => {
-    setArtistGenre((prev) => [newGenre.genreId, ...prev]);
-    setReorderedGenre((prev) => [newGenre, ...prev]);
+  const handleAddGenre = (newGenre: GenreData) => {
+    setListGenres([newGenre, ...listGenres]);
+    console.log(newGenre);
   };
 
   const handleGenreChange = (genreId: string) => {
@@ -95,35 +67,12 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
     );
   };
 
-  // const handleAddGenre = async (newGenre: Genre) => {
-  //   setArtistGenre((prevGenres) => [newGenre.genreId,...prevGenres]);
-
-  //   setGenre((prev) => {
-  //     const updatedGenres = [newGenre, ...prev]; 
-  //     return updatedGenres;
-  //   });
-  //   // await fetchGenres();
-  // };
-
-  // const handleGenreChange = (genreId: string) => {
-  //   setArtistGenre((prevGenres) =>
-  //     prevGenres.includes(genreId)
-  //       ? prevGenres.filter((id) => id !== genreId)
-  //       : [...prevGenres, genreId]
-  //   );
-
-  //   const reorderedGenres = genre
-  //     .filter(
-  //       (item) => artistGenre.includes(item.genreId) || item.genreId === genreId
-  //     )
-  //     .concat(
-  //       genre.filter(
-  //         (item) =>
-  //           !artistGenre.includes(item.genreId) && item.genreId !== genreId
-  //       )
-  //     );
-  //   setGenre(reorderedGenres); 
-  // };
+  const orderedGenres = [
+    // Genres that are selected
+    ...listGenres.filter((genre) => artistGenre.includes(genre.genreId)),
+    // Genres that are not selected
+    ...listGenres.filter((genre) => !artistGenre.includes(genre.genreId)),
+  ];
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -133,14 +82,22 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
         e.target.value = "";
         alert("File size should not exceed 10MB");
         return;
-      }
-      else{
+      } else {
         setArtistAvatar(file);
       }
     }
   };
 
   const handleSave = () => {
+    if (!artistName.trim() || artistGenre.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please provide both Name and Genre before add.",
+        variant: "destructive",
+      });
+      return; 
+    }
+
     onSave({
       name: artistName,
       bio: artistBio,
@@ -164,24 +121,33 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle className="text-primaryColorPink">Add New Artist</SheetTitle>
-          <SheetDescription>Enter details to add a new artist.</SheetDescription>
+          <SheetTitle className="text-primaryColorPink">
+            Add New Artist
+          </SheetTitle>
+          <SheetDescription>
+            Enter details to add a new artist.
+          </SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4 items-start">
           {/* Aritst  */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="artistName" className="text-left">Name</Label>
+            <Label htmlFor="artistName" className="text-left">
+              Name
+            </Label>
             <Input
               id="artistName"
               value={artistName}
               onChange={(e) => setArtistName(e.target.value)}
               placeholder="Enter artist name"
               className="col-span-3 border-darkBlue"
+              required
             />
           </div>
           {/* Bio */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="artistBio" className="text-left">Bio</Label>
+            <Label htmlFor="artistBio" className="text-left">
+              Bio
+            </Label>
             <textarea
               id="artistBio"
               value={artistBio}
@@ -192,7 +158,9 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
           </div>
           {/* Avatar */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="artistAvatar" className="text-left">Avatar</Label>
+            <Label htmlFor="artistAvatar" className="text-left">
+              Avatar
+            </Label>
             <Input
               id="artistAvatar"
               type="file"
@@ -203,7 +171,9 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
           </div>
           {/* Genre */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="genre" className="text-left">Genre</Label>
+            <Label htmlFor="genre" className="text-left">
+              Genre
+            </Label>
             <div className="col-span-3 flex gap-1">
               <Popover open={openGenre} onOpenChange={setOpenGenre}>
                 <PopoverTrigger asChild>
@@ -214,29 +184,33 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
                     className="w-full flex justify-between items-center border-darkBlue p-2"
                   >
                     <span className="truncate max-w-full capitalize">
-
-                    {artistGenre.length > 0
-                      ? reorderedGenre
-                          .filter((g) => artistGenre.includes(g.genreId))
-                          .map((g) => g.name)
-                          .join(", ")
-                      : "Select genre"}
+                      {artistGenre.length > 0
+                        ? listGenres
+                            .filter((g) => artistGenre.includes(g.genreId))
+                            .map((g) => g.name)
+                            .join(", ")
+                        : "Select genre"}
                     </span>
                     <CaretSortIcon className="ml-2 h-4 w-4 flex shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-full p-0 border-darkBlue">
                   <Command>
-                    <CommandInput placeholder="Search genre..." className="h-9" />
+                    <CommandInput
+                      placeholder="Search genre..."
+                      className="h-9"
+                    />
                     <CommandList>
                       <CommandEmpty>No genre found.</CommandEmpty>
                       <ScrollArea className="h-40">
                         <CommandGroup className="capitalize">
                           <AddGenre onAddGenre={handleAddGenre} />
-                          {reorderedGenre.map((genreItem) => (
+                          {orderedGenres.map((genreItem) => (
                             <CommandItem
                               key={genreItem.genreId}
-                              onSelect={() => handleGenreChange(genreItem.genreId)}
+                              onSelect={() =>
+                                handleGenreChange(genreItem.genreId)
+                              }
                             >
                               {genreItem.name}
                               <CheckIcon
@@ -258,7 +232,6 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
           </div>
         </div>
         <SheetFooter>
-          <SheetClose asChild>
             <Button
               onClick={handleSave}
               type="submit"
@@ -266,7 +239,6 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
             >
               Save Artist
             </Button>
-          </SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>
