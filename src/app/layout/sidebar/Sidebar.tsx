@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useAppContext as useSongContext } from '@/components/provider/songProvider';
+import { useAppContext } from "@/app/AppProvider";
 
 import {
   HomeIcon,
@@ -17,7 +18,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
 import { BiAperture } from "react-icons/bi";
 
@@ -47,6 +47,14 @@ const Sidebar = () => {
       setShowRequireLoginForListenTogether(true);
     }
   };
+
+  const { currentSong } = useSongContext()
+  const [pb, setPb] = useState(false)
+  useEffect(() => {
+    if (currentSong) {
+      setPb(true);
+    }
+  }, [currentSong]);
 
   const [activeMenu, setActiveMenu] = useState("");
   const { toast } = useToast();
@@ -104,7 +112,7 @@ const Sidebar = () => {
       : "text-[0.9rem]";
   };
   return (
-    <div className={`h-screen w-full mt-3 pl-9 pr-7 drop-shadow-lg z-20`}>
+    <div className={`h-screen w-full mt-3 pl-9 pr-7 drop-shadow-lg z-20 ${pb && 'pb-24'} overflow-auto`}>
       <div id="menu-section" className="mb-5">
         <p className="text-primaryColorPink/60 text-[0.8rem]">Menu</p>
         <div
@@ -200,7 +208,6 @@ const Sidebar = () => {
             </div>
           )}
         </div>
-
         {/* Listen Together */}
         <div
           className={`relative flex my-2 cursor-pointer ${getMenuClass(
@@ -251,6 +258,16 @@ const Sidebar = () => {
           <Link href="/profile">Profile</Link>
 
           {/* <p>Setting</p> */}
+        </div>
+        <div
+          className={`flex my-2 cursor-pointer ${getMenuClass(
+            "package"
+          )} py-2 items-center`}
+          onClick={() => handleMenuClick("package")}
+        >
+          <AvatarIcon className="w-[24px] h-[24px] mr-3" />
+          <Link href="/package">My package</Link>
+          {/* <p>Artists</p> */}
         </div>
         <div
           className={`flex my-2 cursor-pointer ${getMenuClass(

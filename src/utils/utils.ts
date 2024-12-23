@@ -69,3 +69,25 @@ export const formatTime = (duration: number) => {
 
     return min + ":" + formattedSec;
 };
+
+export function formatTimeCommentNotification(createdAt: string): string {
+    const now = new Date();
+    const createdDate = new Date(createdAt);
+    const diffInSeconds = Math.floor((now.getTime() - createdDate.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+        return `${diffInSeconds} giây trước`;
+    } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes} phút trước`;
+    } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours} tiếng trước`;
+    } else {
+        return createdDate.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    }
+}

@@ -72,6 +72,7 @@ export interface Comment {
     user: User;
     hasChild: number;
     myComment: boolean;
+    songId: string;
 }
 
 //playlist
@@ -135,6 +136,17 @@ export interface Notification {
     from: string;
     createdAt: string;
     updatedAt: string;
+    report: Report
+}
+
+//report
+export interface Report {
+    id: string;
+    content: string;
+    userId: string;
+    status: string;
+    createdAt: string;
+    comment: Comment;
 }
 
 
