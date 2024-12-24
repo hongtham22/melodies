@@ -200,7 +200,7 @@ function ListTracksAdmin({
                         className="rounded-lg"
                       />
                       <div>
-                        <h3 className="text-h4 mb-1 hover:underline">
+                        <h3 className="text-h4 mb-1 hover:underline truncate">
                           {track.title}
                         </h3>
                         <p className="text-textSmall hover:underline text-primaryColorGray">

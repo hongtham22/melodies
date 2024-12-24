@@ -196,7 +196,7 @@ const handleUpdateClick = () => {
   if (!artistName.trim() || artistGenre.length === 0) {
     toast({
       title: "Error",
-      description: "Please provide both Name and Genre before update.",
+      description: "Please provide required information before update.",
       variant: "destructive",
     });
     return; 
@@ -245,7 +245,7 @@ const handleUpdateClick = () => {
 
             {/* Title */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">Name<span className="text-red-500">*</span></Label>
               <Input
                 id="title"
                 name="title"
@@ -269,7 +269,7 @@ const handleUpdateClick = () => {
             </div>
             {/* Genres */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="genre">Genres</Label>
+              <Label htmlFor="genre">Genres<span className="text-red-500">*</span></Label>
               <div className="col-span-3">
                 <Popover open={openGenre} onOpenChange={setOpenGenre}>
                   <PopoverTrigger asChild>

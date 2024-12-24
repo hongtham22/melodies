@@ -30,6 +30,8 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { title } from "process";
+import { useToast } from "@/hooks/use-toast"
 
 interface Artist {
   id: string;
@@ -61,6 +63,8 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
   const [lyricFile, setLyricFile] = useState<File | null>(null);
   const [listArtist, setListArtist] = React.useState<Artist[]>(artist || []);
   const originalOrder = React.useRef<Artist[]>(artist || []);
+  const { toast } = useToast();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   React.useEffect(() => {
     setListArtist((prevList) =>
@@ -91,6 +95,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
         ...prevList.filter((artist) => artist.id !== selectedArtist.id),
       ]);
     }
+    setOpenMainArtist(false);
   };
 
   const handleSubArtistChange = (artist: Artist) => {
@@ -123,7 +128,17 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
     });
   };
 
+
   const handleSave = () => {
+    if (!trackTitle.trim() || !mainArtist || !releaseDate || !audioFile) {
+      toast({
+        title: "Error",
+        description: "Please provide required information before adding.",
+        variant: "destructive",
+      });
+      return;
+    }
+  
     if (audioFile) {
       onSave({
         title: trackTitle,
@@ -133,19 +148,24 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
         audioFile: audioFile,
         lyricFile: lyricFile,
       });
+      console.log("Track saved with release_date:", releaseDate);
+  
+      // Reset fields
+      setTrackTitle("");
+      setMainArtist("");
+      setSubArtists([]);
+      setAudioFile(null);
+      setReleaseDate("");
+      setLyricFile(null);
+  
+      // Close Sheet
+      setIsSheetOpen(false);
     } else {
       console.error("Audio file is required.");
     }
-    console.log("Track saved with release_date:", releaseDate);
-
-    setTrackTitle("");
-    setMainArtist("");
-    setSubArtists([]);
-    setAudioFile(null);
-    setReleaseDate("");
-    setLyricFile(null);
   };
-
+  
+  
   const handleAudioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -186,10 +206,10 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
   };
 
   return (
-    <Sheet>
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <button className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover">
-          <PlusIcon className="text-white w-5 h-5" />
+          <PlusIcon className="text-white w-5 h-5 stroke-white" />
           Add New Track
         </button>
       </SheetTrigger>
@@ -203,7 +223,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
         <div className="grid gap-4 py-4 items-start">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="trackTitle" className="text-left text-textMedium">
-              Title
+              Title<span className="text-red-500">*</span>
             </Label>
             <Input
               id="trackTitle"
@@ -215,7 +235,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="mainArtist" className="text-left text-textMedium">
-              Main Artist
+              Main Artist<span className="text-red-500">*</span>
             </Label>
             <Popover open={openMainArtist} onOpenChange={setOpenMainArtist}>
               <PopoverTrigger asChild>
@@ -277,14 +297,19 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
 
           <div className="grid grid-cols-4 items-center gap-4">
             <label htmlFor="releaseDate" className="text-left text-textMedium">
-              Release Date
+              Release Date<span className="text-red-500">*</span>
             </label>
             <div className="col-span-3">
               <input
                 id="releaseDate"
                 type="date"
                 className="calendar-icon w-full border-primaryColorBlue border p-2 rounded-md bg-slate-950 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primaryColorBlue"
-                onChange={(e) => setReleaseDate(e.target.value)}
+                // onChange={(e) => setReleaseDate(e.target.value)}
+                onChange={(e) => {
+                  const [year, month, day] = e.target.value.split("-"); 
+                  const formattedDate = `${month}/${day}/${year} 00:00:00`; // Chuyển sang định dạng MM/dd/yyyy HH:mm:ss
+                  setReleaseDate(formattedDate);
+                }}
                 max={new Date().toISOString().split("T")[0]}
                 required
               />
@@ -364,7 +389,7 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="audio" className="text-left text-textMedium">
-              Audio
+              Audio<span className="text-red-500">*</span>
             </Label>
             <Input
               id="audio"
@@ -415,7 +440,6 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
 
         </div>
         <SheetFooter>
-          <SheetClose asChild>
             <Button
               onClick={handleSave}
               type="submit"
@@ -423,7 +447,6 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
             >
               Save Track
             </Button>
-          </SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>

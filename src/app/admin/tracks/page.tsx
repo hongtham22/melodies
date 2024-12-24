@@ -39,7 +39,7 @@ function Page() {
         setLoading(false);
       }
     },
-    [setLoading]
+    [setLoading, accessToken]
   );
 
   const fetchArtists = useCallback(async () => {
@@ -61,7 +61,7 @@ function Page() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading]);
+  }, [setLoading, accessToken]);
 
   useEffect(() => {
     fetchArtists();
@@ -164,8 +164,6 @@ function Page() {
     console.log("Deleting tracks:", { songIds: selectedItems });
   };
   
-  
-
   if (loading) return <LoadingPage />;
 
   return (

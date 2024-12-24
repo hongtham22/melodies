@@ -53,6 +53,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
   const [openGenre, setOpenGenre] = React.useState(false);
   const { listGenres, setListGenres } = useGenreContext();
   const { toast } = useToast()
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
   
   const handleAddGenre = (newGenre: GenreData) => {
     setListGenres([newGenre, ...listGenres]);
@@ -109,10 +110,12 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
     setArtistBio("");
     setArtistAvatar(null);
     setArtistGenre([]);
+
+    setIsSheetOpen(false);
   };
 
   return (
-    <Sheet>
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <button className="text-textMedium font-bold p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover  transition-all duration-300">
           <PlusIcon className="text-white w-5 h-5 stroke-white" />
@@ -132,7 +135,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
           {/* Aritst  */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="artistName" className="text-left">
-              Name
+              Name<span className="text-red-500">*</span>
             </Label>
             <Input
               id="artistName"
@@ -172,7 +175,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
           {/* Genre */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="genre" className="text-left">
-              Genre
+              Genre<span className="text-red-500">*</span>
             </Label>
             <div className="col-span-3 flex gap-1">
               <Popover open={openGenre} onOpenChange={setOpenGenre}>
