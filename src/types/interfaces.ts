@@ -50,6 +50,7 @@ export interface DataSong {
     album: Array<DataAlbum>;
     artists: Array<Artist>;
     playCount: string;
+    image: string;
 }
 
 //user
@@ -93,6 +94,7 @@ export interface DataPlaylist {
     totalSong: number;
     createdAt: string;
     songsOfPlaylist: DataSong[];
+    privacy: boolean;
 }
 
 // socket

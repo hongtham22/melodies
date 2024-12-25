@@ -17,19 +17,24 @@ import UpdatePlaylist from "@/components/popup/updatePlaylist";
 import ConfirmDeletePlaylist from "@/components/popup/confirmDeletePlaylist";
 import { useToast } from "@/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
+import ConfirmDeleteSongOnPlaylist from "@/components/popup/confirmDeleteSongOnPlaylist";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { toast } = useToast()
     const { accessToken, loading, setLoading } = useAppContext()
-    const { addListToWaitingList, setCurrentSong, setWaitingList } = useSongContext();
+    const { addListToWaitingList, setCurrentSong, setWaitingList, addToWaitingList } = useSongContext();
     const [playlist, setPlaylist] = useState<DataPlaylist>()
     const [songsOfPlaylist, setSongOfPlaylist] = useState<DataSong[]>([])
     const [showMenuMore, setShowMenuMore] = useState<boolean>(false)
+    const [activeMenuSong, setActiveMenuSong] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [dominantColor, setDominantColor] = useState<string>();
     const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
     const [isUpdate, setIsUpdate] = useState<boolean>(false)
+    const [isUpdateSong, setIsUpdateSong] = useState<boolean>(false)
     const [isDelete, setIsDelete] = useState<boolean>(false)
+    const [isDeleteSong, setIsDeleteSong] = useState<boolean>(false)
+    const [songSelected, setSongSelected] = useState<DataSong>()
 
     useEffect(() => {
         const fetchSong = async () => {
@@ -115,6 +120,10 @@ const Page = ({ params }: { params: { id: string } }) => {
         }
     }
 
+    const toggleMenu = (id: string) => {
+        setActiveMenuSong(activeMenuSong === id ? null : id);
+    }
+
     if (loading) return <LoadingPage />
     return (
         <div className="w-full  bg-secondColorBg">
@@ -174,11 +183,11 @@ const Page = ({ params }: { params: { id: string } }) => {
                                     </td>
                                     <td className="py-1">
                                         <Image
-                                            src={getPosterSong(song.album).image}
+                                            src={playlist?.privacy && song?.image ? song.image : getPosterSong(song.album).image}
                                             alt="song"
                                             width={50}
                                             height={50}
-                                            className="rounded-lg"
+                                            className="w-[50px] h-[50px] rounded-lg"
                                         />
                                     </td>
                                     <td className="pl-4">
@@ -195,11 +204,33 @@ const Page = ({ params }: { params: { id: string } }) => {
                                         </p>
                                     </td>
                                     <td className="rounded-tr-lg rounded-br-lg text-start">
-                                        <div className="flex gap-3 items-center justify-center">
+                                        <div className="relative flex gap-3 items-center justify-center">
                                             <p className="text-textMedium">{formatTime(song.duration)}</p>
                                             <button className="hover:scale-110">
-                                                <TfiMoreAlt className="w-4 h-4 shadow-[0_4px_60px_rgba(0,0,0,0.3)]" />
+                                                <TfiMoreAlt
+                                                    onClick={() => toggleMenu(song.id)}
+                                                    className="w-4 h-4 shadow-[0_4px_60px_rgba(0,0,0,0.3)]" />
                                             </button>
+                                            {
+                                                activeMenuSong === song.id && (
+                                                    <div className="absolute top-5 w-44 right-8 bg-[#1F1F1F] p-2 rounded-md">
+                                                        <ul className="">
+                                                            <li
+                                                                className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md"
+                                                                onClick={() => addToWaitingList(song)}
+                                                            ><RiPlayListAddLine /> Add to waiting list</li>
+                                                            <li
+                                                                className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md "
+                                                                onClick={() => { setIsUpdateSong(true); setShowMenuMore(false) }}
+                                                            ><MdEdit /> Edit song</li>
+                                                            <li
+                                                                className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md"
+                                                                onClick={() => { setIsDeleteSong(true); setActiveMenuSong(null); setSongSelected(song) }}
+                                                            ><MdDelete /> Delete song</li>
+                                                        </ul>
+                                                    </div>
+                                                )
+                                            }
                                         </div>
                                     </td>
                                 </tr>
@@ -277,6 +308,14 @@ const Page = ({ params }: { params: { id: string } }) => {
                 isDelete && (
                     <ConfirmDeletePlaylist onClose={() => setIsDelete(false)}
                         data={playlist}
+                    />
+                )
+            }
+            {
+                isDeleteSong && (
+                    <ConfirmDeleteSongOnPlaylist onClose={() => setIsDeleteSong(false)}
+                        data={songSelected}
+                        playlistId={playlist?.playlistId}
                     />
                 )
             }

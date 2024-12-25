@@ -1,13 +1,16 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation';
 import { useAppContext } from '@/app/AppProvider'
 import { fetchApiData } from '@/app/api/appService'
+import { FaCrown } from "react-icons/fa6";
 import Image from 'next/image'
 import UserImage from '@/assets/img/placeholderUser.jpg'
 import { User } from '@/types/interfaces'
 
 const Page = () => {
     const { accessToken } = useAppContext()
+    const router = useRouter()
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [user, setUser] = useState<User>()
     const [name, setName] = useState(user?.name)
@@ -63,7 +66,7 @@ const Page = () => {
 
     const handleUpdateInformation = () => {
         if (username?.trim() === '' || name?.trim() === '') {
-            alert('Username pr Fullname cannot be left blank');
+            alert('Username or Fullname cannot be left blank');
             return;
         }
 
@@ -100,6 +103,10 @@ const Page = () => {
                                 />
                                 <p className='text-[0.8rem]'>JPG, GIF or PNG. 1MB max.</p>
                             </div>
+                            <FaCrown
+                                className='w-6 h-6 ml-6 text-yellow-400 cursor-pointer'
+                                onClick={() => router.push('/package')}
+                            />
                         </div>
                         <form className='mt-8'>
                             <div className='space-y-10'>
