@@ -266,11 +266,11 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
   };
 
   const handleUpdateClick = () => {
-    console.log("Debugging handleUpdateClick:");
-    console.log("trackTitle:", trackTitle);
-    console.log("mainArtist:", mainArtist);
-    console.log("releaseDate:", releaseDate);
-    console.log("audioFile:", audioFile);
+    // console.log("Debugging handleUpdateClick:");
+    // console.log("trackTitle:", trackTitle);
+    // console.log("mainArtist:", mainArtist);
+    // console.log("releaseDate:", releaseDate);
+    // console.log("audioFile:", audioFile);
   
     if (!trackTitle.trim() || !mainArtist || !releaseDate || !audioSrc) {
       toast({

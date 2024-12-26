@@ -107,45 +107,6 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
     }
   }, [mainArtist]);
 
-  // const handleMainArtistSelect = async (selectedArtist: Artist) => {
-  //   setOpenMainArtist(false);
-  //   if (mainArtist === selectedArtist.id) {
-  //     setMainArtist("");
-  //     setListArtist((prevList) =>
-  //       prevList.map((artist) =>
-  //         artist.id === selectedArtist.id
-  //           ? { ...artist, selected: false }
-  //           : artist
-  //       )
-  //     );
-  //     setListSongOfMainArtist([]);
-  //     setSelectedSongs([]);
-  //   } else {
-  //     setMainArtist(selectedArtist.id);
-  //     setListArtist((prevList) => [
-  //       { ...selectedArtist, selected: true },
-  //       ...prevList.filter((artist) => artist.id !== selectedArtist.id),
-  //     ]);
-
-  //     try {
-  //       const response = await fetchApiData(
-  //         `/api/artist/song/${selectedArtist.id}`,
-  //         "GET",
-  //         null,
-  //         accessToken
-  //       );
-  //       if (response.success) {
-  //         setListSongOfMainArtist(response.data.songs);
-  //         setReorderedSong(response.data.songs);
-  //         setSelectedSongs([]);
-  //       } else {
-  //         console.error("Failed to fetch songs:", response.error);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching songs:", error);
-  //     }
-  //   }
-  // };
   const handleMainArtistSelect = async (selectedArtist: Artist) => {
     setOpenMainArtist(false);
 
@@ -399,9 +360,9 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="ep">EP</SelectItem>
-                      <SelectItem value="single">Single</SelectItem>
-                      <SelectItem value="album">Album</SelectItem>
+                      <SelectItem value="ep" className="text-green-500">EP</SelectItem>
+                      <SelectItem value="single" className="text-yellow-500">Single</SelectItem>
+                      <SelectItem value="album" className="text-pink-500">Album</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>

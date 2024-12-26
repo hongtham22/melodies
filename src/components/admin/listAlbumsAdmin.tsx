@@ -48,6 +48,13 @@ function ListAlbumsAdmin({
   const itemsPerPage = 10;
   const [openAlbumId, setOpenAlbumId] = useState<string | null>(null);
 
+  const typeColors = {
+    ep: "!text-green-500",
+    single: "!text-yellow-500",
+    album: "!text-pink-500",
+  };
+
+
   const handleRowClick = (albumId: string) => {
     console.log("albumId", albumId);
     setOpenAlbumId(albumId); 
@@ -95,43 +102,36 @@ function ListAlbumsAdmin({
             <th className="w-[7%] pl-3">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p>No</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
             <th className="w-[25%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p>Album</p>
-                <CaretSortIcon className="text-white  w-4 h-4" />
               </div>
             </th>
             <th className="w-[20%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p> Number Of Tracks</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
             <th className="w-[12%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p>Main Artist</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
             <th className="w-[15%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p> Upload Date</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
             <th className="w-[15%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p> Release Date</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
             <th className="w-[17%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p>Type</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
           </tr>
@@ -202,7 +202,9 @@ function ListAlbumsAdmin({
                   </div>
                 </td>
                 <td className="text-textMedium text-center pl-2 rounded-tr-lg rounded-br-lg">
-                  <div className="line-clamp-1 capitalize">{album.albumType}</div>
+                  <div className={`line-clamp-1 capitalize ${
+                      typeColors[album.albumType] || ""
+                    }`}>{album.albumType}</div>
                 </td>
               </tr>
             ))}

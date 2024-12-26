@@ -182,7 +182,7 @@ const Header = () => {
             />
             <div className="flex  flex-col">
               <p className="text-textSmall">Welcome</p>
-              <p className="text-textMedium font-bold line-clamp-1">
+              <p className="text-textMedium font-bold line-clamp-1 text-primaryColorBlue">
                 {user?.name || user?.username}
               </p>
             </div>

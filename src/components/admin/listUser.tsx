@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import songimg from "@/assets/img/songs.png";
+import userImg from "@/assets/img/placeholderUser.jpg";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import {
@@ -31,14 +31,14 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
   const itemsPerPage = 10;
 
   const statusOptions = [
-    "normal",
+    "Normal",
     "block 3 days",
     "block 7 days",
     "block a week",
   ];
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "normal":
+      case "Normal":
         return "text-green-500";
       case "block 3 days":
         return "text-yellow-500";
@@ -83,32 +83,27 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
               <th className="w-[3%] pl-3">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>No</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[24%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Name</p>
-                  <CaretSortIcon className="text-white  w-4 h-4" />
                 </div>
               </th>
               <th className="w-[10%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p> Joined</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[10%] pl-2">Type</th>
               <th className="w-[13%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Play Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[15%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Violation Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[15%] pl-2">Status</th>
@@ -128,20 +123,20 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
                   <td className="pl-2 text-h4 rounded-tl-lg rounded-bl-lg text-center">
                   {(page - 1) * itemsPerPage + index + 1}
                   </td>
-                  <td className="">
+                  <td className="pr-2">
                     <div className="pl-2 flex felx-col gap-2 items-start">
                       <Image
-                        src={user.image || songimg}
+                        src={user.image || userImg}
                         alt="song"
                         width={50}
                         height={50}
                         className="rounded-lg"
                       />
                       <div>
-                        <h3 className="text-h4 mb-1 hover:underline line-clamp-1">
+                        <h3 className="text-h4 mb-1 hover:underline truncate">
                           {user.username}
                         </h3>
-                        <p className="text-textSmall hover:underline line-clamp-1">
+                        <p className="text-textSmall hover:underline truncate ellipsis line-clamp-1">
                           {user.email}
                         </p>
                       </div>
