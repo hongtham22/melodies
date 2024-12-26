@@ -60,7 +60,7 @@ function SongPlayedBanner2({
       setStartTime(data.currentTime);
     };
 
-    socket.off("UpdateAudio", handleAudioUpdate);
+    // socket.off("UpdateAudio", handleAudioUpdate);
     socket.on("previousSongFailed", (data) => {
       alert(data);
     });
@@ -201,6 +201,9 @@ function SongPlayedBanner2({
 
   // lấy url nhạc
   useEffect(() => {
+    // if (currentSong.isPlaying){
+
+    // }
     if (currentSong && currentSong.song && currentSong.song.id) {
       const audioUrl = currentSong.song.filePathAudio
         ? decrypt(currentSong.song.filePathAudio)
@@ -209,7 +212,6 @@ function SongPlayedBanner2({
 
       console.log("song: ", audioUrl);
 
-      setIsPlaying(currentSong.isPlaying);
       setStartTime(currentSong.currentTime);
       if (audioRef.current) {
         audioRef.current.pause(); // Dừng bài hát hiện tại

@@ -11,6 +11,7 @@ import LoadingPage from "@/components/loadingPage";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/hooks/use-toast"
 import Genre from "@/components/genre";
+import ConfirmDelete from "@/components/popup/confirmDelete";
 
 function Page() {
   const { loading, setLoading } = useAppContext();
@@ -22,7 +23,7 @@ function Page() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
   const { accessToken } = useAppContext()
-
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
  
   const fetchArtists = useCallback(async (page: number) => {
     setLoading(true);
@@ -124,6 +125,18 @@ function Page() {
     }
   
     console.log("Deleting artists:", { artistIds: selectedItems });
+    setShowConfirmDelete(false);
+  };
+  const handleOpenConfirmDelete = () => {
+    if (selectedItems.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one artist to delete.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowConfirmDelete(true);
   };
 
   if (loading) return <LoadingPage />;
@@ -147,8 +160,9 @@ function Page() {
           <div className="flex gap-4">
             <Genre />
             <button className="text-textMedium font-bold p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md  hover:text-darkBlueHover transition-all duration-300"
-            onClick={handleDeleteArtist}>
+            onClick={handleOpenConfirmDelete}>
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue stroke-primaryColorBlue" />
+
               Delete Artist
             </button>
 
@@ -158,6 +172,13 @@ function Page() {
       </div>
       <ListArtistAdmin data={listArtistsAdminData} page={page} onSelectedItemsChange={setSelectedItems}/>
       <PaginationWithLinks page={page} totalPage={totalPage} />
+      {showConfirmDelete && (
+        <ConfirmDelete
+          onClose={() => setShowConfirmDelete(false)}
+          onDelete={handleDeleteArtist}
+          entityName="artist" 
+        />
+      )}
     </div>
   );
 }

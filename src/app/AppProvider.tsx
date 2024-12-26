@@ -22,6 +22,9 @@ interface AppContextType {
   setAccessToken: (token: string) => void;
   socket: Socket | null;
 }
+import envConfig from "@/config";
+
+const API_BASE_URL = envConfig.NEXT_PUBLIC_API_ENDPOINT;
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -68,7 +71,7 @@ export const AppProvider: React.FC<{
 
   useEffect(() => {
     if (accessToken) {
-      const newSocket = io("http://localhost:20099", {
+      const newSocket = io(`${API_BASE_URL}`, {
         auth: { accessToken: accessToken },
       });
 

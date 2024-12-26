@@ -10,6 +10,7 @@ import { PaginationWithLinks } from "@/components/paginationWithLinks";
 import { useSearchParams } from "next/navigation";
 import LoadingPage from "@/components/loadingPage";
 import { useToast } from "@/hooks/use-toast"
+import ConfirmDelete from "@/components/popup/confirmDelete";
 
 
 function Page() {
@@ -22,6 +23,7 @@ function Page() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
   const { accessToken } = useAppContext()
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
 
   const fetchAlbumsAdmin = useCallback(
@@ -145,11 +147,22 @@ function Page() {
     } finally {
       setSelectedItems([]);
     }
+    setShowConfirmDelete(false);
   
     console.log("Deleting albums:", { albumIds: selectedItems });
   };
   
-  
+  const handleOpenConfirmDelete = () => {
+    if (selectedItems.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one album to delete.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowConfirmDelete(true);
+  };
 
   if (loading) return <LoadingPage />;
 
@@ -160,7 +173,7 @@ function Page() {
           <h1 className="text-h2 text-primaryColorPink">List Albums</h1>
           <div className="flex gap-4">
             <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
-            onClick={handleDeleteAlbums}>
+            onClick={handleOpenConfirmDelete}>
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
               Delete Albums
             </button>
@@ -171,6 +184,13 @@ function Page() {
       </div>
       <ListAlbumsAdmin data={listAlbumsAdminData} page={page} onSelectedItemsChange={setSelectedItems} />
       <PaginationWithLinks page={page} totalPage={totalPage} />
+      {showConfirmDelete && (
+        <ConfirmDelete
+          onClose={() => setShowConfirmDelete(false)}
+          onDelete={handleDeleteAlbums}
+          entityName="track" 
+        />
+      )}
     </div>
   );
 }
