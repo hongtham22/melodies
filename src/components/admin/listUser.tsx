@@ -29,13 +29,6 @@ interface User {
 
 function ListUser({ data, page }: { data: User[]; page: number; }) {
   const itemsPerPage = 10;
-
-  const statusOptions = [
-    "Normal",
-    "block 3 days",
-    "block 7 days",
-    "block a week",
-  ];
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Normal":
@@ -51,22 +44,6 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
     }
   };
 
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(
-    data.map((user) => user.status2)
-  );
-
-  const handleStatusChange = (index: number, newStatus: string) => {
-    const confirmed = window.confirm(
-      `Please confirm change to "${newStatus}"`
-    );
-    if (confirmed) {
-      setSelectedStatuses((prevStatuses) => {
-        const updatedStatuses = [...prevStatuses];
-        updatedStatuses[index] = newStatus;
-        return updatedStatuses;
-      });
-    }
-  };
   
   const options: Intl.DateTimeFormatOptions = { 
     year: 'numeric', 
@@ -111,10 +88,6 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
           </thead>
           <tbody className="">
             {data && data.map((user, index) => {
-              const availableStatuses = [
-                user.status2,
-                ...statusOptions.filter((status) => status !== user.status2),
-              ];
               return (
                 <tr
                   key={user.id}
@@ -136,7 +109,7 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
                         <h3 className="text-h4 mb-1 hover:underline truncate">
                           {user.username}
                         </h3>
-                        <p className="text-textSmall hover:underline truncate ellipsis line-clamp-1">
+                        <p className="text-textSmall hover:underline truncate ellipsis line-clamp-1 text-darkPink">
                           {user.email}
                         </p>
                       </div>
@@ -161,31 +134,9 @@ function ListUser({ data, page }: { data: User[]; page: number; }) {
                     </div>
                   </td>
                   <td className="text-textMedium pl-2 text-center rounded-tr-lg rounded-br-lg">
-                    <Select
-                      value={selectedStatuses[index]}
-                      onValueChange={(newStatus) =>
-                        handleStatusChange(index, newStatus)
-                      }
-                    >
-                      <SelectTrigger className={`${getStatusColor(selectedStatuses[index])} w-full` }>
-                        <SelectValue
-                          placeholder={selectedStatuses[index]}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {availableStatuses.map((status) => (
-                            <SelectItem
-                              key={status}
-                              value={status}
-                              className={getStatusColor(status)}
-                            >
-                              {status.charAt(0).toUpperCase() + status.slice(1)}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                  <div className={`line-clamp-1 capitalize ${
+                      getStatusColor(user.status2) || ""
+                    }`}>{user.status2}</div>
                   </td>
                 </tr>
               );

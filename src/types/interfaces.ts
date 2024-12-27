@@ -125,3 +125,37 @@ export interface Message {
 }
 
 
+export interface UserPayment {
+    id: string;
+    username: string;
+    name: string;
+    email: string;
+    image: string;
+    status: string;
+    createdAt: string;
+}
+
+export interface Package {
+    id: string;
+    time: string;
+    fare: number;
+    description: string;
+    downloads: number;
+    uploads: number;
+    room: number;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface Payment {
+    id: string;
+    startDate: string;
+    endDate: string;
+    status: string;
+    statusUse: boolean;
+    createdAt: string;
+    updatedAt: string;
+    user: UserPayment;
+    package: Package;
+}
