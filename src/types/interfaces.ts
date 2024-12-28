@@ -108,14 +108,6 @@ export interface GenreData {
   }
 
 
-export interface UserRoom {
-    id: string;
-    username: string;
-    image: string | null;
-    accountType: string;
-    name: string;
-    host: boolean   
-}
 
 
 export interface Message {
@@ -125,3 +117,55 @@ export interface Message {
 }
 
 
+// data room
+// export interface CurrentSong {
+
+// }
+
+
+// --------------------------socket--------------------------
+
+export interface UserRoom {
+    id: string;
+    username: string;
+    image: string | null;
+    accountType: string;
+    name: string;
+    host: boolean   
+}
+
+export interface DataRoom {
+    host: string,
+    members: "",
+    max: number,
+    currentSong: DataSong,
+    waitingList: DataSong[],
+    proposalList: DataSong[],
+    isPlaying: boolean,
+    timestamp: number,
+    now: number,
+}
+
+export interface DataMembersRoom {
+    user: UserRoom,
+    members: UserRoom[]
+}
+
+export interface CurrentSong {
+    song: DataSong,
+    isPlaying: boolean,
+    currentTime: number,
+}
+
+export interface Room {
+    id: string,
+    members: UserRoom[],
+    currentSong: CurrentSong,
+    waitingList: DataSong[],
+    proposalList: DataSong[],
+}
+
+export interface DataCurrentRoom {
+    roomData: Room,
+    isHot: boolean,
+}

@@ -8,7 +8,7 @@ import {
 import { useEffect, useState, useRef } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
-import { DataCurrentSong, DataSong, UserRoom } from "@/types/interfaces";
+import { DataCurrentRoom, DataCurrentSong, DataMembersRoom, DataRoom, DataSong, UserRoom } from "@/types/interfaces";
 import Image from "next/image";
 import { getMainArtistName, getPosterSong } from "@/utils/utils";
 import { IoSearch } from "react-icons/io5";
@@ -45,14 +45,13 @@ function Page({params}) {
   const [myId, setMyId] = useState<string>("");
 
   useEffect(() => {
-    socket?.emit("getData");
-  }, [])
+    if (!socket) return;
 
-  // const handleTimeUpdate = () => {
-  //   if (audioRef.current && permit) {
-  //     setCurrentTime(audioRef.current.currentTime);
-  //   }
-  // };
+    socket.emit("joinRoom", {roomId: id, link: true});
+
+  }, [socket, id])
+
+
   const handleViewUser = () => {
     setShowUsers((prev) => !prev);
   };
@@ -84,103 +83,145 @@ function Page({params}) {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("addSongToListWaitSuccess", () => {
-      alert("them bai playlist wait ok");
-    });
-    socket.on("updateListSongWait", (listWait) => {
-      // console.log("list wait: ", listWait);
-      setWaitingSongs(listWait);
-    });
+    // thong bao khi co user join vao thanh cong
+    socket.on("memberJoined", (data: DataMembersRoom) => {
+      console.log("Member joined: ", data.user.id);
+      setListUser(data.members);
+    })
 
-    socket.on("addSongToListPlaySuccess", () => {
-      alert("them bai playlist play ok");
-    });
-
-    socket.on("updateListSongPlay", (listPlay) => {
-      console.log("list play: ", listPlay);
-      setPlaylist(listPlay);
-    });
-    socket.on("addSongToWaitingListSuccess", () => {
-      alert("them bai playlist ok");
-    });
-    socket.on("addSongToWaitingListFailed", (data) => {
+    socket.on("memberLeft", (data: DataMembersRoom) => {
+        console.log("Member left: ", data.user.id);
+        setListUser(data.members);
+    })
+    
+  
+    socket.on("joinRoomLinkFailed", (data) => {
       alert(data);
-    });
-    socket.on("updateWaitingList", (waitingList) => {
-      // console.log("list wait: ", waitingList);
-      setWaitingSongs(waitingList);
-    });
-    socket.on("updateListSong", (data) => {
-      // console.log("list wait: ", data.waitingList);
-      setWaitingSongs(data.waitingList);
-    });
-    socket.on("playSong", (currentSong) => {
-      setCurrentSong(currentSong);
-    });
-    socket.on("members", (data) => {
-      console.log("members: ", data)
-      setListUser(data);
-    })
-    socket.on("roomData", (data) => {
-      console.log("nhaanj room data")
-      setPermit(data.permit);
-      setWaitingSongs(data.waitingList);
-      setCurrentProposalList(data.proposalList);
-      setCurrentSong(data.currentSong);
-      // if (data.currentSong) {
-      //   console.log("room data: ", data.currentSong.song)
-      // } else {
-      //   console.log("room data empty: ", )
-      // }
-    })
-    socket.on("disconnect", () => {
-      alert("Lost connection to server")
       router.push(`/listenTogether`);
     })
+
+    socket.on("joinRoomLinkSuccess", (data: DataCurrentRoom) => {
+      // cập nhập dữ liệu trong phòng
+      console.log("lay du lieu moi cua phong")
+      setListUser(data.roomData.members);
+    })
+
+
+
+
+
+
+    // get data khi vào trang: dataRoom
+    socket.on("dataRoom", (data: DataRoom) => {
+      console.log("dataRoom: ", data);
+    })
+
+
     socket.on("roomClosed", (data) => {
       console.log(data)
       alert(data);
       router.back();
     })
+
     socket.on("leaveRoomSuccess", () => {
       alert("Leave room success");
       console.log("Leave room success");
       router.push(`/listenTogether`);
     });
+
+
     // socket.on("members", (data) => {
     //   console.log("members: ", data)
     //   setListUser(data);
     // })
-
+    // socket.on("myId", (data) => {
+    //   setMyId(data)
+    // })
     // socket.on("roomData", (data) => {
+    //   console.log("nhaanj room data")
     //   setPermit(data.permit);
     //   setWaitingSongs(data.waitingList);
     //   setCurrentProposalList(data.proposalList);
     //   setCurrentSong(data.currentSong);
     // })
-    socket.on("animation", (data) => {
-      setEnableAnimation(data)
-    })
-    socket.on("myId", (data) => {
-      console.log("id haha: ", data)
-      setMyId(data)
-    })
+
+
+
+
+    // socket.on("addSongToListWaitSuccess", () => {
+    //   alert("them bai playlist wait ok");
+    // });
+    // socket.on("updateListSongWait", (listWait) => {
+    //   // console.log("list wait: ", listWait);
+    //   setWaitingSongs(listWait);
+    // });
+
+    // socket.on("addSongToListPlaySuccess", () => {
+    //   alert("them bai playlist play ok");
+    // });
+
+    // socket.on("updateListSongPlay", (listPlay) => {
+    //   console.log("list play: ", listPlay);
+    //   setPlaylist(listPlay);
+    // });
+    // socket.on("addSongToWaitingListSuccess", () => {
+    //   alert("them bai playlist ok");
+    // });
+    // socket.on("addSongToWaitingListFailed", (data) => {
+    //   alert(data);
+    // });
+    // socket.on("updateWaitingList", (waitingList) => {
+    //   // console.log("list wait: ", waitingList);
+    //   setWaitingSongs(waitingList);
+    // });
+    // socket.on("updateListSong", (data) => {
+    //   // console.log("list wait: ", data.waitingList);
+    //   setWaitingSongs(data.waitingList);
+    // });
+    // socket.on("playSong", (currentSong) => {
+    //   setCurrentSong(currentSong);
+    // });
+    
+    
+    // socket.on("disconnect", () => {
+    //   alert("Lost connection to server")
+    //   router.push(`/listenTogether`);
+    // })
+   
+    
+    // // socket.on("members", (data) => {
+    // //   console.log("members: ", data)
+    // //   setListUser(data);
+    // // })
+
+    // // socket.on("roomData", (data) => {
+    // //   setPermit(data.permit);
+    // //   setWaitingSongs(data.waitingList);
+    // //   setCurrentProposalList(data.proposalList);
+    // //   setCurrentSong(data.currentSong);
+    // // })
+    // socket.on("animation", (data) => {
+    //   setEnableAnimation(data)
+    // })
+    
 
     return () => {
-      socket.off("addSongToListWaitSuccess");
-      socket.off("updateListSongWait");
-      socket.off("addSongToListPlaySuccess");
-      socket.off("updateListSongPlay");
-      socket.off("addSongToWaitingListSuccess");
-      socket.off("addSongToWaitingListFailed");
-      socket.off("updateWaitingList");
-      socket.off("updateListSong");
-      socket.off("playSong");
+      socket.off("dataRoom");
       socket.off("roomClosed");
       socket.off("leaveRoomSuccess");
-      socket.off("members");
-      socket.off("roomData");
-      socket.off("myId");
+      
+      // socket.off("members");
+      // socket.off("myId");
+      // socket.off("addSongToListWaitSuccess");
+      // socket.off("updateListSongWait");
+      // socket.off("addSongToListPlaySuccess");
+      // socket.off("updateListSongPlay");
+      // socket.off("addSongToWaitingListSuccess");
+      // socket.off("addSongToWaitingListFailed");
+      // socket.off("updateWaitingList");
+      // socket.off("updateListSong");
+      // socket.off("playSong");
+      // socket.off("roomData");
     };
   }, [socket]);
 

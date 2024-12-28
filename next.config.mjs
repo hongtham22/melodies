@@ -24,6 +24,20 @@ const nextConfig = {
                 pathname: '/**',
 
                 // https://audiomelodies.nyc3.cdn.digitaloceanspaces.com/USER/AVATAR/6abea2cf-6e3b-419a-9141-47fcf327f455/rambo.jpg
+            },
+            {
+                protocol: 'https',
+                hostname: 'melodies.sgp1.cdn.digitaloceanspaces.com',
+                pathname: '/**',
+
+                // https://audiomelodies.nyc3.cdn.digitaloceanspaces.com/USER/AVATAR/6abea2cf-6e3b-419a-9141-47fcf327f455/rambo.jpg
+            },
+            {
+                protocol: 'https',
+                hostname: 'melodies.sgp1.digitaloceanspaces.com',
+                pathname: '/**',
+
+                // https://audiomelodies.nyc3.cdn.digitaloceanspaces.com/USER/AVATAR/6abea2cf-6e3b-419a-9141-47fcf327f455/rambo.jpg
             }
         ],
     },

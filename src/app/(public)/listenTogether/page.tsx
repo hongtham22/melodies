@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import bannerImg from "@/assets/img/together2.png";
 import { useRouter } from "next/navigation";
+import { DataCurrentRoom } from "@/types/interfaces";
 
 function Page() {
   const { socket } = useAppContext();
@@ -20,6 +21,14 @@ function Page() {
   ];
 
   useEffect(() => {
+    socket?.emit("CheckHasJoinedRoom");
+
+    socket?.once("CheckHasJoinedRoomSuccess", (id) => {
+      router.push(`/listenTogether/${id}`);
+    })
+  });
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setIsVisible(false);
       setTimeout(() => {
@@ -31,24 +40,25 @@ function Page() {
   }, []);
 
   const handleJoinRoom = async () => {
-    socket?.emit("joinRoom", roomId);
-    socket?.on("joinRoomSuccess", (data) => {
-      console.log("Join Success to room:", data.roomId);
-      router.push(`/listenTogether/${roomId}`);
+    socket?.emit("joinRoom", {roomId: roomId, link: false});
+    socket?.once("joinRoomSuccess", (data: DataCurrentRoom) => {
+      console.log("Join Success to room:", data.roomData.id);
+      router.push(`/listenTogether/${data.roomData.id}`);
     });
-    socket?.on("joinRoomFailed", (data) => {
-      console.log("joinRoomFailed", data);
+    socket?.once("joinRoomFailed", (data) => {
+      alert(data);
     });
   };
 
   const handleCreateRoom = async () => {
     socket?.emit("createRoom");
-    socket?.on("createRoomSuccess", (id) => {
+    socket?.once("createRoomSuccess", (id) => {
       console.log("Create room success: " + id);
       router.push(`/listenTogether/${id}`);
     });
-    socket?.on("createRoomFailed", (data) => {
-      console.log("createRoomFailed", data);
+    socket?.once("createRoomFailed", (data) => {
+      // console.log("createRoomFailed", data);
+      alert(data);
     });
   };
 
@@ -62,7 +72,9 @@ function Page() {
         >
           {messages[textIndex]}
         </h1>
-        <h2 className="text-xl font-bold text-white/90">No matter where you are.</h2>
+        <h2 className="text-xl font-bold text-white/90">
+          No matter where you are.
+        </h2>
         <h2 className="text-base text-white/90">
           Grab some friends, join a room and listen to music in sync with each
           other
