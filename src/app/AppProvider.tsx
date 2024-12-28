@@ -11,6 +11,7 @@ import Cookies from "js-cookie";
 import { io, Socket } from "socket.io-client";
 import { Notification } from "@/types/interfaces";
 import { fetchNotification } from "@/utils/api";
+import { fetchApiData } from "@/app/api/appService";
 interface AppContextType {
   listNotification: Notification[];
   setListNotification: (noti: Notification[]) => void;
@@ -70,6 +71,34 @@ export const AppProvider: React.FC<{
       Cookies.remove("role");
     }
   }, [accessToken, role]);
+
+  useEffect(() => {
+    const refreshInterval = setInterval(async () => {
+      if (accessToken) {
+        try {
+          const response = await fetchApiData(
+            "/api/auth/refresh",
+            "POST",
+            JSON.stringify({ token: accessToken }),
+            null,
+            null
+          );
+
+          if (response.success) {
+            const newAccessToken = response.data.accessToken;
+            setAccessToken(newAccessToken);
+          } else {
+            Cookies.remove("accessToken");
+            Cookies.remove("role")
+          }
+        } catch (error) {
+          console.error("Error during token refresh:", error);
+        }
+      }
+    }, 30000);
+
+    return () => clearInterval(refreshInterval);
+  }, [accessToken]);
 
   useEffect(() => {
     if (accessToken) {

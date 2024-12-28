@@ -16,6 +16,8 @@ const Page = () => {
     const [name, setName] = useState(user?.name)
     const [username, setUsername] = useState(user?.username)
     const [avatar, setAvatar] = useState(user?.image)
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
     useEffect(() => {
         const fetchUser = async () => {
             const result = await fetchApiData(`/api/user`, 'GET', null, accessToken)
@@ -54,6 +56,7 @@ const Page = () => {
         }
 
         if (file) {
+            setSelectedFile(file)
             const reader = new FileReader();
             reader.onload = () => {
                 if (typeof reader.result === 'string') {
@@ -64,13 +67,27 @@ const Page = () => {
         }
     };
 
-    const handleUpdateInformation = () => {
+    const handleUpdateInformation = async () => {
         if (username?.trim() === '' || name?.trim() === '') {
             alert('Username or Fullname cannot be left blank');
             return;
         }
-
+        const formData = new FormData();
+        const data = {
+            username,
+            name
+        }
+        formData.append('data', JSON.stringify(data));
+        if (selectedFile) {
+            formData.append('image', selectedFile);
+        }
+        console.log(data);
+        const result = await fetchApiData(`/api/user`, 'PATCH', formData, accessToken)
+        if (result.success) {
+            console.log(result.data);
+        }
     }
+
     return (
         <div className="mt-[8%] w-full min-h-dvh bg-secondColorBg p-3">
             <div className="bg-[#121212] w-full p-8 rounded-xl px-16">
@@ -108,7 +125,7 @@ const Page = () => {
                                 onClick={() => router.push('/package')}
                             />
                         </div>
-                        <form className='mt-8'>
+                        <div className='mt-8'>
                             <div className='space-y-10'>
                                 <div className="relative h-11 w-full min-w-[200px]">
                                     <input
@@ -148,7 +165,7 @@ const Page = () => {
                                 onClick={handleUpdateInformation}
                                 className='py-1 px-4 bg-pink-500 mt-5 rounded-lg font-semibold text-[0.9rem]'
                             >Save</button>
-                        </form>
+                        </div>
                     </div>
                 </div>
                 <div className='w-full h-[1px] bg-slate-400 my-8'>

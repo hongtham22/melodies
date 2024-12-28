@@ -9,6 +9,7 @@ import UserImage from '@/assets/img/placeholderUser.jpg'
 import { Link } from 'react-scroll';
 
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { FaCrown } from "react-icons/fa6";
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from "react-icons/fa";
 
@@ -133,6 +134,14 @@ const Header = () => {
 
             {accessToken ? (
                 <div className="flex gap-5 justify-center items-center">
+                    {
+                        user?.accountType === "PREMIUM" && (
+                            <FaCrown
+                                className='w-6 h-6 ml-6 text-yellow-400 cursor-pointer'
+                                onClick={() => router.push('/package')}
+                            />
+                        )
+                    }
                     <Notification />
                     <div className="flex gap-2">
                         <Image

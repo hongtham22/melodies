@@ -18,6 +18,7 @@ import ConfirmDeletePlaylist from "@/components/popup/confirmDeletePlaylist";
 import { useToast } from "@/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import ConfirmDeleteSongOnPlaylist from "@/components/popup/confirmDeleteSongOnPlaylist";
+import EditSongUpload from "@/components/editSongUpload";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { toast } = useToast()
@@ -31,7 +32,6 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [dominantColor, setDominantColor] = useState<string>();
     const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
     const [isUpdate, setIsUpdate] = useState<boolean>(false)
-    const [isUpdateSong, setIsUpdateSong] = useState<boolean>(false)
     const [isDelete, setIsDelete] = useState<boolean>(false)
     const [isDeleteSong, setIsDeleteSong] = useState<boolean>(false)
     const [songSelected, setSongSelected] = useState<DataSong>()
@@ -219,10 +219,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                 className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md"
                                                                 onClick={() => addToWaitingList(song)}
                                                             ><RiPlayListAddLine /> Add to waiting list</li>
-                                                            <li
-                                                                className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md "
-                                                                onClick={() => { setIsUpdateSong(true); setShowMenuMore(false) }}
-                                                            ><MdEdit /> Edit song</li>
+                                                            <li className="pl-1 pr-3 py-2 cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md">
+                                                                <EditSongUpload idSong={song.id} />
+                                                            </li>
                                                             <li
                                                                 className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md"
                                                                 onClick={() => { setIsDeleteSong(true); setActiveMenuSong(null); setSongSelected(song) }}

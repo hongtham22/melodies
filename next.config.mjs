@@ -27,6 +27,11 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'melodies.sgp1.digitaloceanspaces.com',
                 pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'melodies.sgp1.cdn.digitaloceanspaces.com',
+                pathname: '/**',
             }
         ],
     },

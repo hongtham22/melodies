@@ -13,13 +13,13 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { FaUpload } from "react-icons/fa6";
 import SongImage from '@/assets/img/placeholderSong.jpg'
 import Image from "next/image";
 import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from "@/app/AppProvider";
 
-const Page = () => {
+const UploadSong = () => {
     const { accessToken } = useAppContext()
     const [trackTitle, setTrackTitle] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -127,12 +127,12 @@ const Page = () => {
     };
 
     return (
-        <div className="mt-24">
+        <div>
             <Sheet>
                 <SheetTrigger asChild>
-                    <button className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover">
-                        <PlusIcon className="text-white w-5 h-5" />
-                        Add New Track
+                    <button className="flex">
+                        <FaUpload className="w-[20px] h-[20px] mr-3" />
+                        Upload Song
                     </button>
                 </SheetTrigger>
                 <SheetContent>
@@ -143,7 +143,7 @@ const Page = () => {
                         <SheetDescription>Enter details to add a new track.</SheetDescription>
                     </SheetHeader>
                     <div className="grid gap-4 py-4 items-start">
-                        <div>
+                        <div className="flex flex-col items-center gap-5">
                             <Image
                                 src={image || SongImage}
                                 alt='Avatar'
@@ -152,7 +152,7 @@ const Page = () => {
                                 quality={100}
                                 className='object rounded-md w-[100px] h-[100px]'
                             />
-                            <div className='space-y-2'>
+                            <div className='space-y-2 flex flex-col items-center'>
                                 <button
                                     onClick={handleButtonClick}
                                     className='py-2 px-3 bg-white text-black rounded-lg font-semibold text-[0.9rem]'>Change avatar</button>
@@ -267,4 +267,4 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default UploadSong;

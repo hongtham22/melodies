@@ -25,10 +25,10 @@ const ShowDeleteComment: React.FC<ShowDeleteCommentProps> = ({ onClose, notifica
 
     return (
         <div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 shadow-md"
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 shadow-md"
             onClick={handleBackgroundClick}
         >
-            <div className="bg-[#222222] w-[35%] rounded-lg p-5 border border-primaryColorBlue/60 flex flex-col">
+            <div className="bg-[#333333] w-[35%] rounded-lg p-5 border border-primaryColorBlue/60 flex flex-col">
                 <div className="text-primaryColorPink font-bold text-[1.5rem] pb-3">
                     {notification?.message}
                 </div>
