@@ -74,6 +74,8 @@ export interface Comment {
     hasChild: number;
     myComment: boolean;
     songId: string;
+    hide: boolean;
+    song: DataSong;
 }
 
 //playlist
@@ -148,7 +150,9 @@ export interface Report {
     userId: string;
     status: string;
     createdAt: string;
+    updatedAt: string;
     comment: Comment;
+    user: User;
 }
 
 

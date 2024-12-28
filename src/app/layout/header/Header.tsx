@@ -166,7 +166,7 @@ const Header = () => {
       </div>
 
       {accessToken ? (
-        <div className="flex gap-5 justify-center items-center">
+        <div className="flex gap-3 justify-center items-center">
           {
             user?.accountType === "PREMIUM" && (
               <FaCrown

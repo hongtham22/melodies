@@ -38,7 +38,7 @@ const ConfirmDeletePlaylist: React.FC<ConfirmDeletePlaylistProps> = ({ onClose, 
             <div className="bg-[#222222] w-[30%] rounded-lg p-5 border border-slate-400">
                 <div className="md:flex items-center gap-5">
                     <div className="rounded-full border border-gray-300 flex items-center justify-center w-14 h-14">
-                        <i className="bx bx-error text-2xl">
+                        <i className="bx bx-error text-2xl text-yellow-500">
                             &#9888;
                         </i>
                     </div>
@@ -50,7 +50,7 @@ const ConfirmDeletePlaylist: React.FC<ConfirmDeletePlaylistProps> = ({ onClose, 
                     </div>
                 </div>
                 <div className="text-center md:text-right mt-4 md:flex md:justify-end">
-                    <button id="confirm-delete-btn" className="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-gray-200 text-black rounded-lg font-semibold text-sm md:ml-2 md:order-2"
+                    <button id="confirm-delete-btn" className="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-gray-200 text-black rounded-lg font-semibold text-sm md:ml-2 md:order-2 hover:bg-darkPink"
                         onClick={() => data?.playlistId && handleDelete(data.playlistId)}
                     >
                         Delete

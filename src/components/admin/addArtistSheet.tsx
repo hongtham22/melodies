@@ -57,7 +57,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
   
   const handleAddGenre = (newGenre: GenreData) => {
     setListGenres([newGenre, ...listGenres]);
-    console.log(newGenre);
+    // console.log(newGenre);
   };
 
   const handleGenreChange = (genreId: string) => {
@@ -75,6 +75,7 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
     ...listGenres.filter((genre) => !artistGenre.includes(genre.genreId)),
   ];
 
+  // console.log(listGenres);
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

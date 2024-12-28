@@ -22,7 +22,7 @@ import { BiAperture } from "react-icons/bi";
 import UploadSong from "@/components/uploadSong";
 
 const Sidebar = () => {
-  const { accessToken, setAccessToken, setRole, setShowPlaylistMenu } =
+  const { accessToken, setAccessToken, setRole, role, setShowPlaylistMenu } =
     useAppContext();
   const [showRequireLogin, setShowRequireLogin] = useState(false);
   const [

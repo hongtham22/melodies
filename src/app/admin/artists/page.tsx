@@ -89,7 +89,6 @@ function Page() {
   
     try {
       const requestBody = JSON.stringify({ artistIds: selectedItems });
-  
       const response = await fetchApiData(
         "/api/admin/delete/artist",
         "DELETE",
@@ -123,8 +122,6 @@ function Page() {
     } finally {
       setSelectedItems([]);
     }
-  
-    console.log("Deleting artists:", { artistIds: selectedItems });
     setShowConfirmDelete(false);
   };
   const handleOpenConfirmDelete = () => {

@@ -116,8 +116,8 @@ function HeaderAdmin() {
               <BellIcon className="w-6 h-6" />
             </div>
             <div className="flex items-start">
-              <p className="p-1 bg-darkPink rounded-md text-white text-xs whitespace-nowrap">
-                3
+              <p className="max-w-10 p-1 bg-darkPink rounded-md text-white text-xs -translate-y-2 truncate">
+                100+
               </p>
             </div>
           </div>

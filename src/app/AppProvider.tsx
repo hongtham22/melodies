@@ -72,33 +72,33 @@ export const AppProvider: React.FC<{
     }
   }, [accessToken, role]);
 
-  useEffect(() => {
-    const refreshInterval = setInterval(async () => {
-      if (accessToken) {
-        try {
-          const response = await fetchApiData(
-            "/api/auth/refresh",
-            "POST",
-            JSON.stringify({ token: accessToken }),
-            null,
-            null
-          );
+  // useEffect(() => {
+  //   const refreshInterval = setInterval(async () => {
+  //     if (accessToken) {
+  //       try {
+  //         const response = await fetchApiData(
+  //           "/api/auth/refresh",
+  //           "POST",
+  //           JSON.stringify({ token: accessToken }),
+  //           null,
+  //           null
+  //         );
 
-          if (response.success) {
-            const newAccessToken = response.data.accessToken;
-            setAccessToken(newAccessToken);
-          } else {
-            Cookies.remove("accessToken");
-            Cookies.remove("role")
-          }
-        } catch (error) {
-          console.error("Error during token refresh:", error);
-        }
-      }
-    }, 30000);
+  //         if (response.success) {
+  //           const newAccessToken = response.data.accessToken;
+  //           setAccessToken(newAccessToken);
+  //         } else {
+  //           Cookies.remove("accessToken");
+  //           Cookies.remove("role")
+  //         }
+  //       } catch (error) {
+  //         console.error("Error during token refresh:", error);
+  //       }
+  //     }
+  //   }, 30000);
 
-    return () => clearInterval(refreshInterval);
-  }, [accessToken]);
+  //   return () => clearInterval(refreshInterval);
+  // }, [accessToken]);
 
   useEffect(() => {
     if (accessToken) {

@@ -63,6 +63,7 @@ const HeaderAuth = ({}) => {
       }
     >
       <div>
+      <a href="/">
         <svg
           className="cursor-pointer"
           width="129"
@@ -89,6 +90,7 @@ const HeaderAuth = ({}) => {
             </linearGradient>
           </defs>
         </svg>
+      </a>
       </div>
       <div id="about-section">
         <ul className="ml-24 flex gap-28">
