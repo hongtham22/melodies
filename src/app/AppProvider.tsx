@@ -27,9 +27,6 @@ interface AppContextType {
   setAccessToken: (token: string) => void;
   socket: Socket | null;
 }
-import envConfig from "@/config";
-
-const API_BASE_URL = envConfig.NEXT_PUBLIC_API_ENDPOINT;
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
