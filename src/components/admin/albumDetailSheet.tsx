@@ -95,8 +95,13 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
   const [openListSong, setOpenListSong] = React.useState(false);
   const [typeAlbum, setTypeAlbum] = useState<string>("");
   const { toast } = useToast();
-  const { accessToken } = useAppContext()
+  const { accessToken } = useAppContext();
 
+  const typeColors = {
+    ep: "!text-green-500",
+    single: "!text-yellow-500",
+    album: "!text-pink-500",
+  };
 
   useEffect(() => {
     const fetchAlbumDetail = async () => {
@@ -163,6 +168,12 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
   };
 
   const handleSongChange = (song: { id: string; title: string }) => {
+    if (typeAlbum === "single") {
+      setSelectedSongs([song]);
+      // setReorderedSong([song]);
+      setOpenListSong(false);
+      return;
+    }
     // Toggle the selection state of the song
     setSelectedSongs((prevSongs) => {
       if (prevSongs.some((s) => s.id === song.id)) {
@@ -173,15 +184,29 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
         return [...prevSongs, song];
       }
     });
+  };
 
+  useEffect(() => {
+    if (typeAlbum === "single" && selectedSongs.length > 0) {
+      setOpenListSong(false);
+    }
+  }, [selectedSongs, typeAlbum]);
+
+  const handleSelectChange = (value: string) => {
+    setTypeAlbum(value);
+    if (value === "single" && selectedSongs.length > 1) {
+      // Nếu chuyển sang "single", chỉ giữ lại bài hát đầu tiên
+      setSelectedSongs([selectedSongs[0]]);
+      // setReorderedSong([selectedSongs[0]]);
+    }
   };
 
   const orderedSongs = [
     ...listSongOfMainArtist.filter((song) =>
       selectedSongs.some((selected) => selected.id === song.id)
     ),
-    ...listSongOfMainArtist.filter((song) =>
-      !selectedSongs.some((selected) => selected.id === song.id)
+    ...listSongOfMainArtist.filter(
+      (song) => !selectedSongs.some((selected) => selected.id === song.id)
     ),
   ];
 
@@ -196,48 +221,45 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
         return;
       } else {
         setAlbumImgEdit(file);
-        const previewUrl = URL.createObjectURL(file); 
-        setAlbumImages(previewUrl); 
+        const previewUrl = URL.createObjectURL(file);
+        setAlbumImages(previewUrl);
       }
     }
   };
 
-  const handleSelectChange = (value: string) => {
-    setTypeAlbum(value); 
-  };
 
   const handleUpdate = async (albumData: {
-      title: string,
-      releaseDate: string,
-      albumType: string,
-      songIds: string[],
-      albumCover: File | null,
+    title: string;
+    releaseDate: string;
+    albumType: string;
+    songIds: string[];
+    albumCover: File | null;
   }) => {
-    const { title, releaseDate,albumType, songIds, albumCover } = albumData;
-  
+    const { title, releaseDate, albumType, songIds, albumCover } = albumData;
+
     const data = {
       title,
       releaseDate,
       albumType,
       songIds,
     };
-  
+
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
-  
+
     if (albumCover) {
       formData.append("albumCover", albumCover);
     }
-  
+
     try {
       const response = await fetchApiData(
         `/api/admin/update/album/${albumId}`,
         "PATCH",
         formData,
         accessToken,
-        null,
+        null
       );
-  
+
       if (response.success) {
         toast({
           title: "Success",
@@ -252,11 +274,24 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
       console.error("Error updating album:", error);
       alert("An error occurred while sending the data.");
     }
-  
+
     console.log("update album:", data);
   };
 
   const handleUpdateClick = () => {
+    if (
+      !albumTitle.trim() ||
+      !typeAlbum ||
+      !releaseDate ||
+      !selectedSongs.length
+    ) {
+      toast({
+        title: "Error",
+        description: "Please provide required information before adding.",
+        variant: "destructive",
+      });
+      return;
+    }
     const albumData = {
       title: albumTitle,
       releaseDate: releaseDate,
@@ -301,7 +336,9 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
 
             {/* Title */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">
+                Title<span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="title"
                 name="title"
@@ -314,18 +351,26 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
             {/* Album Type */}
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="typeAlbum" className="text-left text-textMedium">
-                Type Album
+                Type Album<span className="text-red-500">*</span>
               </label>
               <div className="col-span-3">
                 <Select value={typeAlbum} onValueChange={handleSelectChange}>
-                  <SelectTrigger className="w-full border-primaryColorBlue">
+                  <SelectTrigger  className={`w-full border-primaryColorBlue ${
+                      typeColors[typeAlbum] || ""
+                    }`}>
                     <SelectValue placeholder="Select type of album" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="ep">EP</SelectItem>
-                      <SelectItem value="single">Single</SelectItem>
-                      <SelectItem value="album">Album</SelectItem>
+                      <SelectItem value="ep" className="text-green-500">
+                        EP
+                      </SelectItem>
+                      <SelectItem value="single" className="text-yellow-500">
+                        Single
+                      </SelectItem>
+                      <SelectItem value="album" className="text-pink-500">
+                        Album
+                      </SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -333,7 +378,9 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
             </div>
             {/* Main artist */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label>Main Artist</Label>
+              <Label>
+                Main Artist<span className="text-red-500">*</span>
+              </Label>
               <div className="flex col-span-3 items-center ">
                 <Image
                   src={albumDetail.artistMain?.avatar || artistImg}
@@ -354,7 +401,7 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
                 htmlFor="releaseDate"
                 className="text-left text-textMedium"
               >
-                Release Date
+                Release Date<span className="text-red-500">*</span>
               </label>
               <div className="col-span-3">
                 <input
@@ -372,7 +419,7 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
             {/* List songs */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="subArtists" className="text-left">
-                List songs
+                List songs<span className="text-red-500">*</span>
               </Label>
               <div className="col-span-3 border-darkBlue">
                 <Popover open={openListSong} onOpenChange={setOpenListSong}>
@@ -382,7 +429,7 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
                       role="combobox"
                       aria-expanded={openListSong}
                       className="w-full justify-between border-darkBlue col-span-3 truncate"
-                      disabled={!albumDetail?.artistMain}
+                      disabled={!albumDetail?.artistMain || !typeAlbum}
                     >
                       Edit songs of main artist
                       <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -446,15 +493,15 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
           <p>No details available.</p>
         )}
         <SheetFooter>
-          <SheetClose asChild>
-            <Button
-              type="submit"
-              onClick={handleUpdateClick}
-              className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-            >
-              Update Album
-            </Button>
-          </SheetClose>
+          {/* <SheetClose asChild>
+          </SheetClose> */}
+          <Button
+            type="submit"
+            onClick={handleUpdateClick}
+            className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+          >
+            Update Album
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

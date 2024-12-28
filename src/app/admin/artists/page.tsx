@@ -11,6 +11,7 @@ import LoadingPage from "@/components/loadingPage";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/hooks/use-toast"
 import Genre from "@/components/genre";
+import ConfirmDelete from "@/components/popup/confirmDelete";
 
 function Page() {
   const { loading, setLoading } = useAppContext();
@@ -18,11 +19,11 @@ function Page() {
   const page = parseInt(searchParams?.get("page") || "1", 10);
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsAdminData, setListArtistsAdminData] = useState([]);
-  const [genreList, setGenreList] = useState([]);
+  // const [genreList, setGenreList] = useState([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
   const { accessToken } = useAppContext()
-
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
  
   const fetchArtists = useCallback(async (page: number) => {
     setLoading(true);
@@ -40,28 +41,11 @@ function Page() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading]);
-
-  // Hàm fetch Genres
-  const fetchGenres = useCallback(async () => {
-    setLoading(true);
-    try {
-      const genresResponse = await fetchApiData("/api/admin/allGenre", "GET", null, accessToken);
-
-      if (genresResponse.success) {
-        setGenreList(genresResponse.data.genres);
-      }
-    } catch (error) {
-      console.error("Error fetching genres:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [setLoading]);
+  }, [setLoading, accessToken]);
 
   useEffect(() => {
     fetchArtists(page);
-    fetchGenres();
-  }, [fetchArtists, fetchGenres, page]);
+  }, [fetchArtists, page]);
 
   const handleAddArtist = async (artistData: { name: string; bio: string; avatar: File; genre: string[] }) => {
     const { name, bio, avatar, genre } = artistData;
@@ -141,12 +125,24 @@ function Page() {
     }
   
     console.log("Deleting artists:", { artistIds: selectedItems });
+    setShowConfirmDelete(false);
+  };
+  const handleOpenConfirmDelete = () => {
+    if (selectedItems.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one artist to delete.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowConfirmDelete(true);
   };
 
   if (loading) return <LoadingPage />;
 
   return (
-    <div className="w-full my-20 m-6 p-8 flex flex-col items-center justify-center">
+    <div className="w-full mt-20 m-6 p-8 flex flex-col items-center justify-center">
       <div className="w-[90%] py-3 flex flex-col items-center justify-center rounded-xl">
         <div className="w-full flex items-center justify-between px-3 mb-3">
           <h1 className="text-h2 text-primaryColorPink">List Artists</h1>
@@ -162,19 +158,27 @@ function Page() {
             />
           </div>
           <div className="flex gap-4">
-            <Genre genreList={genreList} />
-            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
-            onClick={handleDeleteArtist}>
-              <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
+            <Genre />
+            <button className="text-textMedium font-bold p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md  hover:text-darkBlueHover transition-all duration-300"
+            onClick={handleOpenConfirmDelete}>
+              <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue stroke-primaryColorBlue" />
+
               Delete Artist
             </button>
 
-            <AddArtistSheet onSave={handleAddArtist} genre={genreList} fetchGenres={fetchGenres}/>
+            <AddArtistSheet onSave={handleAddArtist}/>
           </div>
         </div>
       </div>
       <ListArtistAdmin data={listArtistsAdminData} page={page} onSelectedItemsChange={setSelectedItems}/>
       <PaginationWithLinks page={page} totalPage={totalPage} />
+      {showConfirmDelete && (
+        <ConfirmDelete
+          onClose={() => setShowConfirmDelete(false)}
+          onDelete={handleDeleteArtist}
+          entityName="artist" 
+        />
+      )}
     </div>
   );
 }

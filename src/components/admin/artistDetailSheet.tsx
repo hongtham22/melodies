@@ -34,15 +34,14 @@ import {
 } from "@/components/ui/command";
 
 import { Button } from "@/components/ui/button";
-
 import { fetchApiData } from "@/app/api/appService";
-import albumImg from "@/assets/img/placeholderPlaylist.png";
-import artistImg from "@/assets/img/placeholderUser.jpg";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { set } from "zod";
-import LoadingPage from "@/components/loadingPage";
 import { useAppContext } from "@/app/AppProvider";
+import artistImg from "@/assets/img/placeholderUser.jpg";
+import { useGenreContext } from "@/components/provider/genreProvider";
+import AddGenre from "@/components/admin/addGenre";
+import { GenreData } from "@/types/interfaces";
 
 interface Genre {
   genreId: string;
@@ -72,30 +71,12 @@ const ArtistDetailSheet: React.FC<
   const [artistName, setArtistName] = useState<string | null>(null);
   const [artistBio, setArtistBio] = useState<string | null>(null);
   const [artistGenre, setArtistGenre] = useState<string[]>([]);
-  const [genreList, setGenreList] = useState<Genre[]>([]);
+  // const [genreList, setGenreList] = useState<Genre[]>([]);
   const [openGenre, setOpenGenre] = useState(false);
-  const { loading, setLoading } = useAppContext();
   const { toast } = useToast();
   const { accessToken } = useAppContext()
+  const { listGenres, setListGenres } = useGenreContext();
 
-
-
-  const fetchGenres = useCallback(async () => {
-    try {
-      const genresResponse = await fetchApiData(
-        "/api/admin/allGenre",
-        "GET",
-        null,
-        accessToken
-      );
-      if (genresResponse.success) {
-        setGenreList(genresResponse.data.genres);
-      }
-    } catch (error) {
-      console.error("Error fetching genres:", error);
-    } finally {
-    }
-  }, []);
 
   useEffect(() => {
     const fetchArtistDetail = async () => {
@@ -122,8 +103,7 @@ const ArtistDetailSheet: React.FC<
     };
 
     if (artistId) fetchArtistDetail();
-    fetchGenres();
-  }, [artistId, fetchGenres]);
+  }, [artistId]);
 
   const handleArtistImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,12 +122,16 @@ const ArtistDetailSheet: React.FC<
     }
   };
 
+    const handleAddGenre = (newGenre: GenreData) => {
+      setListGenres([newGenre, ...listGenres]);
+      console.log(newGenre);
+    };
+  
   const handleGenreChange = (genre: Genre) => {
     setArtistGenre((prevGenres) => {
       if (prevGenres.some((g) => g === genre.genreId)) {
         return prevGenres.filter((g) => g !== genre.genreId);
       } else {
-        // Genre is not selected, so add it
         return [...prevGenres, genre.genreId];
       }
     });
@@ -155,9 +139,9 @@ const ArtistDetailSheet: React.FC<
 
   const orderedGenres = [
     // Genres that are selected
-    ...genreList.filter((genre) => artistGenre.includes(genre.genreId)),
+    ...listGenres.filter((genre) => artistGenre.includes(genre.genreId)),
     // Genres that are not selected
-    ...genreList.filter((genre) => !artistGenre.includes(genre.genreId)),
+    ...listGenres.filter((genre) => !artistGenre.includes(genre.genreId)),
   ];
 
   const handleUpdate = async (artistData: {
@@ -209,6 +193,15 @@ const ArtistDetailSheet: React.FC<
 };
 
 const handleUpdateClick = () => {
+  if (!artistName.trim() || artistGenre.length === 0) {
+    toast({
+      title: "Error",
+      description: "Please provide required information before update.",
+      variant: "destructive",
+    });
+    return; 
+  }
+
   const artistData = {
     name: artistName,
     bio: artistBio,
@@ -252,7 +245,7 @@ const handleUpdateClick = () => {
 
             {/* Title */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">Name<span className="text-red-500">*</span></Label>
               <Input
                 id="title"
                 name="title"
@@ -276,29 +269,32 @@ const handleUpdateClick = () => {
             </div>
             {/* Genres */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="genre">Genres</Label>
+              <Label htmlFor="genre">Genres<span className="text-red-500">*</span></Label>
               <div className="col-span-3">
                 <Popover open={openGenre} onOpenChange={setOpenGenre}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between truncate border-primaryColorBlueHover"
+                      className="w-full flex justify-between items-center border-primaryColorBlueHover p-2"
                     >
+                    <span className="truncate max-w-full capitalize">
                       {artistGenre.length > 0
-                        ? genreList
+                        ? listGenres
                             .filter((g) => artistGenre.includes(g.genreId))
                             .map((g) => g.name)
                             .join(", ")
                         : "Select genres"}
-                      <CaretSortIcon className="ml-2 h-4 w-4" />
+                    </span>
+                      <CaretSortIcon className="ml-2 h-4 w-4 flex-shrink-0" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
+                  <PopoverContent className="w-full p-0 capitalize">
                     <Command>
                       <CommandInput placeholder="Search genres..." />
                       <CommandList>
                         <CommandEmpty>No genres found.</CommandEmpty>
                         <ScrollArea className="h-40">
+                        <AddGenre onAddGenre={handleAddGenre} />
                           <CommandGroup>
                             {orderedGenres.map((genre) => (
                               <CommandItem
@@ -328,7 +324,8 @@ const handleUpdateClick = () => {
           <p>No details available.</p>
         )}
         <SheetFooter>
-          <SheetClose asChild>
+          {/* <SheetClose asChild>
+          </SheetClose> */}
             <Button
               type="submit"
               onClick={handleUpdateClick}
@@ -336,7 +333,6 @@ const handleUpdateClick = () => {
             >
               Update Artist
             </Button>
-          </SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>

@@ -32,7 +32,6 @@ export const ArtistProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const { accessToken } = useAppContext();
 
   useEffect(() => {
-    // Giả sử bạn fetch dữ liệu từ API
     const fetchArtists = async () => {
     try{
         const response = await fetchApiData(
@@ -51,7 +50,7 @@ export const ArtistProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     };
 
     fetchArtists();
-  }, []);
+  }, [accessToken]);
 
   return (
     <ArtistContext.Provider value={{ listArtists, setListArtists }}>

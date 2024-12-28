@@ -24,9 +24,7 @@ const SidebarAdmin = () => {
   const [activeMenu, setActiveMenu] = useState("");
   const { toast } = useToast();
   const router = useRouter();
-
-  const { accessToken, setAccessToken, setRole } =
-  useAppContext();
+  const { accessToken, setAccessToken, setRole } = useAppContext();
 
   const handleMenuClick = (menuItem: string) => {
     setActiveMenu(menuItem);
@@ -46,18 +44,19 @@ const SidebarAdmin = () => {
           "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie =
           "role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        setAccessToken("");
-        setRole("");
-        router.replace("/");
+
         toast({
           variant: "success",
           title: "Congratulation!",
-          description: "Logout Successfully",
+          description: "Logout successfully",
         });
+        router.replace("/");
+        setAccessToken("");
+        setRole("");
       } else {
         toast({
           variant: "destructive",
-          title: "Uh oh! Something went wrong.",
+          title: "Uh oh! Logout unsuccessfully.",
           action: <ToastAction altText="Try again">Try again</ToastAction>,
         });
       }
@@ -77,6 +76,7 @@ const SidebarAdmin = () => {
       ? "bg-primaryColorPink rounded-xl px-2 font-bold"
       : "text-[0.9rem]";
   };
+
   return (
     <div
       className="fixed top-0 left-0 w-1/6 h-full border-r-2 border-primaryColorPink pt-8 pl-10 pr-7 drop-shadow-lg"
@@ -158,7 +158,7 @@ const SidebarAdmin = () => {
           <AvatarIcon className="w-[24px] h-[24px] mr-3" />
           <Link href="/admin/users">Users</Link>
         </div>
-        
+
         <div
           className={`flex my-2 cursor-pointer ${getMenuClass(
             "payments"
@@ -197,8 +197,6 @@ const SidebarAdmin = () => {
         >
           <ExitIcon className="w-[24px] h-[24px] mr-3 text-primaryColorPink" />
           <p className="text-primaryColorPink text-[0.9rem]">Logout</p>
-
-          {/* <p className='text-primaryColorPink'>Logout</p> */}
         </div>
       </div>
     </div>

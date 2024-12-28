@@ -35,6 +35,7 @@ import { fetchApiData } from "@/app/api/appService";
 import { useArtistContext } from "@/components/provider/artistProvider";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/app/AppProvider";
+import { decrypt } from "@/app/decode";
 
 interface SimplifiedArtist {
   id: string;
@@ -92,7 +93,6 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
   const [lyricFile, setLyricFile] = useState<File | null>(null);
   const { toast } = useToast();
   const { accessToken } = useAppContext();
-
   //   const { listArtists } = useArtistContext();
   const { listArtists }: { listArtists: SimplifiedArtist[] } =
     useArtistContext();
@@ -244,7 +244,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
         "PATCH",
         formData,
         accessToken,
-        null,
+        null
       );
 
       if (response.success) {
@@ -266,6 +266,20 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
   };
 
   const handleUpdateClick = () => {
+    // console.log("Debugging handleUpdateClick:");
+    // console.log("trackTitle:", trackTitle);
+    // console.log("mainArtist:", mainArtist);
+    // console.log("releaseDate:", releaseDate);
+    // console.log("audioFile:", audioFile);
+  
+    if (!trackTitle.trim() || !mainArtist || !releaseDate || !audioSrc) {
+      toast({
+        title: "Error",
+        description: "Please provide required information before update.",
+        variant: "destructive",
+      });
+      return;
+    }
     const trackData = {
       title: trackTitle,
       mainArtist: mainArtist || "",
@@ -308,7 +322,9 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
         {trackDetail ? (
           <div className="mt-4 grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">
+                Title<span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="title"
                 name="title"
@@ -330,7 +346,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
                 />
                 <Label
                   htmlFor="trackAlbum"
-                  className=" border-primaryColorBlueHover px-2"
+                  className=" border-primaryColorBlueHover px-2 line-clamp-2"
                 >
                   {trackDetail.album[0]?.title || "No album"}
                 </Label>
@@ -340,7 +356,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
             {/* Main Artist Selection */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="mainArtist" className="text-left text-textMedium">
-                Main Artist
+                Main Artist<span className="text-red-500">*</span>
               </Label>
               <Popover open={openMainArtist} onOpenChange={setOpenMainArtist}>
                 <PopoverTrigger asChild>
@@ -401,7 +417,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
                 htmlFor="releaseDate"
                 className="text-left text-textMedium"
               >
-                Release Date
+                Release Date<span className="text-red-500">*</span>
               </label>
               <div className="col-span-3">
                 <input
@@ -410,7 +426,12 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
                   type="date"
                   className="calendar-icon w-full border-primaryColorBlue border p-2 rounded-md bg-slate-950 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primaryColorBlue"
                   value={releaseDate}
-                  onChange={(e) => setReleaseDate(e.target.value)}
+                  // onChange={(e) => setReleaseDate(e.target.value)}
+                  onChange={(e) => {
+                    const [year, month, day] = e.target.value.split("-");
+                    const formattedDate = `${month}/${day}/${year} 00:00:00`; // Chuyển sang định dạng MM/dd/yyyy HH:mm:ss
+                    setReleaseDate(formattedDate); 
+                  }}
                   max={new Date().toISOString().split("T")[0]}
                 />
               </div>
@@ -431,7 +452,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
                     {subArtists.length > 0
                       ? orderedSubArtists
                           .map((artist) => artist?.name)
-                          .join(", ") 
+                          .join(", ")
                       : "This track has no sub artists"}
                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -479,7 +500,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
             {/* Audio Upload */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="audio" className="text-left text-textMedium">
-                Audio
+                Audio<span className="text-red-500">*</span>
               </Label>
 
               {audioSrc && (
@@ -490,7 +511,15 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
                     key={audioSrc}
                     className="h-8 w-full"
                   >
-                    <source src={audioSrc} type="audio/mpeg" />
+                    <source
+                      src={
+                        typeof audioSrc === "string" &&
+                        audioSrc.startsWith("blob:")
+                          ? audioSrc // Trả về nguyên bản nếu là 'blob:'
+                          : decrypt(audioSrc) // Giải mã nếu không phải 'blob:'
+                      }
+                      type="audio/mpeg"
+                    />
                     Your browser does not support audio playback.
                   </audio>
                 </div>
@@ -554,7 +583,8 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
           <p>No details available.</p>
         )}
         <SheetFooter>
-          <SheetClose asChild>
+          {/* <SheetClose asChild>
+          </SheetClose> */}
             <Button
               type="submit"
               onClick={handleUpdateClick}
@@ -562,7 +592,6 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
             >
               Update Track
             </Button>
-          </SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>

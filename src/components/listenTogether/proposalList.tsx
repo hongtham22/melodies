@@ -28,7 +28,8 @@ function ProposalList({
   // const [proposalSongs, setProposalSongs] = useState([]);
   const [proposalList, setProposalList] = useState([]);
 
-  // console.log("proposalList: ", proposalList);
+
+  console.log("proposalList: ", proposalList);
   useEffect(() => {
     setProposalList(currentProposalList);
   }, [currentProposalList]);
@@ -42,9 +43,9 @@ function ProposalList({
     socket.on("updateProposalList", (proposalList) => {
       setProposalList(proposalList);
     });
-    socket.on("updateListSong", (data) => {
-      setProposalList(data.proposalList);
-    })
+    // socket.on("updateListSong", (data) => {
+    //   setProposalList(data.proposalList);
+    // })
     socket.on("addSongToProposalListFailed", (data) => {
       alert(data)
     })
@@ -55,7 +56,7 @@ function ProposalList({
     return () => {
       socket?.off("addSongToProposalListSuccess");
       socket?.off("updateProposalList");
-      socket?.off("updateListSong");
+      // socket?.off("updateListSong");
       socket?.off("addSongToProposalListFailed");
       socket?.off("forwardSongFailed");
       

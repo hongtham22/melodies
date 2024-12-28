@@ -1,15 +1,12 @@
 "use client";
 import {
-  PlusIcon,
   Cross2Icon,
-  DotsHorizontalIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   ExitIcon,
 } from "@radix-ui/react-icons";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAppContext } from "@/app/AppProvider";
-import LoadingPage from "@/components/loadingPage";
 import { fetchApiData } from "@/app/api/appService";
 import { DataCurrentSong, DataSong, UserRoom } from "@/types/interfaces";
 import Image from "next/image";
@@ -24,13 +21,11 @@ import animation from "../../../../../public/animation/Animation - song.json";
 import Lottie from "react-lottie-player";
 import { useRouter } from "next/navigation";
 
-// let socket: Socket | null = null;
 
 function Page({params}) {
   const { id } = params;
   const { socket } = useAppContext();
   const { accessToken } = useAppContext();
-  const [roomId, setRoomId] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [permit, setPermit] = useState(true);
@@ -53,11 +48,11 @@ function Page({params}) {
     socket?.emit("getData");
   }, [])
 
-  const handleTimeUpdate = () => {
-    if (audioRef.current && permit) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
+  // const handleTimeUpdate = () => {
+  //   if (audioRef.current && permit) {
+  //     setCurrentTime(audioRef.current.currentTime);
+  //   }
+  // };
   const handleViewUser = () => {
     setShowUsers((prev) => !prev);
   };
@@ -152,17 +147,17 @@ function Page({params}) {
       console.log("Leave room success");
       router.push(`/listenTogether`);
     });
-    socket.on("members", (data) => {
-      console.log("members: ", data)
-      setListUser(data);
-    })
+    // socket.on("members", (data) => {
+    //   console.log("members: ", data)
+    //   setListUser(data);
+    // })
 
-    socket.on("roomData", (data) => {
-      setPermit(data.permit);
-      setWaitingSongs(data.waitingList);
-      setCurrentProposalList(data.proposalList);
-      setCurrentSong(data.currentSong);
-    })
+    // socket.on("roomData", (data) => {
+    //   setPermit(data.permit);
+    //   setWaitingSongs(data.waitingList);
+    //   setCurrentProposalList(data.proposalList);
+    //   setCurrentSong(data.currentSong);
+    // })
     socket.on("animation", (data) => {
       setEnableAnimation(data)
     })
@@ -374,12 +369,12 @@ function Page({params}) {
                                   {getMainArtistName(song.artists)}
                                 </p>
                               </div>
-                              {(isCurrentSong && enableAnimation) ? (
+                              {(isCurrentSong) ? (
                                 <div className="absolute right-3">
                                   <Lottie
                                     loop
                                     animationData={animation}
-                                    play={currentSong?.isPlaying}
+                                    play={enableAnimation}
                                     style={{ width: 24, height: 24 }}
                                     className="text-primaryColorPink"
                                   />
@@ -409,7 +404,6 @@ function Page({params}) {
           <ListUser listUser={listUser} />
         ) : (
           <ProposalList
-            socket={socket}
             currentProposalList={currentProposalList}
             permit={permit}
           />

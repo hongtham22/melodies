@@ -1,8 +1,7 @@
 import React from 'react';
 import Image from "next/image";
 import userImg from "@/assets/img/placeholderUser.jpg";
-
-
+import { TimerIcon } from '@radix-ui/react-icons';
 interface Comment {
   id: string;
   content: string;
@@ -32,7 +31,7 @@ function ListCmtAdmin({ data }: ListCmtAdminProps) {
 
   return (
     <div className="flex w-2/3 bg-secondColorBg rounded-xl flex-col gap-4 p-3 shadow-sm shadow-primaryColorBlue">
-      <p className="text-h3 text-primaryColorPink">Recent Comments</p>
+      <p className="text-h3 text-primaryColorPink flex gap-2 items-center"> <span><TimerIcon className='w-5 h-5'/></span>Recent Comments</p>
       {data.map((comment) => {
         const { id, content, createdAt, name, image, status } = comment;
         return (

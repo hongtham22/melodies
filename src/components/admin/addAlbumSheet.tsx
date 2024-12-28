@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,6 +47,7 @@ import Image from "next/image";
 import artistimg from "@/assets/img/placeholderUser.jpg";
 import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from "@/app/AppProvider";
+import { useToast } from "@/hooks/use-toast";
 
 interface Artist {
   id: string;
@@ -64,7 +65,6 @@ interface AddAlbumSheetProps {
   }) => void;
   artist: Artist[];
 }
-
 
 const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
   const [albumTitle, setAlbumTitle] = React.useState("");
@@ -84,8 +84,15 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
   >([]);
   const [releaseDate, setReleaseDate] = useState<string>("");
   const [typeAlbum, setTypeAlbum] = useState<string>("");
-  const { accessToken } = useAppContext()
+  const { accessToken } = useAppContext();
+  const { toast } = useToast();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
+  const typeColors = {
+    ep: "!text-green-500",
+    single: "!text-yellow-500",
+    album: "!text-pink-500",
+  };
 
   React.useEffect(() => {
     setListArtist((prevList) =>
@@ -101,23 +108,12 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
   }, [mainArtist]);
 
   const handleMainArtistSelect = async (selectedArtist: Artist) => {
+    setOpenMainArtist(false);
+
     if (mainArtist === selectedArtist.id) {
-      setMainArtist("");
-      setListArtist((prevList) =>
-        prevList.map((artist) =>
-          artist.id === selectedArtist.id
-            ? { ...artist, selected: false }
-            : artist
-        )
-      );
-      setListSongOfMainArtist([]);
-      setSelectedSongs([]);
+      resetMainArtist(selectedArtist.id);
     } else {
-      setMainArtist(selectedArtist.id);
-      setListArtist((prevList) => [
-        { ...selectedArtist, selected: true },
-        ...prevList.filter((artist) => artist.id !== selectedArtist.id),
-      ]);
+      selectMainArtist(selectedArtist);
 
       try {
         const response = await fetchApiData(
@@ -126,20 +122,55 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
           null,
           accessToken
         );
+
         if (response.success) {
-          setListSongOfMainArtist(response.data.songs);
-          setReorderedSong(response.data.songs);
-          setSelectedSongs([]);
+          const { songs } = response.data;
+          setListSongOfMainArtist(songs);
+          setReorderedSong(songs);
+          setSelectedSongs([]); 
         } else {
           console.error("Failed to fetch songs:", response.error);
+          resetSongs();
         }
       } catch (error) {
         console.error("Error fetching songs:", error);
+        resetSongs();
       }
     }
   };
 
+  const resetMainArtist = (artistId: string) => {
+    setMainArtist("");
+    setListArtist((prevList) =>
+      prevList.map((artist) =>
+        artist.id === artistId ? { ...artist, selected: false } : artist
+      )
+    );
+    resetSongs();
+  };
+
+  const selectMainArtist = (artist: Artist) => {
+    setMainArtist(artist.id);
+    setListArtist((prevList) => [
+      { ...artist, selected: true },
+      ...prevList.filter((item) => item.id !== artist.id),
+    ]);
+  };
+
+  const resetSongs = () => {
+    setListSongOfMainArtist([]);
+    setReorderedSong([]);
+    setSelectedSongs([]);
+  };
+
   const handleSongChange = (song: { id: string; title: string }) => {
+    if (typeAlbum === "single") {
+      setSelectedSongs([song]);
+      // setReorderedSong([song]);
+      setOpenListSong(false);
+      return;
+    }
+
     setSelectedSongs((prevSelected) =>
       prevSelected.some((s) => s.id === song.id)
         ? prevSelected.filter((s) => s.id !== song.id)
@@ -155,8 +186,19 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
     });
   };
 
+  useEffect(() => {
+    if (typeAlbum === "single" && selectedSongs.length > 0) {
+      setOpenListSong(false);
+    }
+  }, [selectedSongs, typeAlbum]);
+
   const handleSelectChange = (value: string) => {
-    setTypeAlbum(value); 
+    setTypeAlbum(value);
+    if (value === "single" && selectedSongs.length > 1) {
+      // Nếu chuyển sang "single", chỉ giữ lại bài hát đầu tiên
+      setSelectedSongs([selectedSongs[0]]);
+      // setReorderedSong([selectedSongs[0]]);
+    }
   };
 
   const handleAlbumImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,13 +211,28 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
         alert("File size should not exceed 10MB");
         return;
       } else {
-        setAlbumImg((file));
+        setAlbumImg(file);
       }
     }
   };
 
   const handleSave = () => {
-    if(albumImg){
+    if (
+      !albumTitle.trim() ||
+      !mainArtist ||
+      !typeAlbum ||
+      !releaseDate ||
+      !selectedSongs.length ||
+      !albumImg
+    ) {
+      toast({
+        title: "Error",
+        description: "Please provide required information before adding.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (albumImg) {
       onSave({
         title: albumTitle,
         mainArtistId: mainArtist,
@@ -195,10 +252,9 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
     setReleaseDate("");
   };
 
- 
   return (
     <div className="">
-      <Sheet>
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetTrigger asChild>
           <button className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover">
             <PlusIcon className="text-white w-5 h-5" />
@@ -218,7 +274,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
             {/* title */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="trackTitle" className="text-left">
-                Title
+                Title<span className="text-red-500">*</span>
               </Label>
               <Input
                 id="albumTitle"
@@ -231,7 +287,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
             {/* Main Aritst */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="mainArtist" className="text-left">
-                Main Artist
+                Main Artist<span className="text-red-500">*</span>
               </Label>
               <Popover open={openMainArtist} onOpenChange={setOpenMainArtist}>
                 <PopoverTrigger asChild>
@@ -291,18 +347,22 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
 
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="typeAlbum" className="text-left text-textMedium">
-                Type Album
+                Type Album<span className="text-red-500">*</span>
               </label>
               <div className="col-span-3">
                 <Select onValueChange={handleSelectChange}>
-                  <SelectTrigger className="w-full border-primaryColorBlue">
+                  <SelectTrigger
+                    className={`w-full border-primaryColorBlue ${
+                      typeColors[typeAlbum] || ""
+                    }`}
+                  >
                     <SelectValue placeholder="Select type of album" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="ep">EP</SelectItem>
-                      <SelectItem value="single">Single</SelectItem>
-                      <SelectItem value="album">Album</SelectItem>
+                      <SelectItem value="ep" className="text-green-500">EP</SelectItem>
+                      <SelectItem value="single" className="text-yellow-500">Single</SelectItem>
+                      <SelectItem value="album" className="text-pink-500">Album</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -311,7 +371,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
             {/* Album img */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="ablumImg" className="text-left">
-                Album Image
+                Album Image<span className="text-red-500">*</span>
               </Label>
               <Input
                 id="ablumImg"
@@ -327,7 +387,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
                 htmlFor="releaseDate"
                 className="text-left text-textMedium"
               >
-                Release Date
+                Release Date<span className="text-red-500">*</span>
               </label>
               <div className="col-span-3">
                 <input
@@ -342,7 +402,7 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
             {/* List song */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="subArtists" className="text-left">
-                List songs
+                List songs<span className="text-red-500">*</span>
               </Label>
               <div className="col-span-3 border-darkBlue">
                 <Popover open={openListSong} onOpenChange={setOpenListSong}>
@@ -416,15 +476,15 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
             </div>
           </div>
           <SheetFooter>
-            <SheetClose asChild>
-              <Button
-                onClick={handleSave}
-                type="submit"
-                className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-              >
-                Save Album
-              </Button>
-            </SheetClose>
+            {/* <SheetClose asChild>
+            </SheetClose> */}
+            <Button
+              onClick={handleSave}
+              type="submit"
+              className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+            >
+              Save Album
+            </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>

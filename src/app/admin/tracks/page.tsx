@@ -10,6 +10,7 @@ import LoadingPage from "@/components/loadingPage";
 import { PaginationWithLinks } from "@/components/paginationWithLinks";
 import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast"
+import ConfirmDelete from "@/components/popup/confirmDelete";
 
 function Page() {
   const { toast } = useToast()
@@ -21,6 +22,7 @@ function Page() {
   const [listArtistsData, setListArtistsData] = useState([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { accessToken } = useAppContext()
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   const fetchTrackAdmin = useCallback(
     async (page: number) => {
@@ -39,7 +41,7 @@ function Page() {
         setLoading(false);
       }
     },
-    [setLoading]
+    [setLoading, accessToken]
   );
 
   const fetchArtists = useCallback(async () => {
@@ -61,7 +63,7 @@ function Page() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading]);
+  }, [setLoading, accessToken]);
 
   useEffect(() => {
     fetchArtists();
@@ -123,7 +125,6 @@ function Page() {
       });
       return;
     }
-  
     try {
       const requestBody = JSON.stringify({ songIds: selectedItems });
   
@@ -160,12 +161,21 @@ function Page() {
     } finally {
       setSelectedItems([]);
     }
-  
+    setShowConfirmDelete(false);
     console.log("Deleting tracks:", { songIds: selectedItems });
   };
+  const handleOpenConfirmDelete = () => {
+    if (selectedItems.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one track to delete.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowConfirmDelete(true);
+  };
   
-  
-
   if (loading) return <LoadingPage />;
 
   return (
@@ -175,7 +185,7 @@ function Page() {
           <h1 className="text-h2 text-primaryColorPink">List Tracks</h1>
           <div className="flex gap-4">
             <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
-            onClick={handleDeleteTracks}>
+            onClick={handleOpenConfirmDelete}>
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
               Delete Track
             </button>
@@ -185,6 +195,13 @@ function Page() {
       </div>
       <ListTracksAdmin data={listTracksData} page={page} onSelectedItemsChange={setSelectedItems} />
       <PaginationWithLinks page={page} totalPage={totalPage} />
+      {showConfirmDelete && (
+        <ConfirmDelete
+          onClose={() => setShowConfirmDelete(false)}
+          onDelete={handleDeleteTracks}
+          entityName="track" 
+        />
+      )}
     </div>
   );
 }
