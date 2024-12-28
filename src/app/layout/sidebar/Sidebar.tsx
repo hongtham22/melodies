@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useAppContext as useSongContext } from '@/components/provider/songProvider';
+import { useAppContext } from "@/app/AppProvider";
 
 import {
   HomeIcon,
@@ -9,19 +10,19 @@ import {
   AvatarIcon,
   ExitIcon,
   GearIcon,
-  HeartIcon,
   ListBulletIcon,
 } from "@radix-ui/react-icons";
+import { CgProfile } from "react-icons/cg";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
 import { BiAperture } from "react-icons/bi";
+import UploadSong from "@/components/uploadSong";
 
 const Sidebar = () => {
-  const { accessToken, setAccessToken, setRole, setShowPlaylistMenu } =
+  const { accessToken, setAccessToken, setRole, role, setShowPlaylistMenu } =
     useAppContext();
   const [showRequireLogin, setShowRequireLogin] = useState(false);
   const [
@@ -46,6 +47,14 @@ const Sidebar = () => {
       setShowRequireLoginForListenTogether(true);
     }
   };
+
+  const { currentSong } = useSongContext()
+  const [pb, setPb] = useState(false)
+  useEffect(() => {
+    if (currentSong) {
+      setPb(true);
+    }
+  }, [currentSong]);
 
   const [activeMenu, setActiveMenu] = useState("");
   const { toast } = useToast();
@@ -103,7 +112,7 @@ const Sidebar = () => {
       : "text-[0.9rem]";
   };
   return (
-    <div className={`h-screen w-full mt-3 pl-9 pr-7 drop-shadow-lg z-20`}>
+    <div className={`h-screen w-full mt-8 pl-9 pr-7 drop-shadow-lg z-20 ${pb && 'pb-40'} overflow-auto scrollbar-thin scrollbar-track-black scrollbar-thumb-darkBlue`}>
       <div id="menu-section" className="mb-5">
         <p className="text-primaryColorPink/60 text-[0.8rem]">Menu</p>
         <div
@@ -153,16 +162,6 @@ const Sidebar = () => {
           Playlist and favorite
         </p>
         <div
-          className={`flex my-2 cursor-pointer ${getMenuClass(
-            "your-favorites"
-          )} py-2 items-center`}
-          onClick={() => handleMenuClick("your-favorites")}
-        >
-          <HeartIcon className="w-[24px] h-[24px] mr-3" />
-          <Link href="/your_favorites">Your favorites</Link>
-          {/* <p>Your favorites</p> */}
-        </div>
-        <div
           className={`relative flex my-2 cursor-pointer ${getMenuClass(
             "your-playlist"
           )} py-2 items-center`}
@@ -199,7 +198,6 @@ const Sidebar = () => {
             </div>
           )}
         </div>
-
         {/* Listen Together */}
         <div
           className={`relative flex my-2 cursor-pointer ${getMenuClass(
@@ -242,15 +240,33 @@ const Sidebar = () => {
         <p className="text-primaryColorPink/60 text-[0.8rem]">General</p>
         <div
           className={`flex my-2 cursor-pointer ${getMenuClass(
+            "Profile"
+          )} py-2 items-center `}
+          onClick={() => handleMenuClick("Profile")}
+        >
+          <CgProfile className="w-[24px] h-[24px] mr-3" />
+          <Link href="/profile">Profile</Link>
+        </div>
+
+        <div
+          className={`flex my-2 cursor-pointer ${getMenuClass(
+            "UploadSong"
+          )} py-2 items-center `}
+          onClick={() => handleMenuClick("UploadSong")}
+        >
+          <UploadSong />
+        </div>
+
+        <div
+          className={`flex my-2 cursor-pointer ${getMenuClass(
             "Setting"
           )} py-2 items-center `}
           onClick={() => handleMenuClick("Setting")}
         >
           <GearIcon className="w-[24px] h-[24px] mr-3" />
           <Link href="/setting">Setting</Link>
-
-          {/* <p>Setting</p> */}
         </div>
+
         <div
           className={`flex my-2 cursor-pointer py-2 items-center`}
           onClick={() => handleLogout()}

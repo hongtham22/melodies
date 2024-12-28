@@ -7,7 +7,7 @@ function Banner() {
 
   return (
     <div
-      className={`${showSidebarRight ? 'w-[60vw]' : 'w-[78vw] h-[80vh]'} text-primaryColorPink my-4 px-8 py-4 rounded-3xl bg-cover bg-center flex self-center  gap-[114px] flex-col relative overflow-hidden`}
+      className={`${showSidebarRight ? 'w-[58vw]' : 'w-[78vw] h-[80vh]'} text-primaryColorPink my-4 px-8 py-4 rounded-3xl bg-cover bg-center flex self-center  gap-[114px] flex-col relative overflow-hidden`}
     >
       {/* Pseudo-element for background image */}
       <div

@@ -42,7 +42,7 @@ function HeaderAdmin() {
     const handleScroll = () => {
       if (headerRef.current && scrollAreaRef?.current) {
         const scrollTop = scrollAreaRef.current.scrollTop;
-        setIsScrolled(scrollTop > 0); 
+        setIsScrolled(scrollTop > 0);
         if (scrollTop > 0) {
           headerRef.current.classList.remove("bg-transparent", "pt-14");
           headerRef.current.classList.add("bg-primaryColorBg", "py-6");
@@ -110,8 +110,17 @@ function HeaderAdmin() {
             </ul>
           </div>
         </div>
-        <div className="flex gap-3 justify-center items-center">
-          <BellIcon className="w-6 h-6" />
+        <div className="flex justify-center items-center gap-2">
+          <div className="flex">
+            <div className="flex items-center">
+              <BellIcon className="w-6 h-6" />
+            </div>
+            <div className="flex items-start">
+              <p className="max-w-10 p-1 bg-darkPink rounded-md text-white text-xs -translate-y-2 truncate">
+                100+
+              </p>
+            </div>
+          </div>
           <div className="flex gap-2">
             <Image
               src={user?.image || userImg}

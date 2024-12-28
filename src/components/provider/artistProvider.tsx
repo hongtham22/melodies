@@ -2,6 +2,7 @@
 
 import { fetchApiData } from '@/app/api/appService';
 import { useAppContext } from '@/app/AppProvider';
+import { Cookie } from 'lucide-react';
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 interface Artist {
@@ -29,28 +30,33 @@ export const useArtistContext = () => {
 // ArtistProvider
 export const ArtistProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [listArtists, setListArtists] = useState<Artist[]>([]);
-  const { accessToken } = useAppContext();
+  const { role, accessToken } = useAppContext();
+
+
 
   useEffect(() => {
-    const fetchArtists = async () => {
-    try{
-        const response = await fetchApiData(
-          "/api/admin/allArtistName",
-          "GET",
-          null,
-          accessToken
-        );
-        if(response.success) {
-            setListArtists(response.data.artists);
-        }
+    if(accessToken && role === 'Admin') {
 
-    } catch (error) {
-        console.error("Error fetching artists:", error);
+      const fetchArtists = async () => {
+      try{
+          const response = await fetchApiData(
+            "/api/admin/allArtistName",
+            "GET",
+            null,
+            accessToken
+          );
+          if(response.success) {
+              setListArtists(response.data.artists);
+          }
+  
+      } catch (error) {
+          console.error("Error fetching artists:", error);
+      }
+      };
+  
+      fetchArtists();
     }
-    };
-
-    fetchArtists();
-  }, [accessToken]);
+  }, [accessToken, role]);
 
   return (
     <ArtistContext.Provider value={{ listArtists, setListArtists }}>

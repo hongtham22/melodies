@@ -7,12 +7,14 @@ import { useScrollArea } from "@/components/provider/scrollProvider";
 import UserImage from "@/assets/img/placeholderUser.jpg";
 import { Link } from "react-scroll";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import { useRouter } from "next/navigation";
+import { FaCrown } from "react-icons/fa6";
+import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from "react-icons/fa";
-import { BellIcon } from "@radix-ui/react-icons";
+
 import Image from "next/image";
 import { fetchApiData } from "@/app/api/appService";
 import { User } from "@/types/interfaces";
+import Notification from "@/components/notification";
 
 const Header = () => {
   const { accessToken, setSearch } = useAppContext();
@@ -61,7 +63,7 @@ const Header = () => {
     const handleScroll = () => {
       if (headerRef.current && scrollAreaRef?.current) {
         const scrollTop = scrollAreaRef.current.scrollTop;
-        setIsScrolled(scrollTop > 0); 
+        setIsScrolled(scrollTop > 0);
         if (scrollTop > 0) {
           headerRef.current.classList.remove("bg-transparent", "pt-14");
           headerRef.current.classList.add("bg-primaryColorBg", "py-6");
@@ -99,13 +101,11 @@ const Header = () => {
     <div
       ref={headerRef}
       id="header"
-      className={`${
-        showSidebarRight ? "w-[62%]" : "w-[84%]"
-      } flex pt-8 px-28 justify-between items-center bg-transparent fixed z-20 ${
-        isScrolled
+      className={`${showSidebarRight ? "w-[62%]" : "w-[84%]"
+        } flex pt-8 px-28 justify-between items-center bg-transparent fixed z-20 ${isScrolled
           ? "after:content-[''] after:w-full after:h-[3px] after:absolute after:bottom-0 after:left-0 after:bg-gradient-to-r after:from-transparent after:via-darkerBlue after:to-transparent"
           : ""
-      }`}
+        }`}
     >
       <div className={`w-[30%] flex items-center`}>
         <div>
@@ -119,11 +119,10 @@ const Header = () => {
           <input
             type="text"
             placeholder="Search For Music, Artist, ..."
-            className={`w-full ${
-              showSidebarRight
+            className={`w-full ${showSidebarRight
                 ? "text-[0.8rem] placeholder:text-[0.8rem]"
                 : "placeholder:text-[0.85rem] text-[0.85rem]"
-            }  ml-2 py-2 pr-2 bg-transparent border-none outline-none placeholder:text-white/80`}
+              }  ml-2 py-2 pr-2 bg-transparent border-none outline-none placeholder:text-white/80`}
             onChange={(e) => setSearchTerm(e.target.value)}
             value={searchTerm}
           />
@@ -132,9 +131,8 @@ const Header = () => {
       <div id="about-section">
         <ul className="flex">
           <li
-            className={`${
-              showSidebarRight ? "mx-6 text-[0.9rem]" : "mx-8"
-            } text-nowrap font-semibold`}
+            className={`${showSidebarRight ? "mx-6 text-[0.9rem]" : "mx-8"
+              } text-nowrap font-semibold`}
           >
             <Link
               to="about"
@@ -146,9 +144,8 @@ const Header = () => {
             </Link>
           </li>
           <li
-            className={`${
-              showSidebarRight ? "mx-6 text-[0.9rem]" : "mx-8"
-            } text-nowrap font-semibold`}
+            className={`${showSidebarRight ? "mx-6 text-[0.9rem]" : "mx-8"
+              } text-nowrap font-semibold`}
           >
             <Link
               to="footer"
@@ -160,9 +157,8 @@ const Header = () => {
             </Link>
           </li>
           <li
-            className={`${
-              showSidebarRight ? "mx-6 text-[0.9rem]" : "mx-8"
-            } text-nowrap font-semibold`}
+            className={`${showSidebarRight ? "mx-6 text-[0.9rem]" : "mx-8"
+              } text-nowrap font-semibold`}
           >
             <a href="/premium">Premium</a>
           </li>
@@ -171,7 +167,15 @@ const Header = () => {
 
       {accessToken ? (
         <div className="flex gap-3 justify-center items-center">
-          <BellIcon className="w-6 h-6" />
+          {
+            user?.accountType === "PREMIUM" && (
+              <FaCrown
+                className='w-6 h-6 ml-6 text-yellow-400 cursor-pointer'
+                onClick={() => router.push('/package')}
+              />
+            )
+          }
+          <Notification />
           <div className="flex gap-2">
             <Image
               src={user?.image || UserImage}
@@ -182,31 +186,15 @@ const Header = () => {
             />
             <div className="flex  flex-col">
               <p className="text-textSmall">Welcome</p>
-              <p className="text-textMedium font-bold line-clamp-1">
-                {user?.name || user?.username}
-              </p>
+              <p className="text-textMedium font-bold line-clamp-1">{user?.name || user?.username}</p>
             </div>
           </div>
         </div>
       ) : (
         <>
-          <div id="button-section" className="flex">
-            <button
-              className={`${
-                showSidebarRight ? "text-[0.9rem] mx-1 w-24" : "mx-2 w-32"
-              } border-2 border-white text-white font-semibold py-2  rounded-full`}
-              onClick={handleLoginClick}
-            >
-              Login
-            </button>
-            <button
-              className={`${
-                showSidebarRight ? "text-[0.9rem] mx-1 w-24" : "mx-2 w-32"
-              } bg-white font-semibold py-2  rounded-full text-black`}
-              onClick={handleSignUpClick}
-            >
-              Sign Up
-            </button>
+          <div id='button-section' className="flex">
+            <button className={`${showSidebarRight ? 'text-[0.9rem] mx-1 w-24' : 'mx-2 w-32'} border-2 border-white text-white font-semibold py-2  rounded-full`} onClick={handleLoginClick}>Login</button>
+            <button className={`${showSidebarRight ? 'text-[0.9rem] mx-1 w-24' : 'mx-2 w-32'} bg-white font-semibold py-2  rounded-full text-black`} onClick={handleSignUpClick}>Sign Up</button>
           </div>
         </>
       )}

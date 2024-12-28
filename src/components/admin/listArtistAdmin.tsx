@@ -69,31 +69,26 @@ function ListArtistAdmin({
             <th className="w-[3%] pl-3">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p>No</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
             <th className="w-[22%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p>Artists</p>
-                <CaretSortIcon className="text-white  w-4 h-4" />
               </div>
             </th>
             <th className="w-[12%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p>Number Of Tracks</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
             <th className="w-[15%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p>Number Of Albums</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
             <th className="w-[15%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
                 <p>Number Of Followers</p>
-                <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
               </div>
             </th>
           </tr>

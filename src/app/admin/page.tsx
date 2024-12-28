@@ -124,7 +124,7 @@ const Page = () => {
               <div className="flex gap-3 w-full mt-2">
                 <Image
                   src={
-                    todayBestSongData.album[0]?.albumImages[0]?.image ?? songimg
+                    todayBestSongData?.album?.[0]?.albumImages?.[0]?.image || songimg
                   }
                   alt="Today Best Song Poster"
                   width={60}
@@ -134,15 +134,15 @@ const Page = () => {
                 />
                 <div className="w-3/4 flex flex-col gap-2">
                   <p className="text-primaryColorGray line-clamp-2">
-                    {todayBestSongData.title}
+                    {todayBestSongData.title || "Unknown"}
                   </p>
                   <p className="text-textMedium text-gray-400 line-clamp-1">
-                    {todayBestSongData.artists[0]?.name}
+                    {todayBestSongData.artists?.[0]?.name || "Unknown"}
                   </p>
                   <div className="flex gap-2">
                     <RocketIcon />
                     <p className="text-textMedium text-gray-400 line-clamp-1">
-                      {todayBestSongData.playCount}
+                      {todayBestSongData.playCount || 0}
                     </p>
                   </div>
                 </div>

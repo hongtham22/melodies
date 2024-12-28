@@ -9,7 +9,12 @@ import React, {
 } from "react";
 import Cookies from "js-cookie";
 import { io, Socket } from "socket.io-client";
+import { Notification } from "@/types/interfaces";
+import { fetchNotification } from "@/utils/api";
+import { fetchApiData } from "@/app/api/appService";
 interface AppContextType {
+  listNotification: Notification[];
+  setListNotification: (noti: Notification[]) => void;
   showPlaylistMenu: boolean;
   setShowPlaylistMenu: (show: boolean) => void;
   search: string;
@@ -22,9 +27,6 @@ interface AppContextType {
   setAccessToken: (token: string) => void;
   socket: Socket | null;
 }
-import envConfig from "@/config";
-
-const API_BASE_URL = envConfig.NEXT_PUBLIC_API_ENDPOINT;
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -43,6 +45,7 @@ export const AppProvider: React.FC<{
   initialId?: string;
 }> = ({ children, initialAccessToken = "", initialRole = "" }) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [listNotification, setListNotification] = useState<Notification[]>([])
   const [showPlaylistMenu, setShowPlaylistMenu] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [role, setRole] = useState<string>(() => {
@@ -61,17 +64,50 @@ export const AppProvider: React.FC<{
 
   useEffect(() => {
     if (accessToken && role) {
-      Cookies.set("role", role, { expires: 7 }); // Expire in 7 days
-      Cookies.set("accessToken", accessToken, { expires: 7 }); // Expire in 7 days
+      Cookies.set("role", role, { expires: 7 });
+      Cookies.set("accessToken", accessToken, { expires: 7 });
     } else {
       Cookies.remove("accessToken");
       Cookies.remove("role");
     }
   }, [accessToken, role]);
 
+  // useEffect(() => {
+  //   const refreshInterval = setInterval(async () => {
+  //     if (accessToken) {
+  //       try {
+  //         const response = await fetchApiData(
+  //           "/api/auth/refresh",
+  //           "POST",
+  //           JSON.stringify({ token: accessToken }),
+  //           null,
+  //           null
+  //         );
+
+  //         if (response.success) {
+  //           const newAccessToken = response.data.accessToken;
+  //           setAccessToken(newAccessToken);
+  //         } else {
+  //           Cookies.remove("accessToken");
+  //           Cookies.remove("role")
+  //         }
+  //       } catch (error) {
+  //         console.error("Error during token refresh:", error);
+  //       }
+  //     }
+  //   }, 30000);
+
+  //   return () => clearInterval(refreshInterval);
+  // }, [accessToken]);
+
   useEffect(() => {
     if (accessToken) {
-      const newSocket = io(`${API_BASE_URL}`, {
+      const fetchAPINotification = async (accessToken: string) => {
+        const listFetchNotification = await fetchNotification(accessToken)
+        setListNotification(listFetchNotification)
+      }
+      fetchAPINotification(accessToken)
+      const newSocket = io(process.env.NEXT_PUBLIC_API_ENDPOINT, {
         auth: { accessToken: accessToken },
       });
 
@@ -90,8 +126,9 @@ export const AppProvider: React.FC<{
         console.log("payment", data);
       });
 
-      newSocket.on("newNoti", (data) => {
-        alert("bạn có thông báo mới, hãy get thông báo")
+      newSocket.on("newNoti", (data: Notification) => {
+        setListNotification((prev) => [data, ...prev])
+
       })
 
       setSocket(newSocket);
@@ -105,6 +142,8 @@ export const AppProvider: React.FC<{
   }, [accessToken]);
 
   const value = {
+    listNotification,
+    setListNotification,
     showPlaylistMenu,
     setShowPlaylistMenu,
     search,

@@ -12,7 +12,6 @@ interface GenreContextType {
 
 const GenreContext = createContext<GenreContextType | undefined>(undefined);
 
-// Hook để sử dụng context
 export const useGenreContext = () => {
   const context = useContext(GenreContext);
   if (!context) {
@@ -23,25 +22,29 @@ export const useGenreContext = () => {
 
 export const GenreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [listGenres, setListGenres] = useState<GenreData[]>([]);
-  const { accessToken } = useAppContext();
+  // const { accessToken } = useAppContext();
+  const { role, accessToken } = useAppContext();
 
   useEffect(() => {
-    const fetchGenres = async () => {
-    try{
-        const response = await fetchApiData(
-         "/api/admin/allGenre", "GET", null, accessToken
-        );
-        if(response.success) {
-            setListGenres(response.data.genres);
-        }
+    if(accessToken && role === 'Admin') {
 
-    } catch (error) {
-        console.error("Error fetching genres:", error);
+      const fetchGenres = async () => {
+      try{
+          const response = await fetchApiData(
+           "/api/admin/allGenre", "GET", null, accessToken
+          );
+          if(response.success) {
+              setListGenres(response.data.genres);
+          }
+  
+      } catch (error) {
+          console.error("Error fetching genres:", error);
+      }
+      };
+  
+      fetchGenres();
     }
-    };
-
-    fetchGenres();
-  }, [accessToken]);
+  }, [accessToken, role]);
 
   return (
     <GenreContext.Provider value={{ listGenres, setListGenres }}>

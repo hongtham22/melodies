@@ -58,11 +58,11 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
   const currentIndex = playlist.findIndex((songId) => songId === currentSongId);
 
   useEffect(() => {
-    setCurrentSongId(id); 
+    setCurrentSongId(id);
   }, [id]);
 
 
-  
+
   useEffect(() => {
     if (currentSongId) {
       console.log("currentSongId:", currentSongId);
@@ -97,20 +97,20 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
         }
         setLoading(false);
       };
-  
+
       fetchData();
     }
   }, [currentSongId, accessToken, setLoading]);
 
-  
- 
+
+
 
   useEffect(() => {
     if (dataSong) {
       const audioUrl = dataSong.filePathAudio
         ? decrypt(dataSong.filePathAudio)
         : "https://audiomelodies.nyc3.cdn.digitaloceanspaces.com/PBL6/AUDIO/OLD/Chillies/VaTheLaHet/VaTheLaHet.m4a";
-      
+
       if (audioRef.current) {
         audioRef.current.pause(); // Dừng bài hát hiện tại
         audioRef.current.src = audioUrl; // Cập nhật src
@@ -126,19 +126,19 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
       }
     }
   }, [dataSong]);
-  
-  
+
+
   useEffect(() => {
     if (audioRef.current) {
       const audioElement = audioRef.current;
       if (audioElement.readyState >= 1) {
         setEndTime(audioElement.duration);
       }
-  
+
       const handleMetadataLoaded = () => {
         const duration = audioElement.duration;
         setEndTime(duration);
-  
+
         audioElement
           .play()
           .then(() => {
@@ -148,23 +148,23 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
             console.error("Autoplay failed:", error);
           });
       };
-  
+
       const handleTimeUpdate = () => {
         if (audioRef.current) {
           const currentTime = audioRef.current.currentTime;
           setStartTime(currentTime);
         }
       };
-  
+
       const handleAudioEnded = () => {
         setIsPlaying(false);
         setStartTime(0);
       };
-  
+
       audioElement.addEventListener("loadedmetadata", handleMetadataLoaded);
       audioElement.addEventListener("timeupdate", handleTimeUpdate);
       audioElement.addEventListener("ended", handleAudioEnded);
-  
+
       return () => {
         if (audioRef.current) {
           audioRef.current.pause();
@@ -175,26 +175,26 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
       };
     }
   }, [audioRef.current]); // Ensure the effect runs when the audioRef.current changes
-  
 
-  
-    const handleRandomPlay = () => {
-      if (playlist.length > 1) {
-        let randomIndex;
-        do {
-          randomIndex = Math.floor(Math.random() * playlist.length);
-        } while (randomIndex === currentIndex);
-        setCurrentSongId(playlist[randomIndex]);
-      }
-    };
 
-    const handlePreviousSong = () => {
-      if (playlist.length > 0) {
-        const previousIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-        setCurrentSongId(playlist[previousIndex]);
-      }
-    };
-  
+
+  const handleRandomPlay = () => {
+    if (playlist.length > 1) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * playlist.length);
+      } while (randomIndex === currentIndex);
+      setCurrentSongId(playlist[randomIndex]);
+    }
+  };
+
+  const handlePreviousSong = () => {
+    if (playlist.length > 0) {
+      const previousIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+      setCurrentSongId(playlist[previousIndex]);
+    }
+  };
+
   const handleNextSong = () => {
     if (playlist.length > 0) {
       const nextIndex = (currentIndex + 1) % playlist.length;
@@ -214,8 +214,8 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
     console.log("Current Index:", currentIndex);
     console.log("Playlist:", playlist);
   }, [currentSongId, currentIndex, playlist]);
-  
- 
+
+
   useEffect(() => {
     if (audioRef.current) {
       const handleAudioEnded = () => {
@@ -225,9 +225,9 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
           handleNextSong();
         }
       };
-  
+
       audioRef.current.addEventListener("ended", handleAudioEnded);
-  
+
       return () => {
         audioRef.current?.removeEventListener("ended", handleAudioEnded);
       };
@@ -242,12 +242,12 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
       const clickX = e.clientX - rect.left;
       const newProgress = (clickX / rect.width) * 100;
       const newTime = (newProgress / 100) * endTime;
-  
+
       audioRef.current.currentTime = newTime;
-      setStartTime(newTime); 
+      setStartTime(newTime);
     }
   };
-  
+
   const handlePlayPause = () => {
     if (audioRef.current) {
       if (isPlaying) {
@@ -256,7 +256,7 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
         audioRef.current.play();
       }
       setIsPlaying(!isPlaying);
-      
+
     }
   };
 
@@ -276,7 +276,7 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
       setStartTime(newTime);
     }
   };
-  
+
 
 
   if (loading) return <LoadingPage />;
@@ -325,8 +325,8 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
                   <div className="flex items-center mb-1 text-primaryColorGray cursor-pointer">
                     <Tooltip>
                       <TooltipTrigger>
-                        <TbSwitch3 className="mx-3 w-[24px] h-[24px] hover:text-primaryColorPink" 
-                        onClick={handleRandomPlay}/>
+                        <TbSwitch3 className="mx-3 w-[24px] h-[24px] hover:text-primaryColorPink"
+                          onClick={handleRandomPlay} />
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Turn on random play</p>
@@ -356,9 +356,8 @@ function SongPlayedBanner({ id, playlist }: { id: string, playlist: string[] }) 
                     <Tooltip>
                       <TooltipTrigger className="relative">
                         <FaRepeat
-                          className={`mx-3 w-[20px] h-[20px] hover:text-primaryColorPink ${
-                            isRepeat ? "text-primaryColorPink" : "text-white"
-                          }`}
+                          className={`mx-3 w-[20px] h-[20px] hover:text-primaryColorPink ${isRepeat ? "text-primaryColorPink" : "text-white"
+                            }`}
                           onClick={handleRepeat}
                         />
                         {isRepeat && (

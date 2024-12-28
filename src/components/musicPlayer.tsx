@@ -1,8 +1,10 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
-import { useAppContext } from '@/components/provider/songProvider';
+import { useRouter } from 'next/navigation';
+import { useAppContext as useSongContext } from '@/components/provider/songProvider';
 import Image from 'next/image';
 import './scss/musicPlayer.scss'
+import Playlist from '@/assets/img/placeholderPlaylist.png'
 
 import { GoPlusCircle } from "react-icons/go";
 import {
@@ -38,11 +40,21 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { formatTime, getMainArtistName, getPosterSong } from '@/utils/utils';
+import { formatTime, getAllArtistsInfo, getPosterSong } from '@/utils/utils';
 import WaveSurfer from 'wavesurfer.js';
 import { decrypt } from '@/app/decode';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAppContext } from '@/app/AppProvider';
+import { DataPlaylist } from '@/types/interfaces';
+import { ToastAction } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
+import { handleAddSongToNewUserPlaylist, handleAddToUserPlaylist, handleFetchPlaylistByUser } from '@/utils/api';
 
 const MusicPlayer: React.FC = () => {
+    const { accessToken } = useAppContext()
+    const router = useRouter()
     const {
         currentSong,
         showContentSong,
@@ -56,15 +68,19 @@ const MusicPlayer: React.FC = () => {
         previousSong,
         startTime,
         setStartTime,
-    } = useAppContext()
-
-    const [isPlaying, setIsPlaying] = useState(false);
+        isPlaying,
+        setIsPlaying
+    } = useSongContext()
+    const [listPlayer, setListPlayer] = useState<DataPlaylist[]>()
+    // const [isPlaying, setIsPlaying] = useState(false);
     const [endTime, setEndTime] = useState<number>(0);
     // const [startTime, setStartTime] = useState<number>(0);
     const [progressWidth, setProgressWidth] = useState(0);
     const [isRepeat, setIsRepeat] = useState(false);
     const [sound, setSound] = useState(100);
     const [isMute, setIsMute] = useState(false)
+    const { toast } = useToast()
+
     const wavesurferRef = useRef<WaveSurfer | null>(null);
     const waveformContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -143,7 +159,6 @@ const MusicPlayer: React.FC = () => {
             document.removeEventListener('lyricClick', handleLyricClick as EventListener);
         };
     }, []);
-
 
     useEffect(() => {
         const progress = (startTime / endTime) * 100;
@@ -228,6 +243,54 @@ const MusicPlayer: React.FC = () => {
         }
     };
 
+    const handleFetchPlaylist = async () => {
+        if (accessToken) {
+            const playlists = await handleFetchPlaylistByUser(accessToken);
+            setListPlayer(playlists);
+        }
+    }
+
+    const handleAddSongToPlaylist = async (playlistId: string) => {
+        if (accessToken && currentSong) {
+            const result = await handleAddToUserPlaylist(accessToken, currentSong?.id, playlistId)
+            if (result.success) {
+                toast({
+                    variant: "success",
+                    title: "Congratulation!!!",
+                    description: 'Add song to your playlist success',
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: result.error,
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+            }
+        }
+    }
+
+    const handleAddSongToNewPlaylist = async () => {
+        if (accessToken && currentSong) {
+            const result = await handleAddSongToNewUserPlaylist(accessToken, currentSong?.id)
+            if (result.success) {
+                toast({
+                    variant: "success",
+                    title: "Congratulation!!!",
+                    description: 'Add song to your playlist success',
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: result.error,
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+            }
+        }
+    }
     if (!currentSong) return null;
 
     return (
@@ -249,10 +312,84 @@ const MusicPlayer: React.FC = () => {
                                 {currentSong.title}
                             </p>
                         </div>
-                        <p className='text-[0.8rem] text-primaryColorGray font-thin cursor-pointer hover:underline hover:text-white'>{getMainArtistName(currentSong.artists)}</p>
+                        <div className="relative max-w-full overflow-hidden">
+                            <div
+                                className={`flex whitespace-nowrap items-center text-[0.8rem] text-primaryColorGray font-thin ${getAllArtistsInfo(currentSong.artists).length > 3 ? 'marquee' : ''
+                                    }`}
+                            >
+                                {currentSong?.artists ? (
+                                    getAllArtistsInfo(currentSong.artists).map((artist, index, array) => (
+                                        <span key={artist.id} className="flex items-center">
+                                            <span
+                                                className="cursor-pointer hover:underline"
+                                                onClick={() => router.push(`/artist/${artist.id}`)}
+                                            >
+                                                {artist.name}
+                                            </span>
+                                            {index < array.length - 1 && <span>,&nbsp;</span>}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <p>Unknown Artist</p>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                    <div className='ml-3 cursor-pointer text-primaryColorGray transition-transform duration-200 hover:scale-105 hover:text-white'>
-                        <GoPlusCircle className='w-[20px] h-[20px]' />
+                    <div
+                        className='relative ml-5 cursor-pointer text-primaryColorGray transition-transform duration-200 hover:scale-105 hover:text-white'
+                    >
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <button onClick={handleFetchPlaylist}>
+                                    <GoPlusCircle className='w-[20px] h-[20px]' />
+                                </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="absolute w-60 p-0 border-darkerBlue bottom-8 left-0 shadow-sm shadow-white/20">
+                                <Command className='bg-[#171717]'>
+                                    <CommandInput
+                                        placeholder="Search your playlist..."
+                                        className="h-9"
+                                        required
+                                    />
+                                    <CommandList>
+                                        <ScrollArea className="h-60">
+                                            <CommandEmpty>No playlist found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {listPlayer?.map((playlist) => (
+                                                    <CommandItem
+                                                        key={playlist.playlistId}
+                                                        onSelect={() => handleAddSongToPlaylist(playlist.playlistId)}
+                                                    >
+                                                        <Image
+                                                            src={playlist.image || Playlist}
+                                                            alt={playlist.title}
+                                                            width={50}
+                                                            height={50}
+                                                            className="rounded-lg w-9 h-9 mr-2"
+                                                        />
+
+                                                        {playlist.title}
+                                                        {/* <CheckIcon
+                                                            className={`ml-auto h-4 w-4 ${playlist.id === mainArtist
+                                                                ? "opacity-100"
+                                                                : "opacity-0"
+                                                                }`}
+                                                        /> */}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </ScrollArea>
+                                    </CommandList>
+                                    <div
+                                        className='bg-[#1F1F1F] w-full px-4 py-3 flex gap-2 items-center cursor-pointer hover:underline'
+                                        onClick={() => handleAddSongToNewPlaylist()}
+                                    >
+                                        <GoPlusCircle className='w-[20px] h-[20px]' />
+                                        <p className='text-[0.9rem]'>Add to new Playlist</p>
+                                    </div>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 </div>
                 <div className='flex flex-col items-center'>

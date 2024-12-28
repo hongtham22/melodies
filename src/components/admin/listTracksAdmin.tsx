@@ -110,61 +110,51 @@ function ListTracksAdmin({
               <th className="w-[10%] pl-3">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>No</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[35%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Track</p>
-                  <CaretSortIcon className="text-white  w-4 h-4" />
                 </div>
               </th>
               <th className="w-[25%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p> Album</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[12%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Duration</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[15%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p> Upload Date</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[15%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p> Release Date</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[17%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Download Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[15%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Play Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[15%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Comment Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
               <th className="w-[15%] pl-2">
                 <div className="flex gap-1 justify-center items-center cursor-pointer">
                   <p>Like Times</p>
-                  <CaretSortIcon className="text-white cursor-pointer w-4 h-4" />
                 </div>
               </th>
             </tr>

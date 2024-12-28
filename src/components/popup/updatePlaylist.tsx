@@ -7,6 +7,7 @@ import { IoMdClose } from "react-icons/io";
 import { LuPen } from "react-icons/lu";
 import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from "@/app/AppProvider";
+import { useAppContext as usePlaylistContext } from '@/components/provider/playlistProvider';
 interface UpdatePlaylistProps {
     onClose: () => void,
     data?: DataPlaylist,
@@ -19,6 +20,7 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose, data, setPlayl
         }
     };
     const { accessToken } = useAppContext()
+    const { updatePlaylist } = usePlaylistContext()
     const [updateName, setUpdateName] = useState(data?.name || '')
     const [updateBio, setUpdateBio] = useState(data?.description || '')
     const [selectedImage, setSelectedImage] = useState(data?.image || '');
@@ -63,6 +65,7 @@ const UpdatePlaylist: React.FC<UpdatePlaylistProps> = ({ onClose, data, setPlayl
                     image: result.data.playlist.image
                 };
             });
+            updatePlaylist(result.data.playlist)
             onClose();
         }
     }

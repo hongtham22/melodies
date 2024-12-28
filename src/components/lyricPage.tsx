@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
 import { useAppContext as useSongContext } from '@/components/provider/songProvider'
-import { getMainArtistName, getPosterSong } from '@/utils/utils'
+import { getMainArtistInfo, getPosterSong } from '@/utils/utils'
 import '@/components/scss/lyricPage.scss'
 import { useAppContext } from '@/app/AppProvider'
 import LoadingPage from '@/components/loadingPage'
@@ -50,7 +50,7 @@ const LyricPage = () => {
     //                     headers: {
     //                         'Content-Type': 'application/json',
     //                     },
-    //                     body: JSON.stringify({ title: currentSong?.title, artist: getMainArtistName(currentSong?.artists) }),
+    //                     body: JSON.stringify({ title: currentSong?.title, artist: getMainArtistInfo(currentSong?.artists)?.name }),
     //                 });
     //                 const data = await response.json();
     //                 if (response.ok) {

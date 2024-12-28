@@ -8,22 +8,24 @@ import { HeartIcon, HeartFilledIcon } from "@radix-ui/react-icons";
 import { IoPlayCircleOutline } from "react-icons/io5";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { IoIosMore } from "react-icons/io";
+import { RiPlayListAddLine } from "react-icons/ri";
 import AlbumList from "@/components/albumList";
 import LoadingPage from "@/components/loadingPage";
 import NotFound from "@/app/not-found";
 import { DataAlbum } from "@/types/interfaces";
-import { formatTime, getMainArtistName, getPoster } from "@/utils/utils";
+import { formatTime, getMainArtistInfo, getPoster } from "@/utils/utils";
 import { useScrollArea } from "@/components/provider/scrollProvider";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { loading, setLoading } = useAppContext();
   const { scrollAreaRef } = useScrollArea();
-  const { showSidebarRight } = useSongContext()
+  const { showSidebarRight, addListToWaitingList, setCurrentSong, setWaitingList } = useSongContext()
   const [dataAlbum, setDataAlbum] = useState<DataAlbum>()
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [dominantColor, setDominantColor] = useState<string>();
   const [notFound, setNotFound] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showMenuMore, setShowMenuMore] = useState<boolean>(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -137,25 +139,39 @@ const Page = ({ params }: { params: { id: string } }) => {
         </div>
         <div
           className={`flex items-center gap-2 fixed top-24 pl-8 font-bold text-2xl py-4 transition-transform duration-300
-                        ${isScrolled ? "translate-y-0" : "-translate-y-full opacity-0"} ${showSidebarRight ? 'w-[61%]' : 'w-[81%]'}`}
+                        ${isScrolled ? "translate-y-0 z-10" : "-translate-y-full opacity-0"} ${showSidebarRight ? 'w-[61%]' : 'w-[81%]'}`}
           style={{
             backgroundColor: isScrolled ? "#1F1F1F" : "transparent",
           }}
         >
           <IoPlayCircleOutline
             className="w-12 h-12 text-white cursor-pointer"
-          // onClick={() => { if (dataSongArtist) { setCurrentSong(dataSongArtist[0]); setWaitingList(dataSongArtist); } }}
+            onClick={() => { if (dataAlbum?.songs) { setCurrentSong(dataAlbum?.songs[0]); setWaitingList(dataAlbum?.songs); } }}
           />
           {dataAlbum?.title}
         </div>
 
         {/* Song lists */}
-        <div className="m-3 flex flex-col ">
-          <div className="flex gap-5 items-center">
-            <IoPlayCircleOutline className="ml-3 mt-1 w-16 h-16 text-primaryColorPink" />
-            <button className=" text-primaryColorPink">
+        <div className="m-3 flex flex-col">
+          <div className="relative flex gap-5 items-center">
+            <IoPlayCircleOutline className="ml-3 mt-1 w-16 h-16 text-primaryColorPink"
+              onClick={() => { if (dataAlbum?.songs) { setCurrentSong(dataAlbum?.songs[0]); setWaitingList(dataAlbum?.songs); } }}
+            />
+            <button className=" text-primaryColorPink" onClick={() => setShowMenuMore(!showMenuMore)}>
               <TfiMoreAlt className="w-5 h-5 shadow-[0_4px_60px_rgba(0,0,0,0.3)]" />
             </button>
+            {
+              showMenuMore && (
+                <div className="absolute top-14 left-20 bg-[#1F1F1F] p-2 rounded-md">
+                  <ul className="">
+                    <li
+                      className="flex gap-2 pl-1 pr-3 py-2 items-center cursor-pointer hover:bg-slate-500 transition-all duration-300 text-[0.9rem] rounded-md"
+                      onClick={() => { if (dataAlbum?.songs) { addListToWaitingList(dataAlbum.songs); setShowMenuMore(false); } }}
+                    ><RiPlayListAddLine /> Add to waiting list</li>
+                  </ul>
+                </div>
+              )
+            }
           </div>
           <table className="max-w-full text-white border-separate border-spacing-y-3 ">
             <thead className="w-full max-h-[32px]">
@@ -189,7 +205,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                       {song.title}
                     </h3>
                     <p className="text-textSmall hover:underline">
-                      {getMainArtistName(song.artists)}
+                      {getMainArtistInfo(song.artists)?.name}
                     </p>
                   </td>
                   <td className="text-center pl-4 rounded-tr-lg rounded-br-lg align-middle">

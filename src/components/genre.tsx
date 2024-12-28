@@ -56,9 +56,8 @@ const Genre: React.FC = () => {
           description: `Genre "${genreName}" has been added successfully.`,
           variant: "success",
         });
-
         setListGenres([
-          { genreId: response.data.genreId, name: genreName },
+          { genreId: response.data.genre.genreId, name: genreName },
           ...listGenres,
         ]);
         setGenreName("");
@@ -83,7 +82,7 @@ const Genre: React.FC = () => {
   };
 
   const handleEditGenre = (genreId: string, currentName: string) => {
-    console.log("Editing genre:", genreId, currentName);
+    // console.log("Editing genre:", genreId, currentName);
     setEditingGenreId(genreId);
     setGenreName(currentName);
     setTimeout(() => inputRef.current?.focus(), 0);
@@ -134,7 +133,7 @@ const Genre: React.FC = () => {
       console.error("Failed to update genre:", error);
     }
     setIsUpdating(false);
-    console.log("Saving genre:", genreId, genreName);
+    // console.log("Saving genre:", genreId, genreName);
     setEditingGenreId(null);
   };
 
@@ -168,7 +167,7 @@ const Genre: React.FC = () => {
     setIsUpdating(false);
     // console.log("Saving genre:", genreId, genreName);
     setEditingGenreId(null);
-    console.log("Deleting genre:", genreId);
+    // console.log("Deleting genre:", genreId);
   };
 
   return (

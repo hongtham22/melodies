@@ -3,15 +3,28 @@ import ImageSong from '@/assets/img/placeholderSong.jpg'
 import ImagePlaylist from '@/assets/img/placeholderPlaylist.png'
 import { StaticImageData } from 'next/image';
 
-// Hàm lấy tên nghệ sĩ chính
-export const getMainArtistName = (artists: Artist[]): string | undefined => {
+// Hàm lấy nghệ sĩ chính
+export const getMainArtistInfo = (artists: Artist[]): { name?: string; id?: string } | undefined => {
     const mainArtist = artists.find(artist => artist?.ArtistSong.main === true);
-    return mainArtist?.name;
+    if (!mainArtist) return undefined;
+    return {
+        name: mainArtist.name,
+        id: mainArtist.id,
+    };
 };
 
-export const getMainArtistId = (artists: Artist[]): string | undefined => {
-    const mainArtist = artists.find(artist => artist?.ArtistSong.main === true);
-    return mainArtist?.id;
+export const getSubArtistsInfo = (artists: Artist[]): { name?: string; id?: string }[] => {
+    return artists
+        .filter(artist => artist?.ArtistSong.main !== true)
+        .map(artist => ({ name: artist.name, id: artist.id }))
+        .filter(subArtist => subArtist.name && subArtist.id);
+};
+
+export const getAllArtistsInfo = (artists: Artist[]): { name?: string; id?: string }[] => {
+    const mainArtist = getMainArtistInfo(artists);
+    const subArtists = getSubArtistsInfo(artists);
+
+    return mainArtist ? [mainArtist, ...subArtists] : subArtists;
 };
 
 export const getPosterSong = (albums: Array<DataAlbum>, albumType?: string) => {
@@ -56,3 +69,25 @@ export const formatTime = (duration: number) => {
 
     return min + ":" + formattedSec;
 };
+
+export function formatTimeCommentNotification(createdAt: string): string {
+    const now = new Date();
+    const createdDate = new Date(createdAt);
+    const diffInSeconds = Math.floor((now.getTime() - createdDate.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+        return `${diffInSeconds} giây trước`;
+    } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes} phút trước`;
+    } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours} tiếng trước`;
+    } else {
+        return createdDate.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    }
+}

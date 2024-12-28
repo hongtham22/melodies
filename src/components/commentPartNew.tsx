@@ -24,7 +24,7 @@ interface CommentPartProps {
 }
 
 const CommentPartNew: React.FC<CommentPartProps> = ({ data, songId, cmtChild, setTotalCmt }) => {
-    const [avatar] = useState(localStorage.getItem('avatar') || UserImage)
+    const [avatar] = useState(typeof window !== 'undefined' ? localStorage.getItem('avatar') || UserImage : UserImage)
     const { accessToken } = useAppContext()
     const { replyStatus, setReplyStatus } = useCommentContext()
     const [showCmtChild, setShowCmtChild] = useState<boolean>(false)
@@ -33,6 +33,7 @@ const CommentPartNew: React.FC<CommentPartProps> = ({ data, songId, cmtChild, se
     const [messageError, setMessageError] = useState<string>('')
 
     const handleComment = async () => {
+        if (contentCmt.trim() === '') return
         setErrorPost(false)
         const payload = {
             songId: songId,
@@ -135,6 +136,8 @@ const CommentPartNew: React.FC<CommentPartProps> = ({ data, songId, cmtChild, se
                                         src={avatar && avatar !== "null" ? avatar : UserImage}
                                         alt="avatar"
                                         className="rounded-full w-[40px] h-[40px] mr-3"
+                                        width={40}
+                                        height={40}
                                     />
                                 </div>
 
