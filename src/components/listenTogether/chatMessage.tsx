@@ -15,13 +15,11 @@ function ChatMessage({myId} : {myId: string}) {
   const { accessToken } = useAppContext();
   const { socket } = useAppContext();
 
-  console.log("my id:" , myIdMes, myId)
+  console.log("my id 2:" , myId)
 
   useEffect(() => {
     if (!socket) return;
     socket.on("ServerSendMessage", (data) => {
-      console.log("Message:", data);
-      // setChatMessages(data)
       setChatMessages((prevMessages) => [
         ...prevMessages,
         { user: data.user, message: data.message, userSend: data.userSend },

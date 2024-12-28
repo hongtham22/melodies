@@ -8,7 +8,7 @@ import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
 import { DataSong } from "@/types/interfaces";
 import Image from "next/image";
-import { getMainArtistName, getPosterSong } from "@/utils/utils";
+import { getMainArtistInfo, getPosterSong } from "@/utils/utils";
 import { IoSearch } from "react-icons/io5";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,7 +16,7 @@ function ProposalList({
   currentProposalList,
   permit,
 }: {
-  currentProposalList: [];
+  currentProposalList: DataSong[];
   permit: boolean;
 }) {
   const { socket } = useAppContext();
@@ -26,7 +26,7 @@ function ProposalList({
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
   // const [proposalSongs, setProposalSongs] = useState([]);
-  const [proposalList, setProposalList] = useState([]);
+  const [proposalList, setProposalList] = useState<DataSong[]>([]);
 
 
   console.log("proposalList: ", proposalList);
@@ -43,9 +43,9 @@ function ProposalList({
     socket.on("updateProposalList", (proposalList) => {
       setProposalList(proposalList);
     });
-    // socket.on("updateListSong", (data) => {
-    //   setProposalList(data.proposalList);
-    // })
+    socket.on("updateListSong", (data) => {
+      setProposalList(data.proposalList);
+    })
     socket.on("addSongToProposalListFailed", (data) => {
       alert(data)
     })
@@ -56,12 +56,9 @@ function ProposalList({
     return () => {
       socket?.off("addSongToProposalListSuccess");
       socket?.off("updateProposalList");
-      // socket?.off("updateListSong");
+      socket?.off("updateListSong");
       socket?.off("addSongToProposalListFailed");
       socket?.off("forwardSongFailed");
-      
-      // socket?.disconnect();
-      // console.log("disconnect socket"); 
     }
   }, [socket]);
   // }, []);
@@ -167,7 +164,7 @@ function ProposalList({
                             {song.title}
                           </p>
                           <p className="font-thin text-primaryColorGray text-[0.9rem] truncate">
-                            {getMainArtistName(song.artists)}
+                            {getMainArtistInfo(song.artists)?.name}
                           </p>
                         </div>
                       </td>
@@ -207,7 +204,7 @@ function ProposalList({
                             {song.title}
                           </p>
                           <p className="font-thin text-primaryColorGray text-[0.9rem] truncate">
-                            {getMainArtistName(song.artists)}
+                            {getMainArtistInfo(song.artists)?.name}
                           </p>
                         </div>
                         { permit && (

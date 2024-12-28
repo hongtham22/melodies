@@ -12,6 +12,7 @@ import { io, Socket } from "socket.io-client";
 import { Notification } from "@/types/interfaces";
 import { fetchNotification } from "@/utils/api";
 import { fetchApiData } from "@/app/api/appService";
+import { useRouter } from "next/navigation";
 interface AppContextType {
   listNotification: Notification[];
   setListNotification: (noti: Notification[]) => void;
@@ -53,6 +54,7 @@ export const AppProvider: React.FC<{
       ? Cookies.get("role") || ""
       : initialRole;
   });
+  const router = useRouter();
 
   const [accessToken, setAccessToken] = useState<string>(() => {
     return typeof window !== "undefined"
@@ -72,33 +74,6 @@ export const AppProvider: React.FC<{
     }
   }, [accessToken, role]);
 
-  // useEffect(() => {
-  //   const refreshInterval = setInterval(async () => {
-  //     if (accessToken) {
-  //       try {
-  //         const response = await fetchApiData(
-  //           "/api/auth/refresh",
-  //           "POST",
-  //           JSON.stringify({ token: accessToken }),
-  //           null,
-  //           null
-  //         );
-
-  //         if (response.success) {
-  //           const newAccessToken = response.data.accessToken;
-  //           setAccessToken(newAccessToken);
-  //         } else {
-  //           Cookies.remove("accessToken");
-  //           Cookies.remove("role")
-  //         }
-  //       } catch (error) {
-  //         console.error("Error during token refresh:", error);
-  //       }
-  //     }
-  //   }, 30000);
-
-  //   return () => clearInterval(refreshInterval);
-  // }, [accessToken]);
 
   useEffect(() => {
     if (accessToken) {
@@ -112,10 +87,16 @@ export const AppProvider: React.FC<{
       });
 
       newSocket.on("errorToken", ({ code, message }) => {
-        console.log("Error accesstoken code: ", code);
-        console.log("Error accesstoken message: ", message);
-        alert(message);
-        newSocket.disconnect();
+        // console.log("Error accesstoken code: ", code);
+        // console.log("Error accesstoken message: ", message);
+        // alert(message);
+        // newSocket.disconnect();
+
+        //  nếu socket thông báo là hết hạn token -> fetth api để refresh token
+      
+        //  nếu socket trả forbidden -> đăng xuất
+
+        // nếu lỗi khác -> log
       });
 
       newSocket.on("errTokenMising", (data) => {
@@ -128,7 +109,13 @@ export const AppProvider: React.FC<{
 
       newSocket.on("newNoti", (data: Notification) => {
         setListNotification((prev) => [data, ...prev])
+      })
 
+      newSocket.on("disconnect", () => {
+        console.log("Socket disconnected");
+        // server lỗi -> router qua trang lỗi, 404,..... hoặc về lại login
+
+        router.push("/listenTogether");
       })
 
       setSocket(newSocket);

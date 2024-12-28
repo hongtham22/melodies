@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import Image from "next/image";
 import posterImg from "@/assets/img/placeholderSong.jpg";
-import { DataCurrentSong, DataSong } from "@/types/interfaces";
+import { CurrentSong, StateSong } from "@/types/interfaces";
 
 import {
   FaCirclePlay,
@@ -23,7 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { formatTime, getMainArtistName, getPosterSong } from "@/utils/utils";
+import { formatTime, getMainArtistInfo, getPosterSong } from "@/utils/utils";
 import WaveSurfer from "wavesurfer.js";
 import { decrypt } from "@/app/decode";
 import LoadingPage from "@/components/loadingPage";
@@ -33,7 +33,7 @@ function SongPlayedBanner2({
   playlist,
   permit,
 }: {
-  currentSong: DataCurrentSong;
+  currentSong: CurrentSong;
   playlist: [];
   permit: boolean;
 }) {
@@ -54,13 +54,12 @@ function SongPlayedBanner2({
   useEffect(() => {
     if (!socket) return;
 
-    const handleAudioUpdate = (data) => {
+    const handleAudioUpdate = (data: StateSong) => {
       console.log("khách", data);
       setIsPlaying(data.isPlaying);
       setStartTime(data.currentTime);
     };
 
-    // socket.off("UpdateAudio", handleAudioUpdate);
     socket.on("previousSongFailed", (data) => {
       alert(data);
     });
@@ -78,7 +77,6 @@ function SongPlayedBanner2({
       }
     })
 
-    // Xóa tất cả listener cũ trước khi thêm mới
     // socket.off("UpdateAudio", handleAudioUpdate);
     socket.on("UpdateAudio", handleAudioUpdate);
 
@@ -86,29 +84,32 @@ function SongPlayedBanner2({
       socket.off("UpdateAudio", handleAudioUpdate);
       socket.off('nextSongFailed');
       socket.off("previousSongFailed");
-      // socket.off("randomSongPlayFailed");
+      socket.off("randomSongPlayFailed");
     };
   }, [socket]);
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && !permit) {
       if (isPlaying) {
         audioRef.current.play();
       } else {
         audioRef.current.pause();
       }
-    }
-  }, [isPlaying]);
 
-  useEffect(() => {
-    if (audioRef.current && !permit) {
-      audioRef.current.currentTime = startTime;
+      audioRef.current.currentTime = startTime
     }
-  }, [startTime]);
+  }, [isPlaying, startTime]);
+
+
 
   const handlePlayPause = () => {
     if (permit && audioRef.current) {
       const newIsPlaying = !isPlaying;
+      if (newIsPlaying) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
       setIsPlaying(newIsPlaying);
       socket?.emit("SyncAudio", {
         isPlaying: newIsPlaying,
@@ -201,9 +202,6 @@ function SongPlayedBanner2({
 
   // lấy url nhạc
   useEffect(() => {
-    // if (currentSong.isPlaying){
-
-    // }
     if (currentSong && currentSong.song && currentSong.song.id) {
       const audioUrl = currentSong.song.filePathAudio
         ? decrypt(currentSong.song.filePathAudio)
@@ -213,7 +211,7 @@ function SongPlayedBanner2({
       console.log("song: ", audioUrl);
 
       setStartTime(currentSong.currentTime);
-      if (audioRef.current) {
+      if (audioRef.current && currentSong.isPlaying) {
         audioRef.current.pause(); // Dừng bài hát hiện tại
         audioRef.current.src = audioUrl; // Cập nhật src
         audioRef.current.load(); // Load lại audio
@@ -326,7 +324,7 @@ function SongPlayedBanner2({
                   <div className="flex items-center space-x-2 text-textMedium ">
                     <p className="cursor-pointer hover:underline">
                       {currentSong?.song?.artists
-                        ? getMainArtistName(currentSong?.song.artists)
+                        ? getMainArtistInfo(currentSong?.song?.artists)?.name || "Unknown Artist"
                         : "Unknown Artist"}
                     </p>
                   </div>

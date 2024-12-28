@@ -8,9 +8,16 @@ import {
 import { useEffect, useState, useRef } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
-import { DataCurrentRoom, DataCurrentSong, DataMembersRoom, DataRoom, DataSong, UserRoom } from "@/types/interfaces";
+import {
+  DataCurrentRoom,
+  DataCurrentSong,
+  DataMembersRoom,
+  DataRoom,
+  DataSong,
+  UserRoom,
+} from "@/types/interfaces";
 import Image from "next/image";
-import { getMainArtistName, getPosterSong } from "@/utils/utils";
+import { getMainArtistInfo, getPosterSong } from "@/utils/utils";
 import { IoSearch } from "react-icons/io5";
 import ChatMessage from "@/components/listenTogether/chatMessage";
 import ProposalList from "@/components/listenTogether/proposalList";
@@ -21,8 +28,7 @@ import animation from "../../../../../public/animation/Animation - song.json";
 import Lottie from "react-lottie-player";
 import { useRouter } from "next/navigation";
 
-
-function Page({params}) {
+function Page({ params }) {
   const { id } = params;
   const { socket } = useAppContext();
   const { accessToken } = useAppContext();
@@ -34,8 +40,8 @@ function Page({params}) {
   const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
   const [playlist, setPlaylist] = useState<string[]>([]);
   // check
-  const [currentProposalList, setCurrentProposalList] = useState([]);
-  const [waitingSongs, setWaitingSongs] = useState([]);
+  const [currentProposalList, setCurrentProposalList] = useState<DataSong[]>([]);
+  const [waitingSongs, setWaitingSongs] = useState<DataSong[]>([]);
   const [currentSong, setCurrentSong] = useState<DataCurrentSong | null>(null);
   const [showUsers, setShowUsers] = useState(false);
   const { toast } = useToast();
@@ -47,10 +53,8 @@ function Page({params}) {
   useEffect(() => {
     if (!socket) return;
 
-    socket.emit("joinRoom", {roomId: id, link: true});
-
-  }, [socket, id])
-
+    socket.emit("joinRoom", { roomId: id, link: true });
+  }, [socket, id]);
 
   const handleViewUser = () => {
     setShowUsers((prev) => !prev);
@@ -83,45 +87,37 @@ function Page({params}) {
   useEffect(() => {
     if (!socket) return;
 
-    // thong bao khi co user join vao thanh cong
     socket.on("memberJoined", (data: DataMembersRoom) => {
       console.log("Member joined: ", data.user.id);
       setListUser(data.members);
-    })
+    });
 
     socket.on("memberLeft", (data: DataMembersRoom) => {
-        console.log("Member left: ", data.user.id);
-        setListUser(data.members);
-    })
-    
-  
+      console.log("Member left: ", data.user.id);
+      setListUser(data.members);
+    });
+
     socket.on("joinRoomLinkFailed", (data) => {
       alert(data);
       router.push(`/listenTogether`);
-    })
+    });
 
     socket.on("joinRoomLinkSuccess", (data: DataCurrentRoom) => {
-      // cập nhập dữ liệu trong phòng
-      console.log("lay du lieu moi cua phong")
+      console.log("lay du lieu moi cua phong");
       setListUser(data.roomData.members);
-    })
-
-
-
-
-
-
-    // get data khi vào trang: dataRoom
-    socket.on("dataRoom", (data: DataRoom) => {
-      console.log("dataRoom: ", data);
-    })
-
+      setPermit(data.isHost);
+      setWaitingSongs(data.roomData.waitingList);
+      setCurrentProposalList(data.roomData.proposalList);
+      setCurrentSong(data.roomData.currentSong);
+      setEnableAnimation(data.roomData.currentSong.isPlaying);
+      setMyId(data.myId);
+    });
 
     socket.on("roomClosed", (data) => {
-      console.log(data)
+      console.log(data);
       alert(data);
       router.back();
-    })
+    });
 
     socket.on("leaveRoomSuccess", () => {
       alert("Leave room success");
@@ -129,99 +125,45 @@ function Page({params}) {
       router.push(`/listenTogether`);
     });
 
+    socket.on("addSongToWaitingListFailed", (data) => {
+      alert(data);
+    });
 
-    // socket.on("members", (data) => {
-    //   console.log("members: ", data)
-    //   setListUser(data);
-    // })
-    // socket.on("myId", (data) => {
-    //   setMyId(data)
-    // })
-    // socket.on("roomData", (data) => {
-    //   console.log("nhaanj room data")
-    //   setPermit(data.permit);
-    //   setWaitingSongs(data.waitingList);
-    //   setCurrentProposalList(data.proposalList);
-    //   setCurrentSong(data.currentSong);
-    // })
+    socket.on("addSongToWaitingListSuccess", () => {
+      alert("them bai playlist ok");
+    });
 
+    socket.on("updateWaitingList", (waitingList) => {
+      setWaitingSongs(waitingList);
+    });
 
+    socket.on("updateListSong", (data) => {
+      // console.log("list wait: ", data.waitingList);
+      setWaitingSongs(data.waitingList);
+    });
 
+    socket.on("playSong", (currentSong) => {
+      setCurrentSong(currentSong);
+    });
 
-    // socket.on("addSongToListWaitSuccess", () => {
-    //   alert("them bai playlist wait ok");
-    // });
-    // socket.on("updateListSongWait", (listWait) => {
-    //   // console.log("list wait: ", listWait);
-    //   setWaitingSongs(listWait);
-    // });
-
-    // socket.on("addSongToListPlaySuccess", () => {
-    //   alert("them bai playlist play ok");
-    // });
-
-    // socket.on("updateListSongPlay", (listPlay) => {
-    //   console.log("list play: ", listPlay);
-    //   setPlaylist(listPlay);
-    // });
-    // socket.on("addSongToWaitingListSuccess", () => {
-    //   alert("them bai playlist ok");
-    // });
-    // socket.on("addSongToWaitingListFailed", (data) => {
-    //   alert(data);
-    // });
-    // socket.on("updateWaitingList", (waitingList) => {
-    //   // console.log("list wait: ", waitingList);
-    //   setWaitingSongs(waitingList);
-    // });
-    // socket.on("updateListSong", (data) => {
-    //   // console.log("list wait: ", data.waitingList);
-    //   setWaitingSongs(data.waitingList);
-    // });
-    // socket.on("playSong", (currentSong) => {
-    //   setCurrentSong(currentSong);
-    // });
-    
-    
-    // socket.on("disconnect", () => {
-    //   alert("Lost connection to server")
-    //   router.push(`/listenTogether`);
-    // })
-   
-    
-    // // socket.on("members", (data) => {
-    // //   console.log("members: ", data)
-    // //   setListUser(data);
-    // // })
-
-    // // socket.on("roomData", (data) => {
-    // //   setPermit(data.permit);
-    // //   setWaitingSongs(data.waitingList);
-    // //   setCurrentProposalList(data.proposalList);
-    // //   setCurrentSong(data.currentSong);
-    // // })
-    // socket.on("animation", (data) => {
-    //   setEnableAnimation(data)
-    // })
-    
+    socket.on("animation", (data) => {
+      setEnableAnimation(data)
+    })
 
     return () => {
-      socket.off("dataRoom");
-      socket.off("roomClosed");
-      socket.off("leaveRoomSuccess");
-      
-      // socket.off("members");
-      // socket.off("myId");
-      // socket.off("addSongToListWaitSuccess");
-      // socket.off("updateListSongWait");
-      // socket.off("addSongToListPlaySuccess");
-      // socket.off("updateListSongPlay");
-      // socket.off("addSongToWaitingListSuccess");
-      // socket.off("addSongToWaitingListFailed");
-      // socket.off("updateWaitingList");
-      // socket.off("updateListSong");
-      // socket.off("playSong");
-      // socket.off("roomData");
+      socket.off("memberJoined")
+      socket.off("memberLeft")
+      socket.off("joinRoomLinkFailed")
+      socket.off("joinRoomLinkSuccess")
+      socket.off("roomClosed")
+      socket.off("leaveRoomSuccess")
+      socket.off("addSongToWaitingListFailed")
+      socket.off("addSongToWaitingListSuccess")
+      socket.off("updateWaitingList")
+      socket.off("updateListSong")
+      socket.off("playSong")
+      socket.off("animation")
+
     };
   }, [socket]);
 
@@ -259,7 +201,7 @@ function Page({params}) {
             onClick={handleLeaveRoom}
             className="p-3 text-textMedium font-bold bg-primaryColorBlueHover flex items-center shrink-0 gap-2 rounded-md shadow-md hover:bg-darkBlueHover transition-all duration-300"
           >
-             <ExitIcon className="text-white w-5 h-5 stroke-white" />
+            <ExitIcon className="text-white w-5 h-5 stroke-white" />
             Leave Room
           </button>
         </div>
@@ -273,12 +215,12 @@ function Page({params}) {
             {showUsers ? (
               <>
                 Hide <span>{listUser.length}</span> Participants
-                <ChevronUpIcon className="text-white w-5 h-5 stroke-white"/>
+                <ChevronUpIcon className="text-white w-5 h-5 stroke-white" />
               </>
             ) : (
               <>
                 View <span>{listUser.length}</span> Participants
-                <ChevronDownIcon className="text-white w-5 h-5 stroke-white"/>
+                <ChevronDownIcon className="text-white w-5 h-5 stroke-white" />
               </>
             )}
           </button>
@@ -294,7 +236,7 @@ function Page({params}) {
             permit={permit}
           />
           {/* list chat */}
-          <ChatMessage myId={myId}/>
+          <ChatMessage myId={myId} />
         </div>
 
         <div className="w-1/4 h-screen flex flex-col gap-6 relative bg-secondColorBg rounded-lg">
@@ -353,7 +295,7 @@ function Page({params}) {
                                 {song.title}
                               </p>
                               <p className="font-thin text-primaryColorGray text-[0.9rem] truncate text-ellipsis">
-                                {getMainArtistName(song.artists)}
+                                {getMainArtistInfo(song.artists)?.name}
                               </p>
                             </div>
                           </td>
@@ -378,7 +320,7 @@ function Page({params}) {
                   </p>
                   <div className="w-full flex ">
                     <ul className="list-none w-full">
-                      {waitingSongs?.map((song, index) => {
+                      {waitingSongs?.map((song: DataSong, index) => {
                         const isCurrentSong = currentSong?.song?.id === song.id;
                         console.log("isCurrentSong: ", isCurrentSong);
                         console.log("currentSong: ", currentSong);
@@ -407,10 +349,10 @@ function Page({params}) {
                                   {song.title}
                                 </p>
                                 <p className="font-thin text-primaryColorGray text-[0.9rem] truncate">
-                                  {getMainArtistName(song.artists)}
+                                {getMainArtistInfo(song.artists)?.name}
                                 </p>
                               </div>
-                              {(isCurrentSong) ? (
+                              {isCurrentSong ? (
                                 <div className="absolute right-3">
                                   <Lottie
                                     loop

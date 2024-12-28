@@ -193,8 +193,18 @@ export interface Room {
 
 export interface DataCurrentRoom {
     roomData: Room,
-    isHot: boolean,
+    isHost: boolean,
+    myId: string,
 }
+
+export interface StateSong {
+    isPlaying: boolean,
+    currentTime: number,
+}
+
+// end socket
+
+
 //report
 export interface Report {
     id: string;
