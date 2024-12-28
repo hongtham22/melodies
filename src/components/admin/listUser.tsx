@@ -1,18 +1,6 @@
 "use client";
 import Image from "next/image";
 import userImg from "@/assets/img/placeholderUser.jpg";
-import { CaretSortIcon } from "@radix-ui/react-icons";
-import { useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-
 interface User {
   id: string;
   name: string;

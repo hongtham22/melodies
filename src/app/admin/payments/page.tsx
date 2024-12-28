@@ -44,7 +44,7 @@ function Page() {
 
 
   return (
-    <div className="w-full my-20 m-6 p-8 flex flex-col items-center justify-center">
+    <div className="w-full mt-20 m-6 p-8 flex flex-col items-center justify-center">
       
       <div className="w-full flex justify-around items-center px-4 mb-3">
         <div className="flex justify-center items-center gap-4 px-4 py-2 bg-secondColorBg shadow-sm shadow-primaryColorBlue rounded-md">
