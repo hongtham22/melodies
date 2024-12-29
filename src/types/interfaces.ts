@@ -157,7 +157,7 @@ export interface UserRoom {
     image: string | null;
     accountType: string;
     name: string;
-    host: boolean   
+    host: boolean 
 }
 
 export interface DataRoom {

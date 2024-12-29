@@ -384,7 +384,7 @@ function Page({ params }) {
           </div>
         </div>
         {showUsers ? (
-          <ListUser listUser={listUser} />
+          <ListUser listUser={listUser} permit = {permit}/>
         ) : (
           <ProposalList
             currentProposalList={currentProposalList}

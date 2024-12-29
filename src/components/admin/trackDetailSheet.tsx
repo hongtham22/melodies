@@ -191,17 +191,44 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
       if (file.size > maxSize) {
         event.target.value = "";
         setAudioSrc(null);
-        alert("File size should not exceed 30MB");
+        toast({
+          title: "Error",
+          description: "File size should not exceed 30MB",
+          variant: "destructive",
+        });
+        // alert("File size should not exceed 30MB");
         return;
       }
-      setAudioFile(file);
-
-      if (audioSrc) {
-        URL.revokeObjectURL(audioSrc);
-      }
-
       const url = URL.createObjectURL(file);
-      setAudioSrc(url);
+      const audio = new Audio(url);
+
+      audio.onloadedmetadata = () => {
+        const maxDuration = 20 * 60; // 20 phut thanh giay
+        if (audio.duration > maxDuration) {
+          event.target.value = "";
+          setAudioSrc(null);
+          URL.revokeObjectURL(url);
+          toast({
+            title: "Error",
+            description: "Audio duration should not exceed 20 minutes",
+            variant: "destructive",
+          });
+          // alert("Audio duration should not exceed 20 minutes");
+          return;
+        }
+        setAudioFile(file);
+
+        if (audioSrc) {
+          URL.revokeObjectURL(audioSrc);
+        }
+
+        // const url = URL.createObjectURL(file);
+        setAudioSrc(url);
+      };
+      audio.onerror = () => {
+        alert("Could not load audio. Please try again with a valid file.");
+        URL.revokeObjectURL(url);
+      };
     }
   };
 
@@ -266,12 +293,6 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
   };
 
   const handleUpdateClick = () => {
-    // console.log("Debugging handleUpdateClick:");
-    // console.log("trackTitle:", trackTitle);
-    // console.log("mainArtist:", mainArtist);
-    // console.log("releaseDate:", releaseDate);
-    // console.log("audioFile:", audioFile);
-  
     if (!trackTitle.trim() || !mainArtist || !releaseDate || !audioSrc) {
       toast({
         title: "Error",
@@ -298,7 +319,12 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
       const maxSize = 10 * 1024 * 1024;
       if (file.size > maxSize) {
         event.target.value = "";
-        alert("File size should not exceed 1MB");
+        // alert("File size should not exceed 10MB");
+        toast({
+          title: "Error",
+          description: "File size should not exceed 10MB",
+          variant: "destructive",
+        });
         return;
       }
       if (file.type !== "application/json") {
@@ -430,7 +456,7 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
                   onChange={(e) => {
                     const [year, month, day] = e.target.value.split("-");
                     const formattedDate = `${month}/${day}/${year} 00:00:00`; // Chuyển sang định dạng MM/dd/yyyy HH:mm:ss
-                    setReleaseDate(formattedDate); 
+                    setReleaseDate(formattedDate);
                   }}
                   max={new Date().toISOString().split("T")[0]}
                 />
@@ -585,13 +611,13 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
         <SheetFooter>
           {/* <SheetClose asChild>
           </SheetClose> */}
-            <Button
-              type="submit"
-              onClick={handleUpdateClick}
-              className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-            >
-              Update Track
-            </Button>
+          <Button
+            type="submit"
+            onClick={handleUpdateClick}
+            className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+          >
+            Update Track
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

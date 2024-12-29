@@ -74,9 +74,8 @@ const ArtistDetailSheet: React.FC<
   // const [genreList, setGenreList] = useState<Genre[]>([]);
   const [openGenre, setOpenGenre] = useState(false);
   const { toast } = useToast();
-  const { accessToken } = useAppContext()
+  const { accessToken } = useAppContext();
   const { listGenres, setListGenres } = useGenreContext();
-
 
   useEffect(() => {
     const fetchArtistDetail = async () => {
@@ -112,7 +111,12 @@ const ArtistDetailSheet: React.FC<
       if (file.size > maxSize) {
         e.target.value = "";
         setArtistImgEdit(null);
-        alert("File size should not exceed 10MB");
+        // alert("File size should not exceed 10MB");
+        toast({
+          title: "Error",
+          description: "File size should not exceed 10MB",
+          variant: "destructive",
+        });
         return;
       } else {
         setArtistImgEdit(file);
@@ -122,11 +126,11 @@ const ArtistDetailSheet: React.FC<
     }
   };
 
-    const handleAddGenre = (newGenre: GenreData) => {
-      setListGenres([newGenre, ...listGenres]);
-      console.log(newGenre);
-    };
-  
+  const handleAddGenre = (newGenre: GenreData) => {
+    setListGenres([newGenre, ...listGenres]);
+    console.log(newGenre);
+  };
+
   const handleGenreChange = (genre: Genre) => {
     setArtistGenre((prevGenres) => {
       if (prevGenres.some((g) => g === genre.genreId)) {
@@ -145,73 +149,72 @@ const ArtistDetailSheet: React.FC<
   ];
 
   const handleUpdate = async (artistData: {
-    name: string,
-    bio: string,
-    genres: string[],
-    avatar: File | null,
-}) => {
-  const { name, bio, genres, avatar } = artistData;
+    name: string;
+    bio: string;
+    genres: string[];
+    avatar: File | null;
+  }) => {
+    const { name, bio, genres, avatar } = artistData;
 
-  const data = {
-    name,
-    bio,
-    genres,
-  };
+    const data = {
+      name,
+      bio,
+      genres,
+    };
 
-  const formData = new FormData();
-  formData.append("data", JSON.stringify(data));
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(data));
 
-  if (avatar) {
-    formData.append("avatar", avatar);
-  }
-
-  try {
-    const response = await fetchApiData(
-      `/api/admin/update/artist/${artistId}`,
-      "PATCH",
-      formData,
-      accessToken,
-      null,
-    );
-
-    if (response.success) {
-      toast({
-        title: "Success",
-        description: `Aritst "${name}" updated successfully.`,
-        variant: "success",
-      });
-      window.location.reload();
-    } else {
-      alert("Error: " + response.error);
+    if (avatar) {
+      formData.append("avatar", avatar);
     }
-  } catch (error) {
-    console.error("Error updating artist:", error);
-    alert("An error occurred while sending the data.");
-  }
 
-  console.log("update artist:", data);
-};
+    try {
+      const response = await fetchApiData(
+        `/api/admin/update/artist/${artistId}`,
+        "PATCH",
+        formData,
+        accessToken,
+        null
+      );
 
-const handleUpdateClick = () => {
-  if (!artistName.trim() || artistGenre.length === 0) {
-    toast({
-      title: "Error",
-      description: "Please provide required information before update.",
-      variant: "destructive",
-    });
-    return; 
-  }
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: `Aritst "${name}" updated successfully.`,
+          variant: "success",
+        });
+        window.location.reload();
+      } else {
+        alert("Error: " + response.error);
+      }
+    } catch (error) {
+      console.error("Error updating artist:", error);
+      alert("An error occurred while sending the data.");
+    }
 
-  const artistData = {
-    name: artistName,
-    bio: artistBio,
-    genres: artistGenre,
-    avatar: artistImgEdit,
+    console.log("update artist:", data);
   };
 
-  handleUpdate(artistData);
-};
+  const handleUpdateClick = () => {
+    if (!artistName.trim() || artistGenre.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please provide required information before update.",
+        variant: "destructive",
+      });
+      return;
+    }
 
+    const artistData = {
+      name: artistName,
+      bio: artistBio,
+      genres: artistGenre,
+      avatar: artistImgEdit,
+    };
+
+    handleUpdate(artistData);
+  };
 
   return (
     <Sheet open={!!artistId} onOpenChange={onClose}>
@@ -245,7 +248,9 @@ const handleUpdateClick = () => {
 
             {/* Title */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title">Name<span className="text-red-500">*</span></Label>
+              <Label htmlFor="title">
+                Name<span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="title"
                 name="title"
@@ -269,7 +274,9 @@ const handleUpdateClick = () => {
             </div>
             {/* Genres */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="genre">Genres<span className="text-red-500">*</span></Label>
+              <Label htmlFor="genre">
+                Genres<span className="text-red-500">*</span>
+              </Label>
               <div className="col-span-3">
                 <Popover open={openGenre} onOpenChange={setOpenGenre}>
                   <PopoverTrigger asChild>
@@ -277,14 +284,14 @@ const handleUpdateClick = () => {
                       variant="outline"
                       className="w-full flex justify-between items-center border-primaryColorBlueHover p-2"
                     >
-                    <span className="truncate max-w-full capitalize">
-                      {artistGenre.length > 0
-                        ? listGenres
-                            .filter((g) => artistGenre.includes(g.genreId))
-                            .map((g) => g.name)
-                            .join(", ")
-                        : "Select genres"}
-                    </span>
+                      <span className="truncate max-w-full capitalize">
+                        {artistGenre.length > 0
+                          ? listGenres
+                              .filter((g) => artistGenre.includes(g.genreId))
+                              .map((g) => g.name)
+                              .join(", ")
+                          : "Select genres"}
+                      </span>
                       <CaretSortIcon className="ml-2 h-4 w-4 flex-shrink-0" />
                     </Button>
                   </PopoverTrigger>
@@ -294,7 +301,7 @@ const handleUpdateClick = () => {
                       <CommandList>
                         <CommandEmpty>No genres found.</CommandEmpty>
                         <ScrollArea className="h-40">
-                        <AddGenre onAddGenre={handleAddGenre} />
+                          <AddGenre onAddGenre={handleAddGenre} />
                           <CommandGroup>
                             {orderedGenres.map((genre) => (
                               <CommandItem
@@ -326,13 +333,13 @@ const handleUpdateClick = () => {
         <SheetFooter>
           {/* <SheetClose asChild>
           </SheetClose> */}
-            <Button
-              type="submit"
-              onClick={handleUpdateClick}
-              className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
-            >
-              Update Artist
-            </Button>
+          <Button
+            type="submit"
+            onClick={handleUpdateClick}
+            className="text-textMedium p-3 bg-primaryColorPink flex items-center gap-2 rounded-md shadow-sm shadow-white/60 hover:bg-darkPinkHover"
+          >
+            Update Artist
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

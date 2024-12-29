@@ -10,6 +10,7 @@ interface User {
   email: string;
   image: string;
   createdAt: string;
+  
 }
 
 interface ListRecentUserAdminProps {

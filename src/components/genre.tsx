@@ -115,7 +115,7 @@ const Genre: React.FC = () => {
 
         setListGenres(listGenres.map((genre) => (genre.genreId === genreId ? { ...genre, name: genreName } : genre)));
         setGenreName("");
-      } else if (response.error === "Genre exists") {
+      } else if (response.error === "Genre name already exists") {
         toast({
           title: "Duplicate Genre",
           description: "This genre already exists. Please try another name.",

@@ -173,17 +173,45 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
       if (file.size > maxSize) {
         event.target.value = "";
         setAudioSrc(null);
-        alert("File size should not exceed 30MB");
+        toast({
+          title: "Error",
+          description: "File size should not exceed 30MB",
+          variant: "destructive",
+        });
+        // alert("File size should not exceed 30MB");
         return;
       }
+      const url = URL.createObjectURL(file);
+      const audio = new Audio(url);
+  
+      audio.onloadedmetadata = () => {
+        const maxDuration = 20 * 60; // 20 phut thanh giay
+        if (audio.duration > maxDuration) {
+          event.target.value = "";
+          setAudioSrc(null);
+          URL.revokeObjectURL(url);
+          toast({
+            title: "Error",
+            description: "Audio duration should not exceed 20 minutes",
+            variant: "destructive",
+          });
+          // alert("Audio duration should not exceed 20 minutes");
+          return;
+        }
+        
       setAudioFile(file);
 
       if (audioSrc) {
         URL.revokeObjectURL(audioSrc);
       }
 
-      const url = URL.createObjectURL(file);
+      // const url = URL.createObjectURL(file);
       setAudioSrc(url);
+    };
+      audio.onerror = () => {
+        alert("Could not load audio. Please try again with a valid file.");
+        URL.revokeObjectURL(url);
+      };
     }
   };
 
@@ -193,7 +221,12 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
       const maxSize = 10 * 1024 * 1024; 
       if (file.size > maxSize) {
         event.target.value = "";
-        alert("File size should not exceed 1MB");
+        toast({
+          title: "Error",
+          description: "File size should not exceed 10MB",
+          variant: "destructive",
+        });
+        // alert("File size should not exceed 10MB");
         return;
       }
       if (file.type !== "application/json") {

@@ -115,7 +115,7 @@ export const AppProvider: React.FC<{
         console.log("Socket disconnected");
         // server lỗi -> router qua trang lỗi, 404,..... hoặc về lại login
 
-        router.push("/listenTogether");
+        // router.push("/listenTogether");
       })
 
       setSocket(newSocket);

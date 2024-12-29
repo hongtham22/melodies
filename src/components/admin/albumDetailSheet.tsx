@@ -217,7 +217,12 @@ const AlbumDetailSheet: React.FC<AlbumDetailProps> = ({ albumId, onClose }) => {
       if (file.size > maxSize) {
         e.target.value = "";
         setAlbumImgEdit(null);
-        alert("File size should not exceed 10MB");
+        toast({
+          title: "Error",
+          description: "File size should not exceed 10MB",
+          variant: "destructive",
+        });
+        // alert("File size should not exceed 10MB");
         return;
       } else {
         setAlbumImgEdit(file);

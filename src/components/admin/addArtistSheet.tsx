@@ -82,7 +82,12 @@ const AddArtistSheet: React.FC<AddArtistSheetProps> = ({ onSave }) => {
       const maxSize = 10 * 1024 * 1024;
       if (file.size > maxSize) {
         e.target.value = "";
-        alert("File size should not exceed 10MB");
+        toast({
+          title: "Error",
+          description: "File size should not exceed 10MB",
+          variant: "destructive",
+        });
+        // alert("File size should not exceed 10MB");
         return;
       } else {
         setArtistAvatar(file);

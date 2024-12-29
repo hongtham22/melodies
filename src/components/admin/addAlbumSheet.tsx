@@ -208,7 +208,12 @@ const AddAlbumSheet: React.FC<AddAlbumSheetProps> = ({ onSave, artist }) => {
       if (file.size > maxSize) {
         e.target.value = "";
         setAlbumImg(null);
-        alert("File size should not exceed 10MB");
+        // alert("File size should not exceed 10MB");
+        toast({
+          title: "Error",
+          description: "File size should not exceed 10MB",
+          variant: "destructive",
+        });
         return;
       } else {
         setAlbumImg(file);
