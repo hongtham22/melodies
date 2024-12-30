@@ -8,10 +8,17 @@ import { Report } from "@/types/interfaces";
 import ReportDetailSheet from "@/components/admin/reportDetailSheet";
 
 function ListReportedCmt({ data }: { data: Report }) {
+  const [reports, setReports] = useState(data);
   const [openReportId, setOpentReportId] = useState<string | null>(null);
 
-    const handleRowClick = (artistId: string) => {
-        setOpentReportId(artistId); 
+  const handleUpdateReport = (updatedReportId: string) => {
+    setReports((prevReports) =>
+      prevReports.filter((report) => report.reportId !== updatedReportId)
+    );
+  };
+
+    const handleRowClick = (reportId: string) => {
+        setOpentReportId(reportId); 
       };
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -39,7 +46,7 @@ function ListReportedCmt({ data }: { data: Report }) {
             </th>
             <th className="w-[20%] pl-2">
               <div className="flex gap-1 justify-center items-center cursor-pointer">
-                <p>User</p>
+                <p>Reported User</p>
               </div>
             </th>
             <th className="w-[40%] pl-2">
@@ -60,8 +67,8 @@ function ListReportedCmt({ data }: { data: Report }) {
           </tr>
         </thead>
         <tbody className="">
-          {data &&
-            data.map((report, index) => (
+          {reports &&
+            reports.map((report, index) => (
               <tr
                 key={report.id}
                 className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
@@ -82,10 +89,10 @@ function ListReportedCmt({ data }: { data: Report }) {
                     />
                     <div>
                         <h3 className="text-h4 mb-1 hover:underline truncate">
-                          {report.user?.username}
+                          {report.comment?.user?.name}
                         </h3>
                         <p className="text-textSmall hover:underline truncate text-darkPink">
-                          {report.user?.email}
+                          {report.comment?.user?.username}
                         </p>
                       </div>
                   </div>
@@ -108,6 +115,7 @@ function ListReportedCmt({ data }: { data: Report }) {
         <ReportDetailSheet
           reportId={openReportId}
           onClose={() => setOpentReportId(null)} 
+          onUpdateReport={handleUpdateReport}
         />
       )}
     </div>
