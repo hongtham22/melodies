@@ -11,8 +11,6 @@ import Cookies from "js-cookie";
 import { io, Socket } from "socket.io-client";
 import { Notification } from "@/types/interfaces";
 import { fetchNotification } from "@/utils/api";
-import { fetchApiData } from "@/app/api/appService";
-import { useRouter } from "next/navigation";
 interface AppContextType {
   listNotification: Notification[];
   setListNotification: (noti: Notification[]) => void;
@@ -54,7 +52,6 @@ export const AppProvider: React.FC<{
       ? Cookies.get("role") || ""
       : initialRole;
   });
-  const router = useRouter();
 
   const [accessToken, setAccessToken] = useState<string>(() => {
     return typeof window !== "undefined"
@@ -74,7 +71,6 @@ export const AppProvider: React.FC<{
     }
   }, [accessToken, role]);
 
-
   useEffect(() => {
     if (accessToken) {
       const fetchAPINotification = async (accessToken: string) => {
@@ -86,19 +82,6 @@ export const AppProvider: React.FC<{
         auth: { accessToken: accessToken },
       });
 
-      newSocket.on("errorToken", ({ code, message }) => {
-        // console.log("Error accesstoken code: ", code);
-        // console.log("Error accesstoken message: ", message);
-        // alert(message);
-        // newSocket.disconnect();
-
-        //  nếu socket thông báo là hết hạn token -> fetth api để refresh token
-      
-        //  nếu socket trả forbidden -> đăng xuất
-
-        // nếu lỗi khác -> log
-      });
-
       newSocket.on("errTokenMising", (data) => {
         alert(data);
       });
@@ -108,6 +91,7 @@ export const AppProvider: React.FC<{
       });
 
       newSocket.on("newNoti", (data: Notification) => {
+        console.log("newNoti: ", data)
         setListNotification((prev) => [data, ...prev])
       })
 

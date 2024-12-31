@@ -80,10 +80,10 @@ const CommentPart: React.FC<CommentPartProps> = ({ data, songId, setTotalCmt }) 
                 if (page > totalPage || data?.hasChild === 0) {
                     setCmtRemain(0)
                 } else {
-                    setCmtRemain((prev) => prev + 1)
+                    setCmtRemain((prev) => Number(prev) + 1)
                 }
-                setCmtUp((prev) => prev + 1)
-                setTotalCmt((prev) => prev + 1)
+                setCmtUp((prev) => Number(prev) + 1)
+                setTotalCmt((prev) => Number(prev) + 1)
             } else {
                 setErrorPost(true)
                 setTimeout(() => {
@@ -133,7 +133,7 @@ const CommentPart: React.FC<CommentPartProps> = ({ data, songId, setTotalCmt }) 
                             onClick={ViewChildrenComment}
                         >
                             <div className="w-[2rem] h-[0.1rem] bg-gray-200 font-bold mr-3"></div>
-                            <p className='text-[0.85rem] text-gray-200 text-nowrap group-hover:underline'>Xem thêm {cmtRemain} câu trả lời</p>
+                            <p className='text-[0.85rem] text-gray-200 text-nowrap group-hover:underline'>View {cmtRemain} replies</p>
                             <FaChevronDown className='ml-2 w-3 h-3 text-gray-200 mr-5' />
                         </div>
                     )
@@ -144,7 +144,7 @@ const CommentPart: React.FC<CommentPartProps> = ({ data, songId, setTotalCmt }) 
                             className='flex items-center cursor-pointer group'
                             onClick={handleHidden}
                         >
-                            <p className='group-hover:underline text-[0.85rem] text-gray-200'>Ẩn</p>
+                            <p className='group-hover:underline text-[0.85rem] text-gray-200'>Hide</p>
                             <FaChevronUp className='ml-2 w-2 h-2 text-gray-200' />
                         </div>
 
