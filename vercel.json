@@ -1,0 +1,9 @@
+{
+    "build": {
+      "ignore": [
+        ".eslintrc.json",
+        ".eslintcache",
+        "node_modules/"
+      ]
+    }
+  }
