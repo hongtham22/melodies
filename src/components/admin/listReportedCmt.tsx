@@ -11,9 +11,19 @@ function ListReportedCmt({ data }: { data: Report }) {
   const [reports, setReports] = useState(data);
   const [openReportId, setOpentReportId] = useState<string | null>(null);
 
-  const handleUpdateReport = (updatedReportId: string) => {
+  // const handleUpdateReport = (updatedReportId: string) => {
+  //   console.log(updatedReportId);
+  //   setReports((prevReports) =>
+  //     prevReports.filter((report) => report.reportId !== updatedReportId)
+  //   );
+  // };
+  const handleUpdateReport = (updatedReportId, newStatus) => {
     setReports((prevReports) =>
-      prevReports.filter((report) => report.reportId !== updatedReportId)
+      prevReports.map((report) =>
+        report.reportId === updatedReportId
+          ? { ...report, status: newStatus } // Cập nhật trạng thái dựa trên hành động
+          : report
+      )
     );
   };
 
@@ -97,7 +107,7 @@ function ListReportedCmt({ data }: { data: Report }) {
                       </div>
                   </div>
                 </td>
-                <td className="text-textMedium pl-2 text-start truncate">
+                <td className="text-textMedium pl-2 text-center truncate">
                   <div className="line-clamp-2">{report.comment?.content || 0}</div>
                 </td>
                 <td className="text-textMedium pl-2 text-center truncate">

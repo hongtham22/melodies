@@ -81,7 +81,7 @@ function ListAIReportCmt({ data }: { data: Report }) {
                     </div>
                 </div>
               </td>
-              <td className="text-textMedium pl-2 text-start truncate">
+              <td className="text-textMedium pl-2 text-center truncate">
                 <div className="line-clamp-2">{report.comment?.content || 0}</div>
               </td>
               <td className="text-textMedium pl-2 text-center truncate">

@@ -12,7 +12,6 @@ import {
   DataCurrentRoom,
   DataCurrentSong,
   DataMembersRoom,
-  DataRoom,
   DataSong,
   UserRoom,
 } from "@/types/interfaces";
@@ -32,13 +31,10 @@ function Page({ params }) {
   const { id } = params;
   const { socket } = useAppContext();
   const { accessToken } = useAppContext();
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [currentTime, setCurrentTime] = useState(0);
   const [permit, setPermit] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
-  const [playlist, setPlaylist] = useState<string[]>([]);
   // check
   const [currentProposalList, setCurrentProposalList] = useState<DataSong[]>([]);
   const [waitingSongs, setWaitingSongs] = useState<DataSong[]>([]);

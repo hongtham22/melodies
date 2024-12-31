@@ -21,7 +21,7 @@ import userImg from "@/assets/img/placeholderUser.jpg";
 import { Report } from "@/types/interfaces";
 
 const ReportDetailSheet: React.FC<
-  Report & { onClose: () => void; onUpdateReport: (id: string) => void }
+  Report & { onClose: () => void; onUpdateReport: (id: string, status: string) => void }
 > = ({ reportId, onClose, onUpdateReport }) => {
   const [reportDetail, setReportDetail] = useState<Report | null>(null);
 
@@ -79,7 +79,7 @@ const ReportDetailSheet: React.FC<
         description: "Comment deleted successfully!",
         variant: "success",
       });
-      onUpdateReport(reportId);
+      onUpdateReport(reportId, "Deleted");
       onClose();
     } else {
       toast({
@@ -103,7 +103,7 @@ const ReportDetailSheet: React.FC<
         description: "Comment marked as resolved!",
         variant: "success",
       });
-      onUpdateReport(reportId);
+      onUpdateReport(reportId, "Not deleted");
       onClose();
     } else {
       console.error("Error resolving comment:", response.error);
@@ -153,9 +153,9 @@ const ReportDetailSheet: React.FC<
                 </span>
               </Label>
               <Label className="font-semibold text-gray-200 leading-relaxed">
-                Song Title:{" "}
+                Status:{" "}
                 <span className="font-normal text-gray-300 leading-relaxed">
-                  {reportDetail?.comment?.song?.title || "Unknown song"}
+                  {reportDetail?.status || "Unknown status"}
                 </span>
               </Label>
               <Label className="font-semibold text-gray-200 leading-relaxed">
