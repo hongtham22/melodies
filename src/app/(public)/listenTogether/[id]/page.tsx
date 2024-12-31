@@ -28,7 +28,14 @@ import animation from "../../../../../public/animation/Animation - song.json";
 import Lottie from "react-lottie-player";
 import { useRouter } from "next/navigation";
 
-function Page({ params }) {
+
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+function Page({ params }: PageProps) {
   const { id } = params;
   const { socket } = useAppContext();
   const { accessToken } = useAppContext();
@@ -177,11 +184,11 @@ function Page({ params }) {
     setFilteredSongs([]);
   };
 
-  const handleAddSong = (song) => {
+  const handleAddSong = (song: DataSong) => {
     console.log("song: ", song);
     socket?.emit("addSongToWaitingList", song);
   };
-  const handlePlaySong = (song) => {
+  const handlePlaySong = (song: DataSong) => {
     // setCurrentSongId(song.id);
     if (permit) {
       socket?.emit("selectSongToPlay", song.id);
@@ -230,11 +237,13 @@ function Page({ params }) {
         {/* player */}
         <div className="w-2/4 h-screen flex flex-col gap-2">
           {/* <SongPlayedBanner id={currentSongId} playlist={playlist} /> */}
-          <SongPlayedBanner2
-            currentSong={currentSong}
-            playlist={waitingSongs}
-            permit={permit}
-          />
+          {currentSong && (
+            <SongPlayedBanner2
+              currentSong={currentSong}
+              playlist={waitingSongs}
+              permit={permit}
+            />
+          )}
           {/* list chat */}
           <ChatMessage myId={myId} />
         </div>

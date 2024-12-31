@@ -1,11 +1,20 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/next"
+      }
+    ],
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/" }
+    ],
+    "build": {
+      "ignore": [
+        "**/*.ts(0)",
+        ".eslintrc.json",
+        ".eslintcache",
+        "node_modules/"
+      ]
     }
-  ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ]
-}
+  }
+  

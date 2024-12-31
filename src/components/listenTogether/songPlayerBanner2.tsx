@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import Image from "next/image";
 import posterImg from "@/assets/img/placeholderSong.jpg";
-import { CurrentSong, StateSong } from "@/types/interfaces";
+import { CurrentSong, DataSong, StateSong } from "@/types/interfaces";
 
 import {
   FaCirclePlay,
@@ -34,7 +34,7 @@ function SongPlayedBanner2({
   permit,
 }: {
   currentSong: CurrentSong;
-  playlist: [];
+  playlist: DataSong[];
   permit: boolean;
 }) {
   const [dominantColor, setDominantColor] = useState<string>();
@@ -188,7 +188,7 @@ function SongPlayedBanner2({
             : posterImg;
         try {
           const responses = await fetch(
-            `/api/get-dominant-color?imageUrl=${encodeURIComponent(imageUrl)}`
+            `/api/get-dominant-color?imageUrl=${encodeURIComponent(typeof imageUrl === 'string' ? imageUrl : imageUrl.src)}`
           );
           const data = await responses.json();
           if (responses.ok) setDominantColor(data.dominantColor);
@@ -213,7 +213,7 @@ function SongPlayedBanner2({
       setStartTime(currentSong.currentTime);
       if (audioRef.current && currentSong.isPlaying) {
         audioRef.current.pause(); // Dừng bài hát hiện tại
-        audioRef.current.src = audioUrl; // Cập nhật src
+        audioRef.current.src = audioUrl || ""; // Cập nhật src
         audioRef.current.load(); // Load lại audio
         audioRef.current
           .play()
