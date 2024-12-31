@@ -1,8 +1,26 @@
 {
+    "version": 2,
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/node"
+      }
+    ],
+    "env": {
+      "NODE_ENV": "production"
+    },
     "build": {
       "env": {
-        "NODE_VERSION": "18.18.0"
+        "PKG_CONFIG_PATH": "/usr/lib/pkgconfig:/usr/share/pkgconfig",
+        "PKG_CONFIG_LIBDIR": "/usr/lib/pkgconfig",
+        "NODE_VERSION": "18" 
       }
-    }
+    },
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/index.js"
+      }
+    ]
   }
   
