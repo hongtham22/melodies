@@ -1,9 +1,8 @@
 {
-    "build": {
-      "ignore": [
-        ".eslintrc.json",
-        ".eslintcache",
-        "node_modules/"
-      ]
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
     }
-  }
+  ]
+}
