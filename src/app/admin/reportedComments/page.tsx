@@ -5,12 +5,13 @@ import { useAppContext } from "@/app/AppProvider";
 import { useSearchParams } from "next/navigation";
 import LoadingPage from "@/components/loadingPage";
 import ListReportedCmt from "@/components/admin/listReportedCmt";
+import { Report } from "@/types/interfaces";
 
 function Page() {
   const { loading, setLoading } = useAppContext();
   const searchParams = useSearchParams();
   const page = parseInt(searchParams?.get("page") || "1", 10);
-  const [listReportsAdmin, setListReportsAdmin] = useState([]);
+  const [listReportsAdmin, setListReportsAdmin] = useState<Report[]>([]);
   const { accessToken } = useAppContext()
 
   const fetchReports = useCallback(async (page: number) => {

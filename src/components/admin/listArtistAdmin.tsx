@@ -17,15 +17,13 @@ interface Artist {
   totalAlbum: number;
   totalFollow: string;
 }
-interface ListArtistAdminProps {
-  data: Artist[];
-}
+
 function ListArtistAdmin({
   data,
   page,
   onSelectedItemsChange,
 }: {
-  data: ListArtistAdminProps;
+  data: Artist[];
   page: number;
   onSelectedItemsChange: (selectedItems: string[]) => void;
 }) {

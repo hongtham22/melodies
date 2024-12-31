@@ -12,13 +12,23 @@ import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/hooks/use-toast"
 import Genre from "@/components/genre";
 import ConfirmDelete from "@/components/popup/confirmDelete";
+interface Artist {
+  id: string;
+  name: string;
+  avatar: string;
+  bio: string | null;
+  createdAt: string;
+  totalSong: string;
+  totalAlbum: number;
+  totalFollow: string;
+}
 
 function Page() {
   const { loading, setLoading } = useAppContext();
   const searchParams = useSearchParams();
   const page = parseInt(searchParams?.get("page") || "1", 10);
   const [totalPage, setTotalPage] = useState(1);
-  const [listArtistsAdminData, setListArtistsAdminData] = useState([]);
+  const [listArtistsAdminData, setListArtistsAdminData] = useState<Artist[]>([]);
   // const [genreList, setGenreList] = useState([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast()
@@ -47,7 +57,7 @@ function Page() {
     fetchArtists(page);
   }, [fetchArtists, page]);
 
-  const handleAddArtist = async (artistData: { name: string; bio: string; avatar: File; genre: string[] }) => {
+  const handleAddArtist = async (artistData: { name: string; bio: string; avatar: File | null; genre: string[] }) => {
     const { name, bio, avatar, genre } = artistData;
     const data = {
       name,
@@ -57,7 +67,9 @@ function Page() {
 
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
-    formData.append("avatar", avatar);
+    if (avatar) {
+      formData.append("avatar", avatar);
+    }
     try {
       const response = await fetchApiData('/api/admin/create/artist', 'POST', formData, accessToken, null);
   

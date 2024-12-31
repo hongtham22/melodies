@@ -7,7 +7,7 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 import { Report } from "@/types/interfaces";
 import ReportDetailSheet from "@/components/admin/reportDetailSheet";
 
-function ListReportedCmt({ data }: { data: Report }) {
+function ListReportedCmt({ data }: { data: Report[] }) {
   const [openReportId, setOpentReportId] = useState<string | null>(null);
 
     const handleRowClick = (artistId: string) => {

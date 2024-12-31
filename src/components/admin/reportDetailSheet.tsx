@@ -40,11 +40,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/app/AppProvider";
 import userImg from "@/assets/img/placeholderUser.jpg";
 import { Report } from "@/types/interfaces";
-
-const ReportDetailSheet: React.FC<
-  Report & { onClose: () => void }
-> = ({ reportId, onClose }) => {
-     
+interface ReportDetailSheetProps extends Report {
+  reportId: string;
+  onClose: () => void;
+}
+const ReportDetailSheet: React.FC<ReportDetailSheetProps> = ({ reportId, onClose }) => {
   return (
     <Sheet open={!!reportId} onOpenChange={onClose}>
       <SheetContent className="max-h-screen overflow-y-auto scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">

@@ -11,11 +11,35 @@ import { useSearchParams } from "next/navigation";
 import LoadingPage from "@/components/loadingPage";
 import { useToast } from "@/hooks/use-toast"
 import ConfirmDelete from "@/components/popup/confirmDelete";
+export interface Album {
+  albumId: string;
+  title: string;
+  releaseDate: string;
+  albumType: 'ep' | 'single' | 'album';
+  createdAt: string;
+  totalSong: string;
+  mainArtist: MainArtist[];
+  albumImages: { image: string }[];
+}
+
+export interface MainArtist {
+  id: string;
+  name: string;
+  avatar: string;
+  bio: string | null;
+  createdAt: string;
+  genres: Genre[];
+}
+
+export interface Genre {
+  genreId: string;
+  name: string;
+}
 
 
 function Page() {
   const { loading, setLoading } = useAppContext();
-  const [listAlbumsAdminData, setListAlbumsAdminData] = useState([]);
+  const [listAlbumsAdminData, setListAlbumsAdminData] = useState<Album[]>([]);
   const searchParams = useSearchParams();
   const page = parseInt(searchParams?.get("page") || "1", 10);
   const [totalPage, setTotalPage] = useState(1);

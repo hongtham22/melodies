@@ -40,7 +40,7 @@ interface AddArtistSheetProps {
   onSave: (artistData: {
     name: string;
     bio: string;
-    avatar: string;
+    avatar: File | null;
     genre: string[];
   }) => void;
 }
