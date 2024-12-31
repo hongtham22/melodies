@@ -7,17 +7,6 @@
     ],
     "rewrites": [
       { "source": "/(.*)", "destination": "/" }
-    ],
-    "ignore": [
-      ".eslintrc.json",
-      ".eslintcache",
-      "**/*.ts(0)",
-      "node_modules/"
-    ],
-    "typescript": {
-      "ignore": [
-        "**/*.ts(0)"
-      ]
-    }
+    ]
   }
   
