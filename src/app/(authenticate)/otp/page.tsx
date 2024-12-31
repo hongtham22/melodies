@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { fetchApiData } from "@/app/api/appService";
 
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
@@ -106,6 +106,7 @@ function Page() {
   }
 
   return (
+    <Suspense fallback={<div>Đang tải...</div>}>
     <div className="flex flex-col justify-center gap-4 p-4">
       <Link href="/login" className="flex items-center">
         <ChevronLeftIcon className="w-5 h-5" />
@@ -169,6 +170,7 @@ function Page() {
         </span>
       </p>
     </div>
+    </Suspense>
   );
 }
 
