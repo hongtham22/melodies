@@ -8,12 +8,15 @@
     "rewrites": [
       { "source": "/(.*)", "destination": "/" }
     ],
-    "build": {
+    "eslint": {
       "ignore": [
-        "**/*.ts(0)",
         ".eslintrc.json",
-        ".eslintcache",
-        "node_modules/"
+        ".eslintcache"
+      ]
+    },
+    "typescript": {
+      "ignore": [
+        "**/*.ts(0)"
       ]
     }
   }
