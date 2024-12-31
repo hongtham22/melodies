@@ -22,14 +22,16 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
+// import { useRouter, useSearchParams } from "next/navigation";
 import { RegisterBody, RegisterBodyType } from "../../../../schemaValidations/auth.schema";
 
 function Page() {
   const router = useRouter();
   const { toast } = useToast();
-  const searchParams = useSearchParams();
-  const action = searchParams.get("action");
+  // const searchParams = useSearchParams();
+  // const action = searchParams.get("action");
+  const action = router.query.action;
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
     defaultValues: {
