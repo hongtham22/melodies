@@ -29,7 +29,7 @@ function Page() {
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
     defaultValues: {
-      email: "",
+      otp: "",
     },
   });
 
@@ -55,7 +55,7 @@ function Page() {
         >
           <FormField
             control={form.control}
-            name="password"
+            name="otp"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
@@ -77,7 +77,7 @@ function Page() {
 
           <FormField
             control={form.control}
-            name="confirmPassword"
+            name="otp"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
