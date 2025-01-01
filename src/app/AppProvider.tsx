@@ -61,7 +61,7 @@ export const AppProvider: React.FC<{
   });
 
   const [socket, setSocket] = useState<Socket | null>(null);
-
+  const route = useRouter();
   useEffect(() => {
     if (accessToken && role) {
       Cookies.set("role", role, { expires: 7 });
@@ -100,7 +100,7 @@ export const AppProvider: React.FC<{
         console.log("Socket disconnected");
         // server lỗi -> router qua trang lỗi, 404,..... hoặc về lại login
 
-        router.replace("/");
+        route.replace("/");
       })
 
       setSocket(newSocket);
