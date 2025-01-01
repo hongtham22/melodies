@@ -34,28 +34,41 @@ function Page() {
   const { toast } = useToast()
   const { accessToken } = useAppContext()
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
- 
-  const fetchArtists = useCallback(async (page: number) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchArtists = useCallback(async (page: number, query: string = '') => {
     setLoading(true);
     try {
-      const artistsResponse = await fetchApiData("/api/artist/allArtist", "GET", null, accessToken, {
+      const artistsResponse = await fetchApiData("/api/admin/search/artist", "GET", null, accessToken, {
         page: page,
+        query: query,
       });
-
+  
       if (artistsResponse.success) {
         setListArtistsAdminData(artistsResponse.data.artists);
         setTotalPage(artistsResponse.data.totalPage);
       }
     } catch (error) {
-      console.error("Error fetching artists:", error);
+      console.error("Lỗi khi lấy danh sách nghệ sĩ:", error);
     } finally {
       setLoading(false);
     }
-  }, [setLoading, accessToken]);
+  }, [accessToken, setLoading]);
+
 
   useEffect(() => {
-    fetchArtists(page);
-  }, [fetchArtists, page]);
+    const handler = setTimeout(() => {
+      fetchArtists(page, searchQuery);
+    }, 500); 
+
+    return () => {
+      clearTimeout(handler); 
+    };
+  }, [fetchArtists, page, searchQuery]);
+  
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
   const handleAddArtist = async (artistData: { name: string; bio: string; avatar: File | null; genre: string[] }) => {
     const { name, bio, avatar, genre } = artistData;
@@ -79,7 +92,7 @@ function Page() {
           description: `Artist "${name}" added successfully.`,
           variant: "success",
         });
-        fetchArtists(page);
+        fetchArtists(page, searchQuery);
       } else {
         alert('Error: ' + response.error);
       }
@@ -110,7 +123,7 @@ function Page() {
       );
   
       if (response.success) {
-        fetchArtists(page);
+        fetchArtists(page, searchQuery);
   
         toast({
           title: "Success",
@@ -162,9 +175,11 @@ function Page() {
             <MagnifyingGlassIcon className="w-[20px] h-[20px] text-primaryColorBlue font-extrabold" />
             <input
               type="text"
-              placeholder="Search for Artist"
+              placeholder="Search for artist"
               className="ml-2 py-2 pr-2 bg-transparent border-none outline-none placeholder:text-white/70"
-            />
+              value={searchQuery}
+              onChange={handleSearchChange}
+           />
           </div>
           <div className="flex gap-4">
             <Genre />

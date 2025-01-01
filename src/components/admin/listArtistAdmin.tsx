@@ -1,9 +1,6 @@
 "use client";
 import Image from "next/image";
-import songimg from "@/assets/img/songs.png";
 import artistImg from "@/assets/img/placeholderUser.jpg";
-import { CaretSortIcon } from "@radix-ui/react-icons";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import ArtistDetailSheet from "@/components/admin/artistDetailSheet";
@@ -36,7 +33,7 @@ function ListArtistAdmin({
     if (isHeaderChecked) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(data.map((artist) => artist.id));
+      setSelectedItems(data.map((artist: Artist) => artist.id));
     }
     setIsHeaderChecked(!isHeaderChecked);
   };
@@ -93,7 +90,7 @@ function ListArtistAdmin({
         </thead>
         <tbody className="">
           {data &&
-            data.map((artist, index) => (
+            data.map((artist: Artist, index: number) => (
               <tr
                 key={artist.id}
                 className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
@@ -107,6 +104,7 @@ function ListArtistAdmin({
                   />
                 </td>
                 <td className="pl-1 text-h4 text-center">
+                {/* {artist.refIndex ? artist.refIndex : (page - 1) * itemsPerPage + index + 1} */}
                   {(page - 1) * itemsPerPage + index + 1}
                 </td>
                 <td className="">

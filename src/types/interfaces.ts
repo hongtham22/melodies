@@ -76,6 +76,7 @@ export interface Comment {
     songId: string;
     hide: boolean;
     song: DataSong;
+    parentComment: Comment;
 }
 
 //playlist

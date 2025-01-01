@@ -111,16 +111,7 @@ function HeaderAdmin() {
           </div>
         </div>
         <div className="flex justify-center items-center gap-2">
-          <div className="flex">
-            <div className="flex items-center">
-              <BellIcon className="w-6 h-6" />
-            </div>
-            <div className="flex items-start">
-              <p className="max-w-10 p-1 bg-darkPink rounded-md text-white text-xs -translate-y-2 truncate">
-                100+
-              </p>
-            </div>
-          </div>
+          
           <div className="flex gap-2">
             <Image
               src={user?.image || userImg}

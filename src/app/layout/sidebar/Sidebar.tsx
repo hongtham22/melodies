@@ -13,8 +13,7 @@ import {
   ListBulletIcon,
 } from "@radix-ui/react-icons";
 import { CgProfile } from "react-icons/cg";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { fetchApiData } from "@/app/api/appService";
@@ -22,31 +21,13 @@ import { BiAperture } from "react-icons/bi";
 import UploadSong from "@/components/uploadSong";
 
 const Sidebar = () => {
-  const { accessToken, setAccessToken, setRole, role, setShowPlaylistMenu } =
+  const { accessToken, socket, setAccessToken, setRole, setShowPlaylistMenu } =
     useAppContext();
   const [showRequireLogin, setShowRequireLogin] = useState(false);
   const [
     showRequireLoginForListenTogether,
     setShowRequireLoginForListenTogether,
   ] = useState(false);
-
-  const handleShowPlaylist = () => {
-    if (accessToken) {
-      setShowPlaylistMenu(true);
-      handleMenuClick("your-playlist");
-    } else {
-      setShowRequireLogin(true);
-    }
-  };
-
-  const handleListenTogether = () => {
-    if (accessToken) {
-      router.push("/listenTogether");
-      handleMenuClick("listen-together");
-    } else {
-      setShowRequireLoginForListenTogether(true);
-    }
-  };
 
   const { currentSong } = useSongContext()
   const [pb, setPb] = useState(false)
@@ -60,8 +41,45 @@ const Sidebar = () => {
   const { toast } = useToast();
   const router = useRouter();
 
+  const currentPath = usePathname();
+  const isInListenTogether = currentPath.startsWith("/listenTogether/");
   const handleMenuClick = (menuItem: string) => {
-    setActiveMenu(menuItem);
+
+    if (isInListenTogether) {
+      setShowPlaylistMenu(false);
+      toast({
+        variant: "destructive",
+        title: "Action Required",
+        description: "Please press the Leave Room button to perform other actions.",
+      });
+    } else {
+      if(menuItem === 'home') {
+        router.push('/');
+        setActiveMenu(menuItem);
+      } else {
+        router.push(`/${menuItem}`);
+        setActiveMenu(menuItem);
+
+      }
+    }
+  };
+
+  const handleShowPlaylist = () => {
+    if (accessToken) {
+      setShowPlaylistMenu(true);
+      handleMenuClick("your-playlist");
+    } else {
+      setShowRequireLogin(true);
+    }
+  };
+
+  const handleListenTogether = () => {
+    if (accessToken) {
+      // router.push("/listenTogether");
+      handleMenuClick("listenTogether");
+    } else {
+      setShowRequireLoginForListenTogether(true);
+    }
   };
 
   async function handleLogout() {
@@ -74,13 +92,14 @@ const Sidebar = () => {
       );
 
       if (result.success) {
+        socket?.emit('leaveRoom');
         document.cookie =
           "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie =
           "role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         setAccessToken("");
         setRole("");
-        router.push("/");
+        router.replace("/");
         window.location.reload();
 
         toast({
@@ -122,8 +141,8 @@ const Sidebar = () => {
           onClick={() => handleMenuClick("home")}
         >
           <HomeIcon className="w-[24px] h-[24px] mr-3" />
-          <Link href="/">Home</Link>
-          {/* <p>Home</p> */}
+          {/* <Link href="/">Home</Link> */}
+          <p>Home</p>
         </div>
         <div
           className={`flex my-2 cursor-pointer ${getMenuClass(
@@ -132,29 +151,29 @@ const Sidebar = () => {
           onClick={() => handleMenuClick("discover")}
         >
           <GlobeIcon className="w-[24px] h-[24px] mr-3" />
-          <Link href="/discover">Discover</Link>
-          {/* <p>Discover</p> */}
+          {/* <Link href="/discover">Discover</Link> */}
+          <p>Discover</p>
         </div>
         <div
           className={`flex my-2 cursor-pointer ${getMenuClass(
             "album"
           )} py-2 items-center`}
-          onClick={() => handleMenuClick("album")}
+          onClick={() => handleMenuClick("albums")}
         >
           <DiscIcon className="w-[24px] h-[24px] mr-3" />
-          <Link href="/albums">Albums</Link>
+          {/* <Link href="/albums">Albums</Link> */}
 
-          {/* <p>Albums</p> */}
+          <p>Albums</p>
         </div>
         <div
           className={`flex my-2 cursor-pointer ${getMenuClass(
             "artist"
           )} py-2 items-center`}
-          onClick={() => handleMenuClick("artist")}
+          onClick={() => handleMenuClick("artists")}
         >
           <AvatarIcon className="w-[24px] h-[24px] mr-3" />
-          <Link href="/artists">Artists</Link>
-          {/* <p>Artists</p> */}
+          {/* <Link href="/artists">Artists</Link> */}
+          <p>Artists</p>
         </div>
       </div>
       <div id="playlist-section" className="mb-5">
@@ -201,7 +220,7 @@ const Sidebar = () => {
         {/* Listen Together */}
         <div
           className={`relative flex my-2 cursor-pointer ${getMenuClass(
-            "listen-together"
+            "listenTogether"
           )} py-2 items-center`}
         >
           <BiAperture className="w-[24px] h-[24px] mr-3" />
@@ -242,10 +261,11 @@ const Sidebar = () => {
           className={`flex my-2 cursor-pointer ${getMenuClass(
             "Profile"
           )} py-2 items-center `}
-          onClick={() => handleMenuClick("Profile")}
+          onClick={() => handleMenuClick("profile")}
         >
           <CgProfile className="w-[24px] h-[24px] mr-3" />
-          <Link href="/profile">Profile</Link>
+          {/* <Link href="/profile">Profile</Link> */}
+          <p>Profile</p>
         </div>
 
         <div
@@ -253,18 +273,20 @@ const Sidebar = () => {
             "UploadSong"
           )} py-2 items-center `}
           onClick={() => handleMenuClick("UploadSong")}
+          style={{ pointerEvents: isInListenTogether ? 'none' : 'auto' }}
         >
           <UploadSong />
         </div>
 
         <div
           className={`flex my-2 cursor-pointer ${getMenuClass(
-            "Setting"
+            "setting"
           )} py-2 items-center `}
-          onClick={() => handleMenuClick("Setting")}
+          onClick={() => handleMenuClick("setting")}
         >
           <GearIcon className="w-[24px] h-[24px] mr-3" />
-          <Link href="/setting">Setting</Link>
+          <p>Setting</p>
+          {/* <Link href="/setting">Setting</Link> */}
         </div>
 
         <div

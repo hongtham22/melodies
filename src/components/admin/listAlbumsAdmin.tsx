@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import songimg from "@/assets/img/placeholderPlaylist.png";
-import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import AlbumDetailSheet from "@/components/admin/albumDetailSheet";
@@ -66,7 +65,7 @@ function ListAlbumsAdmin({
       setSelectedItems([]);
     } else {
       // setSelectedItems(Array.from({ length: 10 }, (_, index) => index));
-      setSelectedItems(data.map((album) => album.albumId));
+      setSelectedItems(data.map((album: Album) => album.albumId));
     }
     setIsHeaderChecked(!isHeaderChecked);
   };
@@ -205,7 +204,7 @@ function ListAlbumsAdmin({
                 </td>
                 <td className="text-textMedium text-center pl-2 rounded-tr-lg rounded-br-lg">
                   <div className={`line-clamp-1 capitalize ${
-                      typeColors[album.albumType] || ""
+                      typeColors[album.albumType as 'ep' | 'single' | 'album'] || ""
                     }`}>{album.albumType}</div>
                 </td>
               </tr>

@@ -5,14 +5,13 @@ import {
   ChevronUpIcon,
   ExitIcon,
 } from "@radix-ui/react-icons";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
 import {
   DataCurrentRoom,
   DataCurrentSong,
   DataMembersRoom,
-  DataRoom,
   DataSong,
   UserRoom,
 } from "@/types/interfaces";
@@ -28,7 +27,6 @@ import animation from "../../../../../public/animation/Animation - song.json";
 import Lottie from "react-lottie-player";
 import { useRouter } from "next/navigation";
 
-
 interface PageProps {
   params: {
     id: string;
@@ -39,13 +37,10 @@ function Page({ params }: PageProps) {
   const { id } = params;
   const { socket } = useAppContext();
   const { accessToken } = useAppContext();
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [currentTime, setCurrentTime] = useState(0);
   const [permit, setPermit] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredSongs, setFilteredSongs] = useState<DataSong[]>([]);
-  const [playlist, setPlaylist] = useState<string[]>([]);
   // check
   const [currentProposalList, setCurrentProposalList] = useState<DataSong[]>([]);
   const [waitingSongs, setWaitingSongs] = useState<DataSong[]>([]);
@@ -105,7 +100,12 @@ function Page({ params }: PageProps) {
     });
 
     socket.on("joinRoomLinkFailed", (data) => {
-      alert(data);
+      // alert(data);
+      toast({
+        title: "Error",
+        description: `Join room by link failed. "${data}"`,
+        variant: "destructive",
+      });
       router.push(`/listenTogether`);
     });
 
@@ -122,22 +122,42 @@ function Page({ params }: PageProps) {
 
     socket.on("roomClosed", (data) => {
       console.log(data);
-      alert(data);
+      toast({
+        title: "Error",
+        description: `Room closed. "${data}"`,
+        variant: "destructive",
+      });
+      // alert(data);
       router.back();
     });
 
     socket.on("leaveRoomSuccess", () => {
-      alert("Leave room success");
+      toast({
+        title: "Success",
+        description: "Leave room success",
+        variant: "success",
+      });
+      // alert("Leave room success");
       console.log("Leave room success");
       router.push(`/listenTogether`);
     });
 
     socket.on("addSongToWaitingListFailed", (data) => {
-      alert(data);
+      toast({
+        title: "Error",
+        description: `Add song to waiting list failed. "${data}"`,
+        variant: "destructive",
+      });
+      // alert(data);
     });
 
     socket.on("addSongToWaitingListSuccess", () => {
-      alert("them bai playlist ok");
+      toast({
+        title: "Success",
+        description: "Add song to waiting list success",
+        variant: "success",
+      });
+      // alert("them bai playlist ok");
     });
 
     socket.on("updateWaitingList", (waitingList) => {
@@ -172,7 +192,7 @@ function Page({ params }: PageProps) {
       socket.off("animation")
 
     };
-  }, [socket]);
+  }, [router, socket]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -198,6 +218,9 @@ function Page({ params }: PageProps) {
   const handleLeaveRoom = async () => {
     socket?.emit("leaveRoom");
   };
+
+  const memoizedProposalList = useMemo(() => currentProposalList, [currentProposalList]);
+  const memoizedListUser = useMemo(() => listUser, [listUser]);
 
   return (
     <div className="w-full my-20 m-6 p-8 flex flex-col gap-4">
@@ -393,10 +416,10 @@ function Page({ params }: PageProps) {
           </div>
         </div>
         {showUsers ? (
-          <ListUser listUser={listUser} permit = {permit}/>
+          <ListUser listUser={memoizedListUser} permit = {permit}/>
         ) : (
           <ProposalList
-            currentProposalList={currentProposalList}
+            currentProposalList={memoizedProposalList}
             permit={permit}
           />
         )}

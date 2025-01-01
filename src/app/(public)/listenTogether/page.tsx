@@ -11,6 +11,7 @@ import { DataCurrentRoom } from "@/types/interfaces";
 
 function Page() {
   const { socket } = useAppContext();
+    const { toast } = useToast()
   const [textIndex, setTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [roomId, setRoomId] = useState<string>("");
@@ -46,19 +47,31 @@ function Page() {
       router.push(`/listenTogether/${data.roomData.id}`);
     });
     socket?.once("joinRoomFailed", (data) => {
-      alert(data);
+      // alert(data);
+      toast({
+        title: "Error",
+        description: `Join room failed. "${data}"`,
+        variant: "destructive",
+      });
     });
   };
 
   const handleCreateRoom = async () => {
+    // console.log("Create room");
     socket?.emit("createRoom");
+    console.log("Create room");
     socket?.once("createRoomSuccess", (id) => {
       console.log("Create room success: " + id);
       router.push(`/listenTogether/${id}`);
     });
     socket?.once("createRoomFailed", (data) => {
       // console.log("createRoomFailed", data);
-      alert(data);
+      toast({
+        title: "Error",
+        description: `Create room failed. "${data}"`,
+        variant: "destructive",
+      });
+      // alert(data);
     });
   };
 
