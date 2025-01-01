@@ -11,7 +11,6 @@ import Cookies from "js-cookie";
 import { io, Socket } from "socket.io-client";
 import { Notification } from "@/types/interfaces";
 import { fetchNotification } from "@/utils/api";
-import { fetchApiData } from "@/app/api/appService";
 import { useRouter } from "next/navigation";
 interface AppContextType {
   listNotification: Notification[];
@@ -115,7 +114,7 @@ export const AppProvider: React.FC<{
         console.log("Socket disconnected");
         // server lỗi -> router qua trang lỗi, 404,..... hoặc về lại login
 
-        // router.push("/listenTogether");
+        router.replace("/");
       })
 
       setSocket(newSocket);

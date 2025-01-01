@@ -9,30 +9,32 @@ import { useAppContext } from "@/app/AppProvider";
 import { PaginationWithLinks } from "@/components/paginationWithLinks";
 import { useSearchParams } from "next/navigation";
 import LoadingPage from "@/components/loadingPage";
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
 import ConfirmDelete from "@/components/popup/confirmDelete";
-
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { DataAlbum } from "@/types/interfaces";
 
 function Page() {
   const { loading, setLoading } = useAppContext();
-  const [listAlbumsAdminData, setListAlbumsAdminData] = useState([]);
+  const [listAlbumsAdminData, setListAlbumsAdminData] = useState<DataAlbum[]>([]);
   const searchParams = useSearchParams();
   const page = parseInt(searchParams?.get("page") || "1", 10);
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsData, setListArtistsData] = useState([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const { toast } = useToast()
-  const { accessToken } = useAppContext()
+  const { toast } = useToast();
+  const { accessToken } = useAppContext();
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchAlbumsAdmin = useCallback(
-    async (currentPage: number) => {
+    async (currentPage: number, query: string) => {
       setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/admin/allAlbum", "GET", null, accessToken, {
+          fetchApiData("/api/admin/search/album", "GET", null, accessToken, {
             page: currentPage,
+            query: query,
           }),
           fetchApiData("/api/admin/allArtistName", "GET", null, accessToken),
         ]);
@@ -48,12 +50,23 @@ function Page() {
       } finally {
         setLoading(false);
       }
-    }, [setLoading]
+    },
+    [accessToken, setLoading]
   );
-  
+
   useEffect(() => {
-    fetchAlbumsAdmin(page);
-  }, [fetchAlbumsAdmin, page]); 
+    const handler = setTimeout(() => {
+      fetchAlbumsAdmin(page, searchQuery);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [fetchAlbumsAdmin, page, searchQuery]);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
   const handleAddAlbum = async (albumData: {
     title: string;
@@ -91,13 +104,23 @@ function Page() {
           description: `Album "${title}" added successfully.`,
           variant: "success",
         });
-        fetchAlbumsAdmin(page);
+        fetchAlbumsAdmin(page, searchQuery);
       } else {
-        alert("Error: " + response.error);
+        toast({
+          title: "Error",
+          description: `Error "${response.error}".`,
+          variant: "destructive",
+        });
+        // alert("Error: " + response.error);
       }
     } catch (error) {
       console.error("Error adding album:", error);
-      alert("An error occurred while sending the data.");
+      toast({
+        title: "Error",
+        description: "An error occurred while sending the data.",
+        variant: "destructive",
+      });
+      // alert("An error occurred while sending the data.");
     }
   };
 
@@ -110,21 +133,21 @@ function Page() {
       });
       return;
     }
-  
+
     try {
       const requestBody = JSON.stringify({ albumIds: selectedItems });
-  
+
       const response = await fetchApiData(
         "/api/admin/delete/album",
         "DELETE",
-        requestBody, 
-        accessToken, 
-        null 
+        requestBody,
+        accessToken,
+        null
       );
-  
+
       if (response.success) {
-        fetchAlbumsAdmin(page);
-  
+        fetchAlbumsAdmin(page, searchQuery);
+
         toast({
           title: "Success",
           description: "Albums deleted successfully.",
@@ -148,10 +171,10 @@ function Page() {
       setSelectedItems([]);
     }
     setShowConfirmDelete(false);
-  
+
     console.log("Deleting albums:", { albumIds: selectedItems });
   };
-  
+
   const handleOpenConfirmDelete = () => {
     if (selectedItems.length === 0) {
       toast({
@@ -171,9 +194,24 @@ function Page() {
       <div className="p-4 flex flex-col items-start rounded-xl">
         <div className="w-full flex items-center justify-between px-3">
           <h1 className="text-h2 text-primaryColorPink">List Albums</h1>
+          <div
+            id="search-header"
+            className="w-1/3 h-[35px] flex bg-transparent border border-darkBlueHover items-center px-2 rounded-full"
+          >
+            <MagnifyingGlassIcon className="w-[20px] h-[20px] text-primaryColorBlue font-extrabold" />
+            <input
+              type="text"
+              placeholder="Search for album"
+              className="ml-2 py-2 pr-2 bg-transparent border-none outline-none placeholder:text-white/70"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
           <div className="flex gap-4">
-            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
-            onClick={handleOpenConfirmDelete}>
+            <button
+              className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
+              onClick={handleOpenConfirmDelete}
+            >
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
               Delete Albums
             </button>
@@ -182,13 +220,17 @@ function Page() {
           </div>
         </div>
       </div>
-      <ListAlbumsAdmin data={listAlbumsAdminData} page={page} onSelectedItemsChange={setSelectedItems} />
+      <ListAlbumsAdmin
+        data={listAlbumsAdminData}
+        page={page}
+        onSelectedItemsChange={setSelectedItems}
+      />
       <PaginationWithLinks page={page} totalPage={totalPage} />
       {showConfirmDelete && (
         <ConfirmDelete
           onClose={() => setShowConfirmDelete(false)}
           onDelete={handleDeleteAlbums}
-          entityName="track" 
+          entityName="track"
         />
       )}
     </div>

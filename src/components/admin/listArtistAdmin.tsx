@@ -13,7 +13,6 @@ interface Artist {
   totalSong: string;
   totalAlbum: number;
   totalFollow: string;
-  refIndex: number;
 }
 interface ListArtistAdminProps {
   data: Artist[];
@@ -36,7 +35,7 @@ function ListArtistAdmin({
     if (isHeaderChecked) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(data.map((artist) => artist.id));
+      setSelectedItems(data.map((artist: Artist) => artist.id));
     }
     setIsHeaderChecked(!isHeaderChecked);
   };
@@ -93,7 +92,7 @@ function ListArtistAdmin({
         </thead>
         <tbody className="">
           {data &&
-            data.map((artist, index) => (
+            data.map((artist: Artist, index: number) => (
               <tr
                 key={artist.id}
                 className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
@@ -107,8 +106,8 @@ function ListArtistAdmin({
                   />
                 </td>
                 <td className="pl-1 text-h4 text-center">
-                {artist.refIndex ? artist.refIndex : (page - 1) * itemsPerPage + index + 1}
-                  {/* {(page - 1) * itemsPerPage + index + 1} */}
+                {/* {artist.refIndex ? artist.refIndex : (page - 1) * itemsPerPage + index + 1} */}
+                  {(page - 1) * itemsPerPage + index + 1}
                 </td>
                 <td className="">
                   <div className="pl-4 flex felx-col gap-2 justify-start items-center">

@@ -231,7 +231,12 @@ const AddTrackSheet: React.FC<AddTrackSheetProps> = ({ onSave, artist }) => {
       }
       if (file.type !== "application/json") {
         event.target.value = "";
-        alert("Only JSON files are allowed");
+        toast({
+          title: "Error",
+          description: "Only JSON files are allowed",
+          variant: "destructive",
+        });
+        // alert("Only JSON files are allowed");
         return;
       }
       setLyricFile(file);

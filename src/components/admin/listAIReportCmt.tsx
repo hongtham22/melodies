@@ -68,7 +68,6 @@ function ListAIReportCmt({ data, page }: { data: Report[], page: number }) {
             >
               <td className="pl-1 text-h4 text-center rounded-tl-lg rounded-bl-lg">
                 {(page - 1) * itemsPerPage + index + 1}
-                {index + 1}
               </td>
               <td className="pr-2">
                 <div className="pl-2 flex felx-col gap-2 items-start">

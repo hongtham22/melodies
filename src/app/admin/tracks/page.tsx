@@ -9,11 +9,12 @@ import AddTrackSheet from "@/components/admin/addTrackSheet";
 import LoadingPage from "@/components/loadingPage";
 import { PaginationWithLinks } from "@/components/paginationWithLinks";
 import { useSearchParams } from "next/navigation";
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
 import ConfirmDelete from "@/components/popup/confirmDelete";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
 function Page() {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const { loading, setLoading } = useAppContext();
   const [listTracksData, setListTracksData] = useState([]);
   const searchParams = useSearchParams();
@@ -21,15 +22,19 @@ function Page() {
   const [totalPage, setTotalPage] = useState(1);
   const [listArtistsData, setListArtistsData] = useState([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const { accessToken } = useAppContext()
+  const { accessToken } = useAppContext();
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchTrackAdmin = useCallback(
-    async (page: number) => {
-      setLoading(true);
+    async (page: number, query: string = "") => {
+      // setLoading(true);
       try {
         const responses = await Promise.all([
-          fetchApiData("/api/songs", "GET", null, accessToken, { page: page }),
+          fetchApiData("/api/admin/search/song", "GET", null, accessToken, {
+            page: page,
+            query: query,
+          }),
         ]);
         if (responses[0].success) {
           setListTracksData(responses[0].data.song);
@@ -38,11 +43,24 @@ function Page() {
       } catch (error) {
         console.error("Error fetching songs:", error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     },
-    [setLoading, accessToken]
+    [accessToken]
   );
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchTrackAdmin(page, searchQuery);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [fetchTrackAdmin, page, searchQuery]);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
   const fetchArtists = useCallback(async () => {
     setLoading(true);
@@ -78,8 +96,14 @@ function Page() {
     releaseDate: string;
     lyricFile: File;
   }) => {
-    const { title, mainArtistId, subArtistIds, audioFile, releaseDate, lyricFile } =
-      trackData;
+    const {
+      title,
+      mainArtistId,
+      subArtistIds,
+      audioFile,
+      releaseDate,
+      lyricFile,
+    } = trackData;
     const data = {
       title,
       mainArtistId,
@@ -93,7 +117,7 @@ function Page() {
 
     try {
       const response = await fetchApiData(
-        '/api/admin/create/song',
+        "/api/admin/create/song",
         "POST",
         formData,
         accessToken
@@ -105,7 +129,7 @@ function Page() {
           description: `Track "${title}" added successfully.`,
           variant: "success",
         });
-        fetchTrackAdmin(page);
+        fetchTrackAdmin(page, searchQuery);
       } else {
         alert("Error: " + response.error);
       }
@@ -127,18 +151,18 @@ function Page() {
     }
     try {
       const requestBody = JSON.stringify({ songIds: selectedItems });
-  
+
       const response = await fetchApiData(
         "/api/admin/delete/song",
         "DELETE",
-        requestBody, 
-        accessToken, 
-        null 
+        requestBody,
+        accessToken,
+        null
       );
-  
+
       if (response.success) {
-        fetchTrackAdmin(page);
-  
+        fetchTrackAdmin(page, searchQuery);
+
         toast({
           title: "Success",
           description: "Tracks deleted successfully.",
@@ -175,7 +199,7 @@ function Page() {
     }
     setShowConfirmDelete(true);
   };
-  
+
   if (loading) return <LoadingPage />;
 
   return (
@@ -183,9 +207,24 @@ function Page() {
       <div className="p-4 flex flex-col items-start rounded-xl">
         <div className="w-full flex items-center justify-between px-3">
           <h1 className="text-h2 text-primaryColorPink">List Tracks</h1>
+          <div
+            id="search-header"
+            className="w-1/3 h-[35px] flex bg-transparent border border-darkBlueHover items-center px-2 rounded-full"
+          >
+            <MagnifyingGlassIcon className="w-[20px] h-[20px] text-primaryColorBlue font-extrabold" />
+            <input
+              type="text"
+              placeholder="Search for track"
+              className="ml-2 py-2 pr-2 bg-transparent border-none outline-none placeholder:text-white/70"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
           <div className="flex gap-4">
-            <button className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
-            onClick={handleOpenConfirmDelete}>
+            <button
+              className="text-textMedium p-3 flex items-center gap-2 bg-transparent border border-primaryColorBlue text-primaryColorBlue rounded-md hover:text-darkBlue"
+              onClick={handleOpenConfirmDelete}
+            >
               <MdDeleteOutline className="text-primaryColorBlue w-5 h-5 hover:text-darkBlue" />
               Delete Track
             </button>
@@ -193,13 +232,17 @@ function Page() {
           </div>
         </div>
       </div>
-      <ListTracksAdmin data={listTracksData} page={page} onSelectedItemsChange={setSelectedItems} />
+      <ListTracksAdmin
+        data={listTracksData}
+        page={page}
+        onSelectedItemsChange={setSelectedItems}
+      />
       <PaginationWithLinks page={page} totalPage={totalPage} />
       {showConfirmDelete && (
         <ConfirmDelete
           onClose={() => setShowConfirmDelete(false)}
           onDelete={handleDeleteTracks}
-          entityName="track" 
+          entityName="track"
         />
       )}
     </div>

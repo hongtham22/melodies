@@ -43,7 +43,7 @@ function Page() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading, accessToken]);
+  }, [accessToken, setLoading]);
 
 
   useEffect(() => {
@@ -163,7 +163,7 @@ function Page() {
             <MagnifyingGlassIcon className="w-[20px] h-[20px] text-primaryColorBlue font-extrabold" />
             <input
               type="text"
-              placeholder="Search for Artist"
+              placeholder="Search for artist"
               className="ml-2 py-2 pr-2 bg-transparent border-none outline-none placeholder:text-white/70"
               value={searchQuery}
               onChange={handleSearchChange}

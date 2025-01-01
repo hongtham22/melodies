@@ -14,14 +14,16 @@ function Page() {
   const searchParams = useSearchParams();
   const page = parseInt(searchParams?.get("page") || "1", 10);
   const [listReportsAdmin, setListReportsAdmin] = useState([]);
+  const [listAIReportsAdmin, setListAIReportsAdmin] = useState([]);
   const [showAICmt, setShowAICmt] = useState(false);
   const { accessToken } = useAppContext();
   const [totalPage, setTotalPage] = useState(1);
+  const [totalAIPage, setTotalAIPage] = useState(1);
   const handleViewAICmt = () => {
     setShowAICmt((prev) => !prev);
   };
 
-  const fetchReports = useCallback(
+  const fetchUserReports = useCallback(
     async (page: number) => {
       setLoading(true);
       try {
@@ -32,6 +34,7 @@ function Page() {
           accessToken,
           {
             page: page,
+            type: "USER",
           }
         );
 
@@ -50,14 +53,47 @@ function Page() {
   );
 
   useEffect(() => {
-    fetchReports(page);
-  }, [fetchReports, page]);
+    fetchUserReports(page);
+  }, [fetchUserReports, page]);
+
+  const fetchAIReports = useCallback(
+    async (page: number) => {
+      setLoading(true);
+      try {
+        const reportRespond = await fetchApiData(
+          "/api/admin/allReport",
+          "GET",
+          null,
+          accessToken,
+          {
+            page: page,
+            type: "AI",
+          }
+        );
+
+        if (reportRespond.success) {
+        setListAIReportsAdmin(reportRespond.data.reports);
+        setTotalAIPage(reportRespond.data.totalPage);
+
+        }
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [setLoading, accessToken]
+  );
+
+  useEffect(() => {
+    fetchAIReports(page);
+  }, [fetchAIReports, page]);
 
   if (loading) return <LoadingPage />;
 
   // Lọc danh sách AI comments
-  const aiComments = listReportsAdmin.filter((comment) => comment.status === "AI");
-  const reportedComments = listReportsAdmin.filter((comment) => comment.status !== "AI");
+  // const aiComments = listReportsAdmin.filter((comment) => comment.status === "AI");
+  // const reportedComments = listReportsAdmin.filter((comment) => comment.status !== "AI");
   return (
     <div className="w-full mt-20 m-6 p-8 flex flex-col items-start justify-center">
       <div className="w-1/4 flex gap-2 items-center my-3">
@@ -82,11 +118,11 @@ function Page() {
 
       {/* Render List */}
       {showAICmt ? (
-        <ListAIReportCmt data={aiComments} page={page} />
+          <ListAIReportCmt data={listAIReportsAdmin} page={page} />
       ) : (
-        <ListReportedCmt data={reportedComments} page={page}/>
-      )}
-      <PaginationWithLinks page={page} totalPage={totalPage} />
+          <ListReportedCmt data={listReportsAdmin} page={page}/>
+        )}
+        <PaginationWithLinks page={page} totalPage={showAICmt ? totalAIPage : totalPage} />
 
     </div>
   );

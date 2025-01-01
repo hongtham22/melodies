@@ -1,8 +1,7 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { PlusIcon, Cross2Icon } from "@radix-ui/react-icons";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
 // import { io, Socket } from "socket.io-client";
 import { useAppContext } from "@/app/AppProvider";
 import { fetchApiData } from "@/app/api/appService";
@@ -38,7 +37,12 @@ function ProposalList({
     if (!socket) return;
 
     socket.on("addSongToProposalListSuccess", () => {
-      alert("them bai playlist wait ok");
+      // alert("them bai playlist wait ok");
+      toast({
+        title: "Success",
+        description: "Add song to proposal list success",
+        variant: "success",
+      });
     });
     socket.on("updateProposalList", (proposalList) => {
       setProposalList(proposalList);
@@ -47,10 +51,21 @@ function ProposalList({
       setProposalList(data.proposalList);
     })
     socket.on("addSongToProposalListFailed", (data) => {
-      alert(data)
+      toast({
+        title: "Error",
+        description: `Add song to proposal list failed. "${data}"`,
+        variant: "destructive",
+      });
+
+      // alert(data)
     })
     socket.on("forwardSongFailed", (data) => {
-      alert(data)
+      toast({
+        title: "Error",
+        description: `Forward song to waiting list failed. "${data}"`,
+        variant: "destructive",
+      });
+      // alert(data)
     })
 
     return () => {

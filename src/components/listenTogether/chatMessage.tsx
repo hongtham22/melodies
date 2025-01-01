@@ -7,15 +7,8 @@ import userImg from "@/assets/img/placeholderUser.jpg";
 import { Message } from "@/types/interfaces";
 function ChatMessage({myId} : {myId: string}) {
   const [message, setMessage] = useState<string>("");
-  // const [chatMessages, setChatMessages] = useState<
-  //   { user: object; message: string }[]
-  // >([]);
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
-  const [myIdMes, setMyIdMes] = useState<string>(myId);
-  const { accessToken } = useAppContext();
   const { socket } = useAppContext();
-
-  console.log("my id 2:" , myId)
 
   useEffect(() => {
     if (!socket) return;
@@ -25,12 +18,17 @@ function ChatMessage({myId} : {myId: string}) {
         { user: data.user, message: data.message, userSend: data.userSend },
       ]);
     });
+    return () => {
+      socket?.off("ServerSendMessage");
+    };
   }, [socket]);
 
   const handleSentMessage = () => {
     socket?.emit("SendMessage", {
       message: message,
     });
+    console.log("message", message);
+    setMessage("");
   };
 
   return (
@@ -49,13 +47,12 @@ function ChatMessage({myId} : {myId: string}) {
           <PaperPlaneIcon className="h-5 w-5 text-white" />
         </button>
       </div>
-      <div className="w-full flex flex-col gap-2 text-white overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
+      <div className="w-full flex flex-col-reverse gap-2 text-white overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-darkBlue scrollbar-track-black">
+        <div className="max-h-[430px] flex flex-col gap-2">
+
         {chatMessages.map((msg, index) => (
           <div
             key={index}
-            // className="w-fit flex gap-2 items-center py-1 px-2 border bg-darkerBlue rounded-full"
-            // className="w-fit flex gap-2 items-center py-1 px-2 border "
-            // style={{backgroundColor: msg.user?.isSender ? 'red' : 'transparent'}}
             className={`w-fit flex gap-2 items-center py-1 px-2 border rounded-full  ${msg.userSend == myId ? 'ml-auto bg-darkerBlue/50': 'ml-0 bg-darkerPink/40'}`} // Thêm điều kiện
           >
             <Image
@@ -73,6 +70,7 @@ function ChatMessage({myId} : {myId: string}) {
             </h3>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );

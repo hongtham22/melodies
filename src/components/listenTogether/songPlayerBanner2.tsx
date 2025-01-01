@@ -24,9 +24,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { formatTime, getMainArtistInfo, getPosterSong } from "@/utils/utils";
-import WaveSurfer from "wavesurfer.js";
 import { decrypt } from "@/app/decode";
 import LoadingPage from "@/components/loadingPage";
+import { useToast } from "@/hooks/use-toast";
 
 function SongPlayedBanner2({
   currentSong,
@@ -45,6 +45,7 @@ function SongPlayedBanner2({
   const { accessToken, loading, setLoading } = useAppContext();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { socket } = useAppContext();
+  const { toast } = useToast();
 
   // doi nhacj
   useEffect(() => {
@@ -55,19 +56,36 @@ function SongPlayedBanner2({
     if (!socket) return;
 
     const handleAudioUpdate = (data: StateSong) => {
-      console.log("khách", data);
-      setIsPlaying(data.isPlaying);
-      setStartTime(data.currentTime);
+      if(permit){
+        console.log("khách", data);
+        setIsPlaying(data.isPlaying);
+        setStartTime(data.currentTime);
+      }
     };
 
     socket.on("previousSongFailed", (data) => {
-      alert(data);
+      toast({
+        title: "Error",
+        description: `Play previous song failed. "${data}"`,
+        variant: "destructive",
+      });
+      // alert(data);
     });
     socket.on("nextSongFailed", (data) => {
-      alert(data);
+      toast({
+        title: "Error",
+        description: `Play next song failed. "${data}"`,
+        variant: "destructive",
+      });
+      // alert(data);
     });
     socket.on("randomSongPlayFailed", (data) => {
-      alert(data);
+      toast({
+        title: "Error",
+        description: `Play random song failed. "${data}"`,
+        variant: "destructive",
+      });
+      // alert(data);
     });
 
     socket.on("repeatSong", () => {
@@ -77,7 +95,6 @@ function SongPlayedBanner2({
       }
     })
 
-    // socket.off("UpdateAudio", handleAudioUpdate);
     socket.on("UpdateAudio", handleAudioUpdate);
 
     return () => {
