@@ -112,7 +112,7 @@ const Sidebar = () => {
       : "text-[0.9rem]";
   };
   return (
-    <div className={`h-screen w-full mt-8 pl-9 pr-7 drop-shadow-lg z-20 ${pb && 'pb-40'} overflow-auto scrollbar-thin scrollbar-track-black scrollbar-thumb-darkBlue`}>
+    <div className={`h-screen w-full mt-8 pl-9 pr-7 drop-shadow-lg ${pb && 'pb-40'} overflow-auto scrollbar-thin scrollbar-track-black scrollbar-thumb-darkBlue`}>
       <div id="menu-section" className="mb-5">
         <p className="text-primaryColorPink/60 text-[0.8rem]">Menu</p>
         <div
@@ -169,7 +169,7 @@ const Sidebar = () => {
           <ListBulletIcon className="w-[24px] h-[24px] mr-3" />
           <p onClick={handleShowPlaylist}>Your playlists</p>
           {showRequireLogin && (
-            <div className="absolute z-20 w-[21rem] transition-opacity duration-300 ease-in-out px-6 py-4 text-sm text-black bg-[#69BFFF] rounded-lg shadow-lg transform -translate-y-1/2 left-48 top-1/2">
+            <div className="absolute z-50 w-[21rem] transition-opacity duration-300 ease-in-out px-6 py-4 text-sm text-black bg-[#69BFFF] rounded-lg shadow-lg transform -translate-y-1/2 left-48 top-1/2">
               <p className="font-bold mb-2">Create playlist</p>
               <p className="font-thin text-[0.9rem]">
                 Sign in to create and share playlists.
