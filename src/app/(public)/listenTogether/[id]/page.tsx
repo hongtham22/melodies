@@ -174,22 +174,22 @@ function Page({ params }: PageProps) {
     });
 
     socket.on("animation", (data) => {
-      setEnableAnimation(data)
-    })
+      setEnableAnimation(data);
+    });
 
     return () => {
-      socket.off("memberJoined")
-      socket.off("memberLeft")
-      socket.off("joinRoomLinkFailed")
-      socket.off("joinRoomLinkSuccess")
-      socket.off("roomClosed")
-      socket.off("leaveRoomSuccess")
-      socket.off("addSongToWaitingListFailed")
-      socket.off("addSongToWaitingListSuccess")
-      socket.off("updateWaitingList")
-      socket.off("updateListSong")
-      socket.off("playSong")
-      socket.off("animation")
+      socket.off("memberJoined");
+      socket.off("memberLeft");
+      socket.off("joinRoomLinkFailed");
+      socket.off("joinRoomLinkSuccess");
+      socket.off("roomClosed");
+      socket.off("leaveRoomSuccess");
+      socket.off("addSongToWaitingListFailed");
+      socket.off("addSongToWaitingListSuccess");
+      socket.off("updateWaitingList");
+      socket.off("updateListSong");
+      socket.off("playSong");
+      socket.off("animation");
 
     };
   }, [router, socket]);
@@ -219,9 +219,19 @@ function Page({ params }: PageProps) {
     socket?.emit("leaveRoom");
   };
 
-  const memoizedProposalList = useMemo(() => currentProposalList, [currentProposalList]);
-  const memoizedListUser = useMemo(() => listUser, [listUser]);
+  // const memoizedProposalList = useMemo(() => currentProposalList, [currentProposalList]);
+  // const memoizedListUser = useMemo(() => listUser, [listUser]);
 
+  const MemoizedProposalList = useMemo(
+    () => (
+      <ProposalList currentProposalList={currentProposalList} permit={permit} />
+    ),
+    [currentProposalList, permit]
+  );
+  const MemoizedListUser = useMemo(
+    () => <ListUser listUser={listUser} permit={permit} />,
+    [listUser, permit]
+  );
   return (
     <div className="w-full my-20 m-6 p-8 flex flex-col gap-4">
       <div className="w-full flex items-center justify-start">
@@ -415,14 +425,21 @@ function Page({ params }: PageProps) {
             </div>
           </div>
         </div>
-        {showUsers ? (
+        {/* {showUsers ? (
           <ListUser listUser={memoizedListUser} permit = {permit}/>
         ) : (
           <ProposalList
             currentProposalList={memoizedProposalList}
             permit={permit}
           />
-        )}
+        )} */}
+          <div className="w-1/4 h-screen flex flex-col gap-6 relative bg-secondColorBg rounded-lg" style={{ display: showUsers ? "none" : "block" }}>
+            {MemoizedProposalList}
+          </div>
+          <div className="w-1/4 h-screen flex flex-col gap-6 relative bg-secondColorBg rounded-lg"
+          style={{ display: showUsers ? "block" : "none" }}>
+            {MemoizedListUser}
+          </div>
       </div>
     </div>
   );
