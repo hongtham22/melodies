@@ -33,6 +33,7 @@ export interface Artist {
     createdAt: string;
     updatedAt: string;
     popSong: Array<DataSong>
+    followed: boolean
 }
 
 //song

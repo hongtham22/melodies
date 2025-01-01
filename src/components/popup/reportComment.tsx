@@ -1,5 +1,7 @@
 import { fetchApiData } from "@/app/api/appService";
 import { useAppContext } from "@/app/AppProvider";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
 interface ReportContentProps {
@@ -9,6 +11,7 @@ interface ReportContentProps {
 
 const ReportContent: React.FC<ReportContentProps> = ({ onClose, cmtId }) => {
     const { accessToken } = useAppContext();
+    const { toast } = useToast()
     const reportContents = ['Toxic', 'Severe Toxic', 'Obscene', 'Threat', 'Insult', 'Identity Hate']
     const [selectedStates, setSelectedStates] = useState<any[]>(Array(reportContents.length).fill(0));
     const [textareaContent, setTextareaContent] = useState('');
@@ -34,8 +37,26 @@ const ReportContent: React.FC<ReportContentProps> = ({ onClose, cmtId }) => {
             commentId: cmtId,
             content: finalReportContents.join(',')
         }
-
-        const response = await fetchApiData('/api/user/actions/report', 'POST', JSON.stringify(payload), accessToken)
+        if (accessToken) {
+            const response = await fetchApiData('/api/user/actions/report', 'POST', JSON.stringify(payload), accessToken)
+            if (response.success) {
+                toast({
+                    variant: "success",
+                    title: "Your report is submitted.",
+                    description: 'You have successfully reported your comment',
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+                onClose()
+            }
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: 'You must be logged in to perform this function',
+                action: <ToastAction altText="Try again">Try again</ToastAction>,
+            });
+            onClose()
+        }
     };
     return (
         <div
@@ -67,7 +88,7 @@ const ReportContent: React.FC<ReportContentProps> = ({ onClose, cmtId }) => {
                         className="w-full h-[100px] outline-none p-2 rounded-md  text-black"
                         name=""
                         id=""
-                        placeholder='Nội dung báo cáo...'
+                        placeholder='Report Content...'
                         value={textareaContent}
                         onChange={(e) => setTextareaContent(e.target.value)}
                     ></textarea>
