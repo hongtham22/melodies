@@ -51,6 +51,7 @@ export interface DataSong {
     artists: Array<Artist>;
     playCount: string;
     image: string;
+    liked: boolean
 }
 
 //user
