@@ -4,7 +4,8 @@ import Image from "next/image";
 import React from "react";
 import userImg from "@/assets/img/placeholderUser.jpg";
 
-function ListAIReportCmt({ data }: { data: Report }) {
+function ListAIReportCmt({ data, page }: { data: Report[], page: number }) {
+  const itemsPerPage = 10;
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Not deleted":
@@ -19,6 +20,13 @@ function ListAIReportCmt({ data }: { data: Report }) {
         return "";
     }
   };
+  if (!data || data.length === 0) {
+    return (
+      <div className="w-full flex justify-center items-start text-textMedium text-primaryColorBlue mt-4">
+        <p>No reports to display</p>
+      </div>
+    );
+  }
   return (
     <div className="w-[100%] flex flex-col justify-center items-center rounded-md border-primaryColorBg mb-2">
     <table className="w-full text-white border-separate border-spacing-y-3 mb-2 ">
@@ -59,7 +67,7 @@ function ListAIReportCmt({ data }: { data: Report }) {
               className="bg-secondColorBg  cursor-pointer hover:bg-gray-700"
             >
               <td className="pl-1 text-h4 text-center rounded-tl-lg rounded-bl-lg">
-                {/* {(page - 1) * itemsPerPage + index + 1} */}
+                {(page - 1) * itemsPerPage + index + 1}
                 {index + 1}
               </td>
               <td className="pr-2">

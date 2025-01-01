@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import LoadingPage from "@/components/loadingPage";
 import ListReportedCmt from "@/components/admin/listReportedCmt";
 import ListAIReportCmt from "@/components/admin/listAIReportCmt";
+import { PaginationWithLinks } from "@/components/paginationWithLinks";
 
 function Page() {
   const { loading, setLoading } = useAppContext();
@@ -15,7 +16,7 @@ function Page() {
   const [listReportsAdmin, setListReportsAdmin] = useState([]);
   const [showAICmt, setShowAICmt] = useState(false);
   const { accessToken } = useAppContext();
-
+  const [totalPage, setTotalPage] = useState(1);
   const handleViewAICmt = () => {
     setShowAICmt((prev) => !prev);
   };
@@ -36,6 +37,8 @@ function Page() {
 
         if (reportRespond.success) {
           setListReportsAdmin(reportRespond.data.reports);
+        setTotalPage(reportRespond.data.totalPage);
+
         }
       } catch (error) {
         console.error("Error fetching reports:", error);
@@ -79,11 +82,11 @@ function Page() {
 
       {/* Render List */}
       {showAICmt ? (
-        <ListAIReportCmt data={aiComments} />
+        <ListAIReportCmt data={aiComments} page={page} />
       ) : (
-        <ListReportedCmt data={reportedComments} />
+        <ListReportedCmt data={reportedComments} page={page}/>
       )}
-      {/* <PaginationWithLinks page={page} totalPage={totalPage} /> */}
+      <PaginationWithLinks page={page} totalPage={totalPage} />
 
     </div>
   );

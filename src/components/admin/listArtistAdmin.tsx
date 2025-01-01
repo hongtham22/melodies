@@ -1,9 +1,6 @@
 "use client";
 import Image from "next/image";
-import songimg from "@/assets/img/songs.png";
 import artistImg from "@/assets/img/placeholderUser.jpg";
-import { CaretSortIcon } from "@radix-ui/react-icons";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import ArtistDetailSheet from "@/components/admin/artistDetailSheet";
@@ -16,6 +13,7 @@ interface Artist {
   totalSong: string;
   totalAlbum: number;
   totalFollow: string;
+  refIndex: number;
 }
 interface ListArtistAdminProps {
   data: Artist[];
@@ -109,7 +107,8 @@ function ListArtistAdmin({
                   />
                 </td>
                 <td className="pl-1 text-h4 text-center">
-                  {(page - 1) * itemsPerPage + index + 1}
+                {artist.refIndex ? artist.refIndex : (page - 1) * itemsPerPage + index + 1}
+                  {/* {(page - 1) * itemsPerPage + index + 1} */}
                 </td>
                 <td className="">
                   <div className="pl-4 flex felx-col gap-2 justify-start items-center">

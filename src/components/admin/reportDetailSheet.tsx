@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Sheet,
@@ -9,7 +9,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
+  
 } from "@/components/ui/sheet";
 import Image from "next/image";
 
@@ -19,17 +19,19 @@ import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/app/AppProvider";
 import userImg from "@/assets/img/placeholderUser.jpg";
 import { Report } from "@/types/interfaces";
+import LoadingPage from "@/components/loadingPage";
 
 const ReportDetailSheet: React.FC<
-  Report & { onClose: () => void; onUpdateReport: (id: string, status: string) => void }
+  Report & { reportId: string; onClose: () => void; onUpdateReport: (id: string, status: string) => void }
 > = ({ reportId, onClose, onUpdateReport }) => {
   const [reportDetail, setReportDetail] = useState<Report | null>(null);
-
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { accessToken } = useAppContext();
 
   useEffect(() => {
     const fetchReportDetail = async () => {
+      setLoading(true); 
       try {
         const response = await fetchApiData(
           `/api/admin/report/${reportId}`,
@@ -44,6 +46,7 @@ const ReportDetailSheet: React.FC<
       } catch (error) {
         console.error("Error fetching artist details:", error);
       } finally {
+        setLoading(false);
       }
     };
 
@@ -114,6 +117,14 @@ const ReportDetailSheet: React.FC<
       });
     }
   };
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       <p className="text-gray-300">Loading...</p>
+  //     </div>
+  //   );
+  // }
+  if (loading) return <LoadingPage />;
 
   return (
     <Sheet open={!!reportId} onOpenChange={onClose}>
@@ -139,7 +150,7 @@ const ReportDetailSheet: React.FC<
                 className="rounded-full w-30 h-30 object-cover border-2 border-blue-500 shadow-lg"
               />
             </div>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+            <div className="grid grid-cols-1 gap-4">
               <Label className="font-semibold text-gray-300 leading-relaxed">
                 Report User:{" "}
                 <span className="font-normal text-gray-400 leading-relaxed">
@@ -214,7 +225,7 @@ const ReportDetailSheet: React.FC<
           </div>
         </div>
         <SheetFooter>
-        {reportDetail?.status === "PENDING" && (
+        {reportDetail?.status === "Pending" && (
 
           <SheetClose asChild>
             <div className="w-full p-2 flex justify-between">
