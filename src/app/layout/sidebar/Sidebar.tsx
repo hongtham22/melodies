@@ -53,7 +53,7 @@ const Sidebar = () => {
         description: "Please press the Leave Room button to perform other actions.",
       });
     } else {
-      if(menuItem === 'home') {
+      if (menuItem === 'home') {
         router.push('/');
         setActiveMenu(menuItem);
       } else {
@@ -67,7 +67,6 @@ const Sidebar = () => {
   const handleShowPlaylist = () => {
     if (accessToken) {
       setShowPlaylistMenu(true);
-      handleMenuClick("your-playlist");
     } else {
       setShowRequireLogin(true);
     }
@@ -135,16 +134,16 @@ const Sidebar = () => {
       <div id="menu-section" className="mb-5">
         <p className="text-primaryColorPink/60 text-[0.8rem]">Menu</p>
         {role === "Admin" && (
-        <div
-          className={`flex my-2 cursor-pointer ${getMenuClass(
-            "home"
-          )} py-2 items-center `}
-          onClick={() => handleMenuClick("admin")}
-        >
-          <ExternalLinkIcon className="w-[24px] h-[24px] mr-3 text-primaryColorBlue" />
-          {/* <Link href="/">Home</Link> */}
-          <p className="text-primaryColorBlueHover font-bold">Admin Manage</p>
-        </div>
+          <div
+            className={`flex my-2 cursor-pointer ${getMenuClass(
+              "home"
+            )} py-2 items-center `}
+            onClick={() => handleMenuClick("admin")}
+          >
+            <ExternalLinkIcon className="w-[24px] h-[24px] mr-3 text-primaryColorBlue" />
+            {/* <Link href="/">Home</Link> */}
+            <p className="text-primaryColorBlueHover font-bold">Admin Manage</p>
+          </div>
         )}
         <div
           className={`flex my-2 cursor-pointer ${getMenuClass(
@@ -292,15 +291,15 @@ const Sidebar = () => {
 
 
       </div>
-        <div
-          className={`flex my-2 cursor-pointer py-2 items-center`}
-          onClick={() => handleLogout()}
-        >
-          <ExitIcon className="w-[24px] h-[24px] mr-3 text-primaryColorPink" />
-          <p className="text-primaryColorPink text-[0.9rem]">Logout</p>
+      <div
+        className={`flex my-2 cursor-pointer py-2 items-center`}
+        onClick={() => handleLogout()}
+      >
+        <ExitIcon className="w-[24px] h-[24px] mr-3 text-primaryColorPink" />
+        <p className="text-primaryColorPink text-[0.9rem]">Logout</p>
 
-          {/* <p className='text-primaryColorPink'>Logout</p> */}
-        </div>
+        {/* <p className='text-primaryColorPink'>Logout</p> */}
+      </div>
     </div>
   );
 };

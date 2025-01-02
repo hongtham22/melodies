@@ -15,9 +15,11 @@ import NotFound from "@/app/not-found";
 import { DataAlbum } from "@/types/interfaces";
 import { formatTime, getMainArtistInfo, getPoster } from "@/utils/utils";
 import { useScrollArea } from "@/components/provider/scrollProvider";
+import { useRouter } from "next/navigation";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { loading, setLoading } = useAppContext();
+  const router = useRouter()
   const { scrollAreaRef } = useScrollArea();
   const { showSidebarRight, addListToWaitingList, setCurrentSong, setWaitingList } = useSongContext()
   const [dataAlbum, setDataAlbum] = useState<DataAlbum>()
@@ -201,7 +203,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                     />
                   </td>
                   <td className="pl-4">
-                    <h3 className="text-h4 mb-1 hover:underline">
+                    <h3
+                      className="text-h4 mb-1 hover:underline"
+                      onClick={() => router.push(`/song/${song.id}`)}
+                    >
                       {song.title}
                     </h3>
                     <p className="text-textSmall hover:underline">
