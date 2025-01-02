@@ -136,7 +136,7 @@ const Sidebar = () => {
         {role === "Admin" && (
           <div
             className={`flex my-2 cursor-pointer ${getMenuClass(
-              "home"
+              "admin"
             )} py-2 items-center `}
             onClick={() => handleMenuClick("admin")}
           >

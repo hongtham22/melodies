@@ -362,6 +362,8 @@ const TrackDetailSheet: React.FC<TrackDetailProps> = ({ trackId, onClose }) => {
               <Input
                 id="title"
                 name="title"
+                maxLength={150}
+
                 value={trackTitle}
                 onChange={(e) => setTrackTitle(e.target.value)}
                 placeholder="Enter track title"

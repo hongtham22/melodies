@@ -185,7 +185,9 @@ const CommentPart: React.FC<CommentPartProps> = ({ data, songId, setTotalCmt }) 
                                         type="text"
                                         className='w-full py-2 bg-transparent border-2 border-white text-[0.9rem] rounded-3xl pl-3 pr-10 focus:outline-none'
                                         placeholder='Thêm bình luận...'
+                                        maxLength={150}
                                         value={contentCmt}
+
                                         onChange={(e) => setContentComment(e.target.value)}
                                     />
                                     <IoMdClose

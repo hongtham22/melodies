@@ -191,7 +191,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
                             type="text"
                             className='w-full py-2 bg-transparent border-2 border-white text-[0.9rem] rounded-3xl pl-3 pr-10 focus:outline-none'
                             placeholder='Write a comment'
+                            maxLength={150}
                             value={contentCmt}
+
                             onChange={(e) => setContentComment(e.target.value)}
                         />
                         <IoMdClose
