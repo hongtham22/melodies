@@ -4,17 +4,7 @@ import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAppContext } from "@/components/provider/songProvider";
-
-interface Artist {
-  id: string;
-  name: string;
-  avatar: string;
-  bio: string | null;
-  createdAt: string;
-  updatedAt: string;
-  followerCount: string;
-}
-
+import { Artist } from "@/types/interfaces";
 interface PeopleListProps {
   maintitle?: string;
   subtitle?: string;
