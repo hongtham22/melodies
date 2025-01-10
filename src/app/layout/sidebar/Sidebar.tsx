@@ -116,6 +116,7 @@ const Sidebar = () => {
           "role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         setAccessToken("");
         setRole("");
+        localStorage.removeItem('avatar')
         router.replace("/");
         window.location.reload();
 
@@ -182,27 +183,6 @@ const Sidebar = () => {
           <GlobeIcon className="w-[24px] h-[24px] mr-3" />
           {/* <Link href="/discover">Discover</Link> */}
           <p>Discover</p>
-        </div>
-        <div
-          className={`flex my-2 cursor-pointer ${getMenuClass(
-            "album"
-          )} py-2 items-center`}
-          onClick={() => handleMenuClick("albums")}
-        >
-          <DiscIcon className="w-[24px] h-[24px] mr-3" />
-          {/* <Link href="/albums">Albums</Link> */}
-
-          <p>Albums</p>
-        </div>
-        <div
-          className={`flex my-2 cursor-pointer ${getMenuClass(
-            "artist"
-          )} py-2 items-center`}
-          onClick={() => handleMenuClick("artists")}
-        >
-          <AvatarIcon className="w-[24px] h-[24px] mr-3" />
-          {/* <Link href="/artists">Artists</Link> */}
-          <p>Artists</p>
         </div>
       </div>
       <div id="playlist-section" className="mb-5">
@@ -305,8 +285,6 @@ const Sidebar = () => {
         >
           <UploadSong />
         </div>
-
-
       </div>
       <div
         className={`flex my-2 cursor-pointer py-2 items-center`}
@@ -314,7 +292,6 @@ const Sidebar = () => {
       >
         <ExitIcon className="w-[24px] h-[24px] mr-3 text-primaryColorPink" />
         <p className="text-primaryColorPink text-[0.9rem]">Logout</p>
-
         {/* <p className='text-primaryColorPink'>Logout</p> */}
       </div>
     </div>
