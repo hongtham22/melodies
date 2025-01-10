@@ -64,6 +64,24 @@ const Sidebar = () => {
     }
   };
 
+  const handleMenuClickUploadSong = (menuItem: string) => {
+    if (isInListenTogether) {
+      setShowPlaylistMenu(false);
+      toast({
+        variant: "destructive",
+        title: "Action Required",
+        description: "Please press the Leave Room button to perform other actions.",
+      });
+    } else {
+      if (menuItem === 'home') {
+        router.push('/');
+        setActiveMenu(menuItem);
+      } else {
+        setActiveMenu(menuItem);
+      }
+    }
+  };
+
   const handleShowPlaylist = () => {
     if (accessToken) {
       setShowPlaylistMenu(true);
@@ -275,7 +293,6 @@ const Sidebar = () => {
           onClick={() => handleMenuClick("profile")}
         >
           <CgProfile className="w-[24px] h-[24px] mr-3" />
-          {/* <Link href="/profile">Profile</Link> */}
           <p>Profile</p>
         </div>
 
@@ -283,7 +300,7 @@ const Sidebar = () => {
           className={`flex my-2 cursor-pointer ${getMenuClass(
             "UploadSong"
           )} py-2 items-center `}
-          onClick={() => handleMenuClick("UploadSong")}
+          onClick={() => handleMenuClickUploadSong("UploadSong")}
           style={{ pointerEvents: isInListenTogether ? 'none' : 'auto' }}
         >
           <UploadSong />
