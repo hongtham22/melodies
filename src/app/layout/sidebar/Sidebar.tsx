@@ -22,14 +22,7 @@ import { BiAperture } from "react-icons/bi";
 import UploadSong from "@/components/uploadSong";
 
 const Sidebar = () => {
-  const { accessToken, socket, setAccessToken, role, setRole, setShowPlaylistMenu } =
-    useAppContext();
-  const [showRequireLogin, setShowRequireLogin] = useState(false);
-  const [
-    showRequireLoginForListenTogether,
-    setShowRequireLoginForListenTogether,
-  ] = useState(false);
-
+  const { accessToken, socket, setAccessToken, role, setRole, setShowPlaylistMenu } = useAppContext();
   const { currentSong } = useSongContext()
   const [pb, setPb] = useState(false)
   useEffect(() => {
@@ -86,7 +79,12 @@ const Sidebar = () => {
     if (accessToken) {
       setShowPlaylistMenu(true);
     } else {
-      setShowRequireLogin(true);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "You must be logged in to perform this function",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
     }
   };
 
@@ -95,7 +93,12 @@ const Sidebar = () => {
       // router.push("/listenTogether");
       handleMenuClick("listenTogether");
     } else {
-      setShowRequireLoginForListenTogether(true);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "You must be logged in to perform this function",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
     }
   };
 
@@ -145,155 +148,100 @@ const Sidebar = () => {
 
   const getMenuClass = (menuItem: string) => {
     return activeMenu === menuItem
-      ? "bg-primaryColorPink rounded-xl px-2 font-semibold"
+      ? "bg-primaryColorPink rounded-xl px-2 font-semibold w-[12rem]"
       : "text-[0.9rem]";
   };
   return (
-    <div className={`h-screen w-full mt-8 pl-9 pr-7 drop-shadow-lg ${pb && 'pb-40'} overflow-auto scrollbar-thin scrollbar-track-black scrollbar-thumb-darkBlue`}>
-      <div id="menu-section" className="mb-5">
-        <p className="text-primaryColorPink/60 text-[0.8rem]">Menu</p>
-        {role === "Admin" && (
+    <div className={`flex flex-col justify-between h-full w-full mt-8 pl-9 pr-7 drop-shadow-lg ${pb && 'pb-20'} overflow-auto scrollbar-thin scrollbar-track-black scrollbar-thumb-darkBlue`}>
+      <div>
+        <div id="menu-section" className="mb-5">
+          <p className="text-primaryColorPink/60 text-[0.8rem]">Menu</p>
+          {role === "Admin" && (
+            <div
+              className={`flex my-2 cursor-pointer ${getMenuClass(
+                "admin"
+              )} py-2 items-center `}
+              onClick={() => handleMenuClick("admin")}
+            >
+              <ExternalLinkIcon className="w-[24px] h-[24px] mr-3 text-primaryColorBlue" />
+              {/* <Link href="/">Home</Link> */}
+              <p className="text-primaryColorBlueHover font-bold">Admin Manage</p>
+            </div>
+          )}
           <div
             className={`flex my-2 cursor-pointer ${getMenuClass(
-              "admin"
+              "home"
             )} py-2 items-center `}
-            onClick={() => handleMenuClick("admin")}
+            onClick={() => handleMenuClick("home")}
           >
-            <ExternalLinkIcon className="w-[24px] h-[24px] mr-3 text-primaryColorBlue" />
+            <HomeIcon className="w-[24px] h-[24px] mr-3" />
             {/* <Link href="/">Home</Link> */}
-            <p className="text-primaryColorBlueHover font-bold">Admin Manage</p>
+            <p>Home</p>
           </div>
-        )}
-        <div
-          className={`flex my-2 cursor-pointer ${getMenuClass(
-            "home"
-          )} py-2 items-center `}
-          onClick={() => handleMenuClick("home")}
-        >
-          <HomeIcon className="w-[24px] h-[24px] mr-3" />
-          {/* <Link href="/">Home</Link> */}
-          <p>Home</p>
+          <div
+            className={`flex my-2 cursor-pointer ${getMenuClass(
+              "discover"
+            )} py-2 items-center`}
+            onClick={() => handleMenuClick("discover")}
+          >
+            <GlobeIcon className="w-[24px] h-[24px] mr-3" />
+            {/* <Link href="/discover">Discover</Link> */}
+            <p>Discover</p>
+          </div>
         </div>
-        <div
-          className={`flex my-2 cursor-pointer ${getMenuClass(
-            "discover"
-          )} py-2 items-center`}
-          onClick={() => handleMenuClick("discover")}
-        >
-          <GlobeIcon className="w-[24px] h-[24px] mr-3" />
-          {/* <Link href="/discover">Discover</Link> */}
-          <p>Discover</p>
+        <div id="playlist-section" className="mb-5">
+          <p className="text-primaryColorPink/60 text- text-[0.8rem]">
+            Playlist and favorite
+          </p>
+          <div
+            className={`relative flex my-2 cursor-pointer ${getMenuClass(
+              "your-playlist"
+            )} py-2 items-center`}
+          >
+            <ListBulletIcon className="w-[24px] h-[24px] mr-3" />
+            <p onClick={handleShowPlaylist}>Your playlists</p>
+          </div>
+          {/* Listen Together */}
+          <div
+            className={`relative flex my-2 cursor-pointer ${getMenuClass(
+              "listenTogether"
+            )} py-2 items-center`}
+          >
+            <BiAperture className="w-[24px] h-[24px] mr-3" />
+            <p onClick={handleListenTogether}>Listen Together</p>
+          </div>
         </div>
-      </div>
-      <div id="playlist-section" className="mb-5">
-        <p className="text-primaryColorPink/60 text- text-[0.8rem]">
-          Playlist and favorite
-        </p>
-        <div
-          className={`relative flex my-2 cursor-pointer ${getMenuClass(
-            "your-playlist"
-          )} py-2 items-center`}
-        >
-          <ListBulletIcon className="w-[24px] h-[24px] mr-3" />
-          <p onClick={handleShowPlaylist}>Your playlists</p>
-          {showRequireLogin && (
-            <div className="absolute z-50 w-[21rem] transition-opacity duration-300 ease-in-out px-6 py-4 text-sm text-black bg-[#69BFFF] rounded-lg shadow-lg transform -translate-y-1/2 left-48 top-1/2">
-              <p className="font-bold mb-2">Create playlist</p>
-              <p className="font-thin text-[0.9rem]">
-                Sign in to create and share playlists.
-              </p>
-              <div className="mt-7 flex space-x-2 justify-end w-full">
-                <button
-                  className="px-2 py-2 rounded-md text-[0.85rem] font-bold  hover:scale-105"
-                  onClick={() => {
-                    setShowRequireLogin(!showRequireLogin);
-                    console.log(showRequireLogin);
-                  }}
-                >
-                  Later
-                </button>
-                <button
-                  className="bg-white px-4 py-2 rounded-full text-[0.85rem] hover:scale-105 font-bold"
-                  onClick={() => router.push("/login")}
-                >
-                  Login
-                </button>
-              </div>
+        <div id="general-section" className="mb-5">
+          <p className="text-primaryColorPink/60 text-[0.8rem]">General</p>
+          <div
+            className={`flex my-2 cursor-pointer ${getMenuClass(
+              "Profile"
+            )} py-2 items-center `}
+            onClick={() => handleMenuClick("profile")}
+          >
+            <CgProfile className="w-[24px] h-[24px] mr-3" />
+            <p>Profile</p>
+          </div>
 
-              <div className="absolute -left-2 top-1/2 transform -translate-y-1/2">
-                <div className="w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-[#69BFFF]"></div>
-              </div>
-            </div>
-          )}
-        </div>
-        {/* Listen Together */}
-        <div
-          className={`relative flex my-2 cursor-pointer ${getMenuClass(
-            "listenTogether"
-          )} py-2 items-center`}
-        >
-          <BiAperture className="w-[24px] h-[24px] mr-3" />
-          <p onClick={handleListenTogether}>Listen Together</p>
-          {showRequireLoginForListenTogether && (
-            <div className="absolute z-20 w-[21rem] transition-opacity duration-300 ease-in-out px-6 py-4 text-sm text-black bg-[#69BFFF] rounded-lg shadow-lg transform -translate-y-1/2 left-48 top-1/2">
-              <p className="font-bold mb-2">Listen Together</p>
-              <p className="font-thin text-[0.9rem]">
-                Sign in to join and enjoy listening together.
-              </p>
-              <div className="mt-7 flex space-x-2 justify-end w-full">
-                <button
-                  className="px-2 py-2 rounded-md text-[0.85rem] font-bold  hover:scale-105"
-                  onClick={() => {
-                    setShowRequireLoginForListenTogether(false);
-                  }}
-                >
-                  Later
-                </button>
-                <button
-                  className="bg-white px-4 py-2 rounded-full text-[0.85rem] hover:scale-105 font-bold"
-                  onClick={() => router.push("/login")}
-                >
-                  Login
-                </button>
-              </div>
-
-              <div className="absolute -left-2 top-1/2 transform -translate-y-1/2">
-                <div className="w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-[#69BFFF]"></div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      <div id="general-section" className="mb-5">
-        <p className="text-primaryColorPink/60 text-[0.8rem]">General</p>
-        <div
-          className={`flex my-2 cursor-pointer ${getMenuClass(
-            "Profile"
-          )} py-2 items-center `}
-          onClick={() => handleMenuClick("profile")}
-        >
-          <CgProfile className="w-[24px] h-[24px] mr-3" />
-          <p>Profile</p>
-        </div>
-
-        <div
-          className={`flex my-2 cursor-pointer ${getMenuClass(
-            "UploadSong"
-          )} py-2 items-center `}
-          onClick={() => handleMenuClickUploadSong("UploadSong")}
-          style={{ pointerEvents: isInListenTogether ? 'none' : 'auto' }}
-        >
-          <UploadSong />
+          <div
+            className={`flex my-2 cursor-pointer ${getMenuClass(
+              "UploadSong"
+            )} py-2 items-center `}
+            onClick={() => handleMenuClickUploadSong("UploadSong")}
+            style={{ pointerEvents: isInListenTogether ? 'none' : 'auto' }}
+          >
+            <UploadSong />
+          </div>
         </div>
       </div>
       <div
-        className={`flex my-2 cursor-pointer py-2 items-center`}
+        className={`flex cursor-pointer mb-10 py-2 items-center ${accessToken ? 'opacity-100' : 'hidden'}`}
         onClick={() => handleLogout()}
       >
         <ExitIcon className="w-[24px] h-[24px] mr-3 text-primaryColorPink" />
         <p className="text-primaryColorPink text-[0.9rem]">Logout</p>
-        {/* <p className='text-primaryColorPink'>Logout</p> */}
       </div>
+
     </div>
   );
 };

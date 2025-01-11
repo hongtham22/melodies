@@ -12,6 +12,7 @@ import { io, Socket } from "socket.io-client";
 import { Notification } from "@/types/interfaces";
 import { fetchNotification } from "@/utils/api";
 import { useRouter } from "next/navigation";
+import { fetchApiData } from "@/app/api/appService";
 interface AppContextType {
   numberNotification: number;
   setNumberNotification: (numberNotification: number) => void;
@@ -74,6 +75,34 @@ export const AppProvider: React.FC<{
       Cookies.remove("role");
     }
   }, [accessToken, role]);
+
+  useEffect(() => {
+    const refreshInterval = setInterval(async () => {
+      if (accessToken) {
+        try {
+          const response = await fetchApiData(
+            "/api/auth/refresh",
+            "POST",
+            JSON.stringify({ token: accessToken }),
+            null,
+            null
+          );
+
+          if (response.success) {
+            const newAccessToken = response.data.accessToken;
+            setAccessToken(newAccessToken);
+          } else {
+            Cookies.remove("accessToken");
+            Cookies.remove("role")
+          }
+        } catch (error) {
+          console.error("Error during token refresh:", error);
+        }
+      }
+    }, 18000000);//5 hours
+
+    return () => clearInterval(refreshInterval);
+  }, [accessToken]);
 
   useEffect(() => {
     if (accessToken) {

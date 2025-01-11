@@ -9,6 +9,7 @@ import PopularArtists from "@/components/popularArtists";
 import SongList from "@/components/listSong";
 import TrendingSongs from "@/components/trendingSongs";
 import LoadingPage from "@/components/loadingPage";
+import { DataSong } from "@/types/interfaces";
 
 export default function Home() {
   const { loading, setLoading, accessToken } = useAppContext();
@@ -28,7 +29,10 @@ export default function Home() {
           fetchApiData("/api/artist/popular", "GET", null, null, { page: 1 }),
         ]);
         if (responses[0].success) setWeekSong(responses[0].data.weeklyTopSongs);
-        if (responses[1].success) setNewReleaseSong(responses[1].data.newReleaseSongs);
+        if (responses[1].success) {
+          const visibleSong = responses[1].data.newReleaseSongs.filter((song: DataSong) => song.privacy === false)
+          setNewReleaseSong(visibleSong);
+        }
         if (responses[2].success) setTrendSong(responses[2].data.trendingSongs);
         if (responses[3].success) setPopularArtist(responses[3].data.popularArtist);
       } catch (error) {

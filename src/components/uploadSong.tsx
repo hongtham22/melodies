@@ -21,6 +21,7 @@ import { useAppContext } from "@/app/AppProvider";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@/types/interfaces";
+import { ToastAction } from "@/components/ui/toast";
 
 const UploadSong = () => {
   const { accessToken, role } = useAppContext();
@@ -58,7 +59,7 @@ const UploadSong = () => {
     }
   }, [accessToken]);
 
-  const handleUploadClick = () => { 
+  const handleUploadClick = () => {
     toast({
       title: "Error",
       description: "Please register a Premium package to use this feature.",
@@ -127,7 +128,16 @@ const UploadSong = () => {
       accessToken
     );
     if (result.success) {
-      console.log(result.data);
+      toast({
+        variant: "success",
+        title: "Upload Song successfully",
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
     }
   };
 

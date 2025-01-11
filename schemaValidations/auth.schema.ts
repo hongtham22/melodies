@@ -35,3 +35,16 @@ export const RegisterBody = z.object({
     .strict()
 
 export type RegisterBodyType = z.TypeOf<typeof RegisterBody>;
+
+export const ForgotPassword = z.object({
+    email: z.string().email(),
+})
+
+export type ForgotPasswordType = z.TypeOf<typeof ForgotPassword>;
+
+export const SetPassword = z.object({
+    password: z.string().min(6),
+    confirmPassword: z.string().min(6),
+})
+
+export type SetPasswordType = z.TypeOf<typeof SetPassword>;

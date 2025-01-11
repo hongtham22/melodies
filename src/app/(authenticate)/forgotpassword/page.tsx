@@ -15,26 +15,35 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  RegisterBody,
-  RegisterBodyType,
+  ForgotPassword,
+  ForgotPasswordType,
 } from "../../../../schemaValidations/auth.schema";
 import { EnvelopeClosedIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
+import { fetchApiData } from "@/app/api/appService";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 function Page() {
-  const router = useRouter();
-  const handleEmailSubmit = () => {
-    router.push("/otp?action=forgotpassword");
-  };
-  const form = useForm<RegisterBodyType>({
-    resolver: zodResolver(RegisterBody),
+  const router = useRouter()
+  const { toast } = useToast()
+  const form = useForm<ForgotPasswordType>({
+    resolver: zodResolver(ForgotPassword),
     defaultValues: {
-      otp: "",
+      email: "",
     },
   });
 
-  function onSubmit(values: RegisterBodyType) {
-    console.log(values);
+  async function onSubmit(values: ForgotPasswordType) {
+    const response = await fetchApiData('/api/auth/request-reset-password', 'POST', JSON.stringify(values))
+    if (response.success) {
+      toast({
+        variant: "success",
+        title: "Reset Password successfully",
+        description: "Please go to gmail to change your password",
+      });
+      router.push('/login')
+    }
   }
 
   return (
@@ -57,7 +66,7 @@ function Page() {
         >
           <FormField
             control={form.control}
-            name="otp"
+            name="email"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
@@ -80,7 +89,6 @@ function Page() {
           <Button
             type="submit"
             className="bg-primaryColorPink w-full p-4  hover:bg-darkPinkHover"
-            onClick={handleEmailSubmit}
           >
             Submit
           </Button>

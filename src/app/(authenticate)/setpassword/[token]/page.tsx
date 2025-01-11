@@ -15,26 +15,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  RegisterBody,
-  RegisterBodyType,
-} from "../../../../schemaValidations/auth.schema";
+  SetPassword,
+  SetPasswordType,
+} from "../../../../../schemaValidations/auth.schema";
 import { LockClosedIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
+import { fetchApiData } from "@/app/api/appService";
+import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
-function Page() {
+function Page({ params }: { params: { token: string } }) {
   const router = useRouter();
   const handleSetPasswordClick = () => {
     router.push("/login");
   };
-  const form = useForm<RegisterBodyType>({
-    resolver: zodResolver(RegisterBody),
+  const form = useForm<SetPasswordType>({
+    resolver: zodResolver(SetPassword),
     defaultValues: {
-      otp: "",
+      password: "",
+      confirmPassword: ""
     },
   });
 
-  function onSubmit(values: RegisterBodyType) {
-    console.log(values);
+  async function onSubmit(values: SetPasswordType) {
+    const response = await fetchApiData(`/api/auth/reset-password/${params.token}`, 'POST', JSON.stringify(values))
+    if (response.success) {
+      toast({
+        variant: "success",
+        title: "Change Password successfully",
+      });
+      router.push('/login')
+    }
   }
   return (
     <div className="flex flex-col justify-center gap-5 p-4">
@@ -55,7 +66,7 @@ function Page() {
         >
           <FormField
             control={form.control}
-            name="otp"
+            name="password"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
@@ -78,7 +89,7 @@ function Page() {
 
           <FormField
             control={form.control}
-            name="otp"
+            name="confirmPassword"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
