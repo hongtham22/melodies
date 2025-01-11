@@ -234,14 +234,17 @@ const Sidebar = () => {
           </div>
         </div>
       </div>
-      <div
-        className={`flex cursor-pointer mb-10 py-2 items-center ${accessToken ? 'opacity-100' : 'hidden'}`}
-        onClick={() => handleLogout()}
-      >
-        <ExitIcon className="w-[24px] h-[24px] mr-3 text-primaryColorPink" />
-        <p className="text-primaryColorPink text-[0.9rem]">Logout</p>
-      </div>
-
+      {
+        accessToken && (
+          <div
+            className={`flex cursor-pointer mb-10 py-2 items-center`}
+            onClick={() => handleLogout()}
+          >
+            <ExitIcon className="w-[24px] h-[24px] mr-3 text-primaryColorPink" />
+            <p className="text-primaryColorPink text-[0.9rem]">Logout</p>
+          </div>
+        )
+      }
     </div>
   );
 };

@@ -53,7 +53,7 @@ function Page() {
       alert("Please accept the terms and privacy policies to sign up.");
       return;
     }
-  
+
     console.log(values);
 
     const result = await fetchApiData(
@@ -66,7 +66,7 @@ function Page() {
       localStorage.setItem('email', values.email);
       localStorage.setItem('username', values.username);
       localStorage.setItem('password', values.password);
-      router.push("/otp?action=signup");
+      router.push("/otp");
     } else {
       toast({
         variant: "destructive",
@@ -75,7 +75,7 @@ function Page() {
         action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
     }
-  }  
+  }
 
   return (
     <div className="flex gap-5 justify-center items-center flex-col">
@@ -102,7 +102,7 @@ function Page() {
                         placeholder="Enter your username"
                         {...field}
                         className="pl-8"
-                      maxLength={150}
+                        maxLength={150}
                       />
                     </div>
                   </FormControl>
