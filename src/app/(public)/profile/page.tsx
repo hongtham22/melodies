@@ -7,6 +7,8 @@ import { FaCrown } from "react-icons/fa6";
 import Image from 'next/image'
 import UserImage from '@/assets/img/placeholderUser.jpg'
 import { User } from '@/types/interfaces'
+import { toast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 const Page = () => {
     const { accessToken } = useAppContext()
@@ -84,6 +86,13 @@ const Page = () => {
         const result = await fetchApiData(`/api/user`, 'PATCH', formData, accessToken)
         if (result.success) {
             console.log(result.data);
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "You must be logged in to perform this function",
+                action: <ToastAction altText="Try again">Try again</ToastAction>,
+            });
         }
     }
 
