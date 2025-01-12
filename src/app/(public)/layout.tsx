@@ -37,7 +37,7 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [search, router, previousPage]);
   return (
-    <div>
+    <div className='flex'>
       <PlaylistProvider>
         <div className="fixed top-0 left-0 w-1/6 flex flex-col h-screen">
           <Link href="/" passHref>
@@ -60,7 +60,7 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({
           </div>
         </div>
         <ScrollContent>
-          <main className="ml-[16.66vw] border-l-2 border-primaryColorPink flex flex-col items-center z-10">
+          <main className="ml-[16.66vw] border-l-2 border-primaryColorPink flex flex-col items-center">
             <Header />
             {
               showLyricPage ? (
@@ -76,7 +76,6 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({
         <SongIntroduce />
         <WaitingList />
         <MusicPlayer />
-        <ScrollButton />
       </PlaylistProvider>
     </div>
   );

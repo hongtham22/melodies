@@ -16,15 +16,15 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { role } = useAppContext();
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
-    setIsClient(true); 
+    setIsClient(true);
   }, []);
 
   if (!isClient) {
-    return null; 
+    return null;
   }
   return (
     <div className="">
-       { 
+      {
         role && role === 'Admin' ? (
           <div>
             <SidebarAdmin />
@@ -41,12 +41,11 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <SongIntroduce />
             <WaitingList />
             <MusicPlayer />
-            <ScrollButton />
           </div>
         ) : (
           <NotFound />
-        ) 
-       }
+        )
+      }
     </div>
   );
 };
